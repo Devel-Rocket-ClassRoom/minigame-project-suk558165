@@ -42,6 +42,10 @@ publish/
 /[Aa]ssets/[Ii]mported/
 /[Aa]ssets/[Ii]mported.meta
 
+# Claude Code
+.claude/
+CLAUDE.md
+
 # Build output
 *.apk
 *.aab
