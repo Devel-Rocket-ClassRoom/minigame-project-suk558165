@@ -30,7 +30,16 @@ public class WolfController : MonoBehaviour
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
     private static readonly int HashBowAttack = Animator.StringToHash("BowAttack");
     private static readonly int HashSwordAttack = Animator.StringToHash("SwordAttack");
+    private static readonly int HashDash = Animator.StringToHash("Dash");
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
+
+    public float dashSpeedMultiplier = 3f;
+    public float dashDuration = 0.3f;
+    public float dashCooldown = 1f;
+
+    private bool isDashing;
+    private float dashTimer;
+    private float dashCooldownTimer;
 
     void Awake()
     {
@@ -71,6 +80,23 @@ public class WolfController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
+        dashCooldownTimer -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.Z) && !isDashing && dashCooldownTimer <= 0f)
+        {
+            isDashing = true;
+            dashTimer = dashDuration;
+            dashCooldownTimer = dashCooldown;
+            animator.SetTrigger(HashDash);
+        }
+
+        if (isDashing)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f)
+                isDashing = false;
+        }
+
         if (Input.GetKeyDown(KeyCode.F))
         {
             animator.SetTrigger(HashBowAttack);
@@ -99,6 +125,8 @@ public class WolfController : MonoBehaviour
     void FixedUpdate()
     {
         float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        if (isDashing)
+            currentSpeed *= dashSpeedMultiplier;
         rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
