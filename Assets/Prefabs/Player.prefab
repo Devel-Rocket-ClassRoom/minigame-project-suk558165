@@ -204,13 +204,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: WolfController
   walkSpeed: 3
-  runSpeed: 6
   jumpForce: 10
+  maxJumpCharges: 2
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 400001}
   groundCheckRadius: 0.2
+  gravityScale: 1.2
+  fallGravityMultiplier: 1.2
+  dashSpeedMultiplier: 3
+  dashDuration: 0.3
+  dashCooldown: 1
+  maxDashCharges: 2
+  previewDeath: 0
 --- !u!1 &100001
 GameObject:
   m_ObjectHideFlags: 0
