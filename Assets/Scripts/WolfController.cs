@@ -5,26 +5,32 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class WolfController : MonoBehaviour
 {
-    public float walkSpeed = 3f;
-    public float runSpeed = 6f;
+    public float walkSpeed = 6f;
     public float jumpForce = 12f;
+    public int maxJumpCharges = 2;
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+
+    public float gravityScale = 1.2f;
+    public float fallGravityMultiplier = 1.2f;
+
+    public float dashSpeedMultiplier = 3f;
+    public float dashDuration = 0.3f;
+    public float dashCooldown = 1f;
+    public int maxDashCharges = 2;
 
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
     private bool isGrounded;
     private float moveInput;
-    private bool isRunning;
+    private int jumpCharges;
 
-    private float lastTapTime;
-    private float lastTapDir;
-    private const float doubleTapWindow = 0.3f;
-
-    private bool suppressJump;
-    private Coroutine attackRoutine;
+    private bool isDashing;
+    private float dashTimer;
+    private float dashCooldownTimer;
+    private int dashCharges;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -33,60 +39,48 @@ public class WolfController : MonoBehaviour
     private static readonly int HashDash = Animator.StringToHash("Dash");
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
 
-    public float dashSpeedMultiplier = 3f;
-    public float dashDuration = 0.3f;
-    public float dashCooldown = 1f;
-
-    private bool isDashing;
-    private float dashTimer;
-    private float dashCooldownTimer;
-
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        rb.gravityScale = gravityScale;
+        dashCharges = maxDashCharges;
+        jumpCharges = maxJumpCharges;
     }
 
     void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
 
-        // 방향키 두 번 탭으로 달리기
-        float dir = 0f;
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-            dir = 1f;
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-            dir = -1f;
+        // 착지 시 점프 충전 복구
+        if (isGrounded)
+            jumpCharges = maxJumpCharges;
 
-        if (dir != 0f)
-        {
-            if (dir == lastTapDir && Time.time - lastTapTime < doubleTapWindow)
-                isRunning = true;
-            lastTapDir = dir;
-            lastTapTime = Time.time;
-        }
-
-        // 방향 전환하거나 멈추면 달리기 해제
-        if (
-            moveInput == 0f
-            || (moveInput > 0f && lastTapDir < 0f)
-            || (moveInput < 0f && lastTapDir > 0f)
-        )
-            isRunning = false;
-
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && jumpCharges > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            jumpCharges--;
         }
 
-        dashCooldownTimer -= Time.deltaTime;
+        if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
 
-        if (Input.GetKeyDown(KeyCode.Z) && !isDashing && dashCooldownTimer <= 0f)
+        // 대쉬 쿨타임
+        if (dashCharges == 0)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+            if (dashCooldownTimer <= 0f)
+                dashCharges = maxDashCharges;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Z) && !isDashing && dashCharges > 0)
         {
             isDashing = true;
             dashTimer = dashDuration;
-            dashCooldownTimer = dashCooldown;
+            dashCharges--;
+            if (dashCharges == 0)
+                dashCooldownTimer = dashCooldown;
             animator.SetTrigger(HashDash);
         }
 
@@ -97,24 +91,18 @@ public class WolfController : MonoBehaviour
                 isDashing = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        // 지상에서만 공격 가능
+        if (isGrounded)
         {
-            animator.SetTrigger(HashBowAttack);
-            if (!isGrounded)
-                StartAirAttack();
+            if (Input.GetKeyDown(KeyCode.F))
+                animator.SetTrigger(HashBowAttack);
+
+            if (Input.GetKeyDown(KeyCode.G))
+                animator.SetTrigger(HashSwordAttack);
         }
 
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            animator.SetTrigger(HashSwordAttack);
-            if (!isGrounded)
-                StartAirAttack();
-        }
-
-        float absInput = Mathf.Abs(moveInput);
-        float speed = absInput > 0f ? (isRunning ? 1f : 0.5f) : 0f;
-        animator.SetFloat(HashSpeed, speed);
-        animator.SetBool(HashIsGrounded, isGrounded || suppressJump);
+        animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
+        animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
         if (moveInput > 0f)
             sr.flipX = false;
@@ -124,36 +112,16 @@ public class WolfController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float currentSpeed = isRunning ? runSpeed : walkSpeed;
-        if (isDashing)
-            currentSpeed *= dashSpeedMultiplier;
+        float currentSpeed = isDashing ? walkSpeed * dashSpeedMultiplier : walkSpeed;
         rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
+
+        if (rb.linearVelocity.y < 0f)
+            rb.linearVelocity +=
+                Vector2.up
+                * Physics2D.gravity.y
+                * (fallGravityMultiplier - 1f)
+                * Time.fixedDeltaTime;
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-    }
-
-    void StartAirAttack()
-    {
-        if (attackRoutine != null)
-            StopCoroutine(attackRoutine);
-        attackRoutine = StartCoroutine(SuppressJumpDuringAttack());
-    }
-
-    System.Collections.IEnumerator SuppressJumpDuringAttack()
-    {
-        suppressJump = true;
-        // 트리거가 적용되어 애니메이터가 공격 상태로 전환될 때까지 대기
-        yield return null;
-        yield return null;
-        // 공격 상태가 끝날 때까지 대기
-        while (true)
-        {
-            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
-            bool inAttack = info.IsName("Attack") || info.IsName("SwordAttack");
-            if (!inAttack || info.normalizedTime >= 1f)
-                break;
-            yield return null;
-        }
-        suppressJump = false;
-        attackRoutine = null;
     }
 }
