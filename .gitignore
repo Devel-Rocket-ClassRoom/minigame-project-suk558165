@@ -15,8 +15,10 @@
 
 # NuGet Packages
 *.nupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
+
+# Unity Packages 폴더는 추적 (manifest.json, packages-lock.json 필요)
+!/[Pp]ackages/
+!/[Pp]ackages/**
 
 # .NET build artifacts
 artifacts/
