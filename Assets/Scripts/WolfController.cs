@@ -5,23 +5,41 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class WolfController : MonoBehaviour
 {
-    public float walkSpeed = 3f;
-    public float runSpeed = 6f;
+    public float walkSpeed = 6f;
     public float jumpForce = 12f;
+    public int maxJumpCharges = 2;
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+
+    public float gravityScale = 1.2f;
+    public float fallGravityMultiplier = 1.2f;
+
+    public float dashSpeedMultiplier = 3f;
+    public float dashDuration = 0.3f;
+    public float dashCooldown = 1f;
+    public int maxDashCharges = 2;
 
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
     private bool isGrounded;
     private float moveInput;
-    private bool isRunning;
+    private int jumpCharges;
+
+    private bool isDashing;
+    private float dashTimer;
+    private float dashCooldownTimer;
+    private int dashCharges;
+
+    [Header("Debug")]
+    public bool previewDeath;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
-    private static readonly int HashAttack = Animator.StringToHash("Attack");
+    private static readonly int HashBowAttack = Animator.StringToHash("BowAttack");
+    private static readonly int HashSwordAttack = Animator.StringToHash("SwordAttack");
+    private static readonly int HashDash = Animator.StringToHash("Dash");
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
 
     void Awake()
@@ -29,36 +47,85 @@ public class WolfController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        rb.gravityScale = gravityScale;
+        dashCharges = maxDashCharges;
+        jumpCharges = maxJumpCharges;
     }
 
     void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
-        isRunning = Input.GetKey(KeyCode.LeftShift);
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        // 착지 시 점프 충전 복구
+        if (isGrounded)
+            jumpCharges = maxJumpCharges;
+
+        if (Input.GetButtonDown("Jump") && jumpCharges > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            jumpCharges--;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
+
+        // 대쉬 쿨타임
+        if (dashCharges == 0)
         {
-            animator.SetTrigger(HashAttack);
+            dashCooldownTimer -= Time.deltaTime;
+            if (dashCooldownTimer <= 0f)
+                dashCharges = maxDashCharges;
         }
 
-        float absInput = Mathf.Abs(moveInput);
-        float speed = absInput > 0f ? (isRunning ? 1f : 0.5f) : 0f;
-        animator.SetFloat(HashSpeed, speed);
-        animator.SetBool(HashIsGrounded, isGrounded);
+        if (Input.GetKeyDown(KeyCode.Z) && !isDashing && dashCharges > 0)
+        {
+            isDashing = true;
+            dashTimer = dashDuration;
+            dashCharges--;
+            if (dashCharges == 0)
+                dashCooldownTimer = dashCooldown;
+            animator.SetTrigger(HashDash);
+        }
 
-        if (moveInput > 0f) sr.flipX = false;
-        else if (moveInput < 0f) sr.flipX = true;
+        if (isDashing)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f)
+                isDashing = false;
+        }
+
+        // 지상에서만 공격 가능
+        if (isGrounded)
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+                animator.SetTrigger(HashBowAttack);
+
+            if (Input.GetKeyDown(KeyCode.G))
+                animator.SetTrigger(HashSwordAttack);
+        }
+
+        animator.SetBool(HashIsDead, previewDeath);
+        animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
+        animator.SetBool(HashIsGrounded, isGrounded || isDashing);
+
+        if (moveInput > 0f)
+            sr.flipX = false;
+        else if (moveInput < 0f)
+            sr.flipX = true;
     }
 
     void FixedUpdate()
     {
-        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        float currentSpeed = isDashing ? walkSpeed * dashSpeedMultiplier : walkSpeed;
         rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
+
+        if (rb.linearVelocity.y < 0f)
+            rb.linearVelocity +=
+                Vector2.up
+                * Physics2D.gravity.y
+                * (fallGravityMultiplier - 1f)
+                * Time.fixedDeltaTime;
+
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 }
