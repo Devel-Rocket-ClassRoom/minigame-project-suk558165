@@ -32,6 +32,9 @@ public class WolfController : MonoBehaviour
     private float dashCooldownTimer;
     private int dashCharges;
 
+    [Header("Debug")]
+    public bool previewDeath;
+
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
     private static readonly int HashBowAttack = Animator.StringToHash("BowAttack");
@@ -101,6 +104,7 @@ public class WolfController : MonoBehaviour
                 animator.SetTrigger(HashSwordAttack);
         }
 
+        animator.SetBool(HashIsDead, previewDeath);
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
