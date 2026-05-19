@@ -20,6 +20,10 @@ public class WolfController : MonoBehaviour
     public float dashCooldown = 1f;
     public int maxDashCharges = 2;
 
+    [Header("Attack")]
+    public PlayerWeapon weapon;
+    public float attackCooldown = 0.5f;
+
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
@@ -27,10 +31,13 @@ public class WolfController : MonoBehaviour
     private float moveInput;
     private int jumpCharges;
 
+    private bool wasGrounded;
     private bool isDashing;
     private float dashTimer;
     private float dashCooldownTimer;
     private int dashCharges;
+    private float attackTimer;
+    private bool isAttacking;
 
     [Header("Debug")]
     public bool previewDeath;
@@ -55,10 +62,17 @@ public class WolfController : MonoBehaviour
     void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
+        if (moveInput == 0f)
+        {
+            if (Input.GetKey(KeyCode.A))
+                moveInput = -1f;
+            else if (Input.GetKey(KeyCode.D))
+                moveInput = 1f;
+        }
 
-        // 착지 시 점프 충전 복구
-        if (isGrounded)
+        if (isGrounded && !wasGrounded)
             jumpCharges = maxJumpCharges;
+        wasGrounded = isGrounded;
 
         if (Input.GetButtonDown("Jump") && jumpCharges > 0)
         {
@@ -94,24 +108,30 @@ public class WolfController : MonoBehaviour
                 isDashing = false;
         }
 
-        // 지상에서만 공격 가능
-        if (isGrounded)
-        {
-            if (Input.GetKeyDown(KeyCode.F))
-                animator.SetTrigger(HashBowAttack);
+        attackTimer -= Time.deltaTime;
 
-            if (Input.GetKeyDown(KeyCode.G))
-                animator.SetTrigger(HashSwordAttack);
+        isAttacking = false;
+        if (Input.GetMouseButtonDown(0) && attackTimer <= 0f && weapon != null)
+        {
+            attackTimer = attackCooldown;
+            isAttacking = true;
+            Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            sr.flipX = mouseWorld.x < transform.position.x;
+            animator.SetTrigger(HashSwordAttack);
+            weapon.Attack(mouseWorld);
         }
 
         animator.SetBool(HashIsDead, previewDeath);
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
-        if (moveInput > 0f)
-            sr.flipX = false;
-        else if (moveInput < 0f)
-            sr.flipX = true;
+        if (!isAttacking)
+        {
+            if (moveInput > 0f)
+                sr.flipX = false;
+            else if (moveInput < 0f)
+                sr.flipX = true;
+        }
     }
 
     void FixedUpdate()
