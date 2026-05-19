@@ -108,7 +108,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 2
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_GravityScale: 1
@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 894066a434fe52a4fb66bfcacc848635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: WolfController
-  walkSpeed: 3
+  walkSpeed: 6
   jumpForce: 10
   maxJumpCharges: 2
   groundLayer:
@@ -213,7 +213,7 @@ MonoBehaviour:
   groundCheckRadius: 0.2
   gravityScale: 1.2
   fallGravityMultiplier: 1.2
-  dashSpeedMultiplier: 3
+  dashSpeedMultiplier: 5
   dashDuration: 0.3
   dashCooldown: 1
   maxDashCharges: 2
