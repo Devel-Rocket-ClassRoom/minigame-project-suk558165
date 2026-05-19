@@ -117,7 +117,6 @@ public class WolfController : MonoBehaviour
             isAttacking = true;
             Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             sr.flipX = mouseWorld.x < transform.position.x;
-            animator.SetTrigger(HashSwordAttack);
             weapon.Attack(mouseWorld);
         }
 

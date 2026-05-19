@@ -8,6 +8,7 @@ public class PlayerWeapon : MonoBehaviour
     [Header("Swing")]
     public float swingAngle = 120f;
     public float swingDuration = 0.25f;
+    public float restAngle = -90f;
 
     [Header("Damage")]
     public float damage = 20f;
@@ -16,6 +17,7 @@ public class PlayerWeapon : MonoBehaviour
     private bool isSwinging;
     private Collider2D weaponCollider;
     private SpriteRenderer weaponSr;
+    private SpriteRenderer parentSr;
     private readonly HashSet<int> hitIds = new HashSet<int>();
 
     void Awake()
@@ -26,8 +28,10 @@ public class PlayerWeapon : MonoBehaviour
 
         weaponCollider = GetComponentInChildren<Collider2D>();
         weaponSr = GetComponentInChildren<SpriteRenderer>();
+        parentSr = GetComponentInParent<SpriteRenderer>();
         if (weaponCollider != null)
             weaponCollider.enabled = false;
+        transform.localRotation = Quaternion.Euler(0f, 0f, restAngle);
     }
 
     public bool Swinging => isSwinging;
@@ -70,6 +74,19 @@ public class PlayerWeapon : MonoBehaviour
         if (weaponCollider != null)
             weaponCollider.enabled = false;
         isSwinging = false;
+        transform.localRotation = Quaternion.Euler(0f, 0f, restAngle);
+    }
+
+    void Update()
+    {
+        if (isSwinging || parentSr == null)
+            return;
+        bool flip = parentSr.flipX;
+        Vector3 pos = transform.localPosition;
+        pos.x = Mathf.Abs(pos.x) * (flip ? -1f : 1f);
+        transform.localPosition = pos;
+        if (weaponSr != null)
+            weaponSr.flipY = flip;
     }
 
     void OnTriggerEnter2D(Collider2D other)
