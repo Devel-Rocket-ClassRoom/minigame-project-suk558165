@@ -27,6 +27,7 @@ public class WolfController : MonoBehaviour
     private float moveInput;
     private int jumpCharges;
 
+    private bool wasGrounded;
     private bool isDashing;
     private float dashTimer;
     private float dashCooldownTimer;
@@ -55,10 +56,18 @@ public class WolfController : MonoBehaviour
     void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
+        if (moveInput == 0f)
+        {
+            if (Input.GetKey(KeyCode.A))
+                moveInput = -1f;
+            else if (Input.GetKey(KeyCode.D))
+                moveInput = 1f;
+        }
 
-        // 착지 시 점프 충전 복구
-        if (isGrounded)
+        // 착지 순간에만 점프 충전 복구
+        if (isGrounded && !wasGrounded)
             jumpCharges = maxJumpCharges;
+        wasGrounded = isGrounded;
 
         if (Input.GetButtonDown("Jump") && jumpCharges > 0)
         {
@@ -94,7 +103,6 @@ public class WolfController : MonoBehaviour
                 isDashing = false;
         }
 
-        // 지상에서만 공격 가능
         if (isGrounded)
         {
             if (Input.GetKeyDown(KeyCode.F))

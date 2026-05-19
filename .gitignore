@@ -43,6 +43,13 @@ publish/
 # Imported assets
 /[Aa]ssets/[Ii]mported/
 /[Aa]ssets/[Ii]mported.meta
+/[Ii]mported/
+
+# Generated assets
+/[Gg]enerated[Aa]ssets/
+
+# Misc
+/does/
 
 # Claude Code
 .claude/
