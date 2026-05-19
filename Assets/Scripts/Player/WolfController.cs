@@ -2,7 +2,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class WolfController : MonoBehaviour
 {
     public float walkSpeed = 6f;
@@ -22,10 +21,10 @@ public class WolfController : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator animator;
-    private SpriteRenderer sr;
     private bool isGrounded;
     private float moveInput;
     private int jumpCharges;
+    private bool facingRight = true;
 
     private bool wasGrounded;
     private bool isDashing;
@@ -47,7 +46,6 @@ public class WolfController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        sr = GetComponent<SpriteRenderer>();
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
@@ -116,10 +114,10 @@ public class WolfController : MonoBehaviour
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
-        if (moveInput > 0f)
-            sr.flipX = false;
-        else if (moveInput < 0f)
-            sr.flipX = true;
+        if (moveInput > 0f && !facingRight)
+            Flip();
+        else if (moveInput < 0f && facingRight)
+            Flip();
     }
 
     void FixedUpdate()
@@ -136,4 +134,16 @@ public class WolfController : MonoBehaviour
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1f;
+        transform.localScale = scale;
+    }
+
+    public bool IsFacingRight => facingRight;
+    public bool IsGrounded => isGrounded;
+    public bool IsDashing => isDashing;
 }
