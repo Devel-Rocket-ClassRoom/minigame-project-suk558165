@@ -2,7 +2,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class WolfController : MonoBehaviour
 {
     public float walkSpeed = 6f;
@@ -20,24 +19,18 @@ public class WolfController : MonoBehaviour
     public float dashCooldown = 1f;
     public int maxDashCharges = 2;
 
-    [Header("Attack")]
-    public PlayerWeapon weapon;
-    public float attackCooldown = 0.5f;
-
     private Rigidbody2D rb;
     private Animator animator;
-    private SpriteRenderer sr;
     private bool isGrounded;
     private float moveInput;
     private int jumpCharges;
+    private bool facingRight = true;
 
     private bool wasGrounded;
     private bool isDashing;
     private float dashTimer;
     private float dashCooldownTimer;
     private int dashCharges;
-    private float attackTimer;
-    private bool isAttacking;
 
     [Header("Debug")]
     public bool previewDeath;
@@ -53,7 +46,6 @@ public class WolfController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        sr = GetComponent<SpriteRenderer>();
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
@@ -70,6 +62,7 @@ public class WolfController : MonoBehaviour
                 moveInput = 1f;
         }
 
+        // 착지 순간에만 점프 충전 복구
         if (isGrounded && !wasGrounded)
             jumpCharges = maxJumpCharges;
         wasGrounded = isGrounded;
@@ -108,29 +101,23 @@ public class WolfController : MonoBehaviour
                 isDashing = false;
         }
 
-        attackTimer -= Time.deltaTime;
-
-        isAttacking = false;
-        if (Input.GetMouseButtonDown(0) && attackTimer <= 0f && weapon != null)
+        if (isGrounded)
         {
-            attackTimer = attackCooldown;
-            isAttacking = true;
-            Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            sr.flipX = mouseWorld.x < transform.position.x;
-            weapon.Attack(mouseWorld);
+            if (Input.GetKeyDown(KeyCode.F))
+                animator.SetTrigger(HashBowAttack);
+
+            if (Input.GetKeyDown(KeyCode.G))
+                animator.SetTrigger(HashSwordAttack);
         }
 
         animator.SetBool(HashIsDead, previewDeath);
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
-        if (!isAttacking)
-        {
-            if (moveInput > 0f)
-                sr.flipX = false;
-            else if (moveInput < 0f)
-                sr.flipX = true;
-        }
+        if (moveInput > 0f && !facingRight)
+            Flip();
+        else if (moveInput < 0f && facingRight)
+            Flip();
     }
 
     void FixedUpdate()
@@ -147,4 +134,16 @@ public class WolfController : MonoBehaviour
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1f;
+        transform.localScale = scale;
+    }
+
+    public bool IsFacingRight => facingRight;
+    public bool IsGrounded => isGrounded;
+    public bool IsDashing => isDashing;
 }
