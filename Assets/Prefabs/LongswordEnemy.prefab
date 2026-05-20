@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 649462761567960538}
   - component: {fileID: 6960627286309403541}
   - component: {fileID: 6709233648315465440}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: LongswordEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

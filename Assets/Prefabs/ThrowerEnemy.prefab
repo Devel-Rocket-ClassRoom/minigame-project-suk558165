@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 466404281026085894}
   - component: {fileID: 4782860181572812992}
   - component: {fileID: 6608094127087746524}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ThrowerEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7534495030535882700}
   - component: {fileID: 913124059834750503}
   - component: {fileID: 140225379474927144}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BowEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

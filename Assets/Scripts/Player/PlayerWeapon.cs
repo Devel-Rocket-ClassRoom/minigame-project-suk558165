@@ -10,6 +10,7 @@ public class PlayerWeapon : MonoBehaviour
     public float swingDuration = 0.5f;
     public float restAngle = -90f;
     public float attackRadius = 1.5f;
+    public float hitRadius = 0.7f;
 
     [Header("Damage")]
     public float damage = 20f;
@@ -18,6 +19,8 @@ public class PlayerWeapon : MonoBehaviour
     private bool isSwinging;
     private SpriteRenderer weaponSr;
     private SpriteRenderer parentSr;
+    private Transform playerRoot;
+    private Transform visuals;
     private readonly HashSet<int> hitIds = new HashSet<int>();
 
     void Awake()
@@ -30,10 +33,15 @@ public class PlayerWeapon : MonoBehaviour
         parentSr =
             transform.parent != null ? transform.parent.GetComponent<SpriteRenderer>() : null;
 
-        // 기존 트리거 콜라이더는 비활성화 (OverlapCircle로 대체)
+        playerRoot = transform.root;
+        visuals = playerRoot.Find("Visuals");
+
         var col = GetComponentInChildren<Collider2D>();
         if (col != null)
             col.enabled = false;
+
+        if (enemyLayer == 0)
+            enemyLayer = LayerMask.GetMask("Enemy");
 
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.Euler(0f, 0f, restAngle);
@@ -62,7 +70,7 @@ public class PlayerWeapon : MonoBehaviour
         isSwinging = true;
         hitIds.Clear();
 
-        Vector2 dir = (Vector2)(mouseWorld - transform.position);
+        Vector2 dir = (Vector2)(mouseWorld - playerRoot.position);
         float baseAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
         bool facingLeft = Mathf.Abs(baseAngle) > 90f;
@@ -81,8 +89,7 @@ public class PlayerWeapon : MonoBehaviour
             float currentAngle = Mathf.Lerp(from, to, ratio);
             transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
 
-            // 매 프레임 무기 끝 위치에서 적 판정
-            CheckHitAtAngle(currentAngle);
+            CheckHit(currentAngle);
 
             yield return null;
         }
@@ -91,12 +98,14 @@ public class PlayerWeapon : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0f, 0f, restAngle);
     }
 
-    void CheckHitAtAngle(float angleDeg)
+    void CheckHit(float angleDeg)
     {
-        // transform.right = 무기의 월드 방향 (부모 flip 포함) → 좌우 모두 정확
-        Vector2 tipPos = (Vector2)transform.position + (Vector2)transform.right * attackRadius;
+        bool facingLeft = visuals != null && visuals.localScale.x < 0f;
+        float facing = facingLeft ? -1f : 1f;
+        Vector2 origin = (Vector2)playerRoot.position;
+        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.2f);
 
-        var hits = Physics2D.OverlapCircleAll(tipPos, 0.4f, enemyLayer);
+        var hits = Physics2D.OverlapCircleAll(tipPos, hitRadius, enemyLayer);
         foreach (var hit in hits)
         {
             int id = hit.GetInstanceID();
@@ -111,7 +120,7 @@ public class PlayerWeapon : MonoBehaviour
 
             hitIds.Add(id);
             damageable.TakeDamage(damage);
-            Debug.Log($"[PlayerWeapon] {hit.name} 피격 — 데미지 {damage}");
+            Debug.Log("[PlayerWeapon] " + hit.name + " hit — damage " + damage);
         }
     }
 

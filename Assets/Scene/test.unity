@@ -1700,8 +1700,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
     - target: {fileID: 6100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: m_Size.y
+      value: 2.2058895
+      objectReference: {fileID: 0}
+    - target: {fileID: 6100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.0065721273
+      objectReference: {fileID: 0}
+    - target: {fileID: 6100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1274484273918966404, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: barSize.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: barSize.y
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7740948866993071214, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
       propertyPath: 'weapons.Array.data[0]'
@@ -1895,7 +1915,7 @@ Transform:
   m_GameObject: {fileID: 600806625}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: -10}
+  m_LocalPosition: {x: 0, y: 2.85, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

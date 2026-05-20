@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8595897406208908840}
   - component: {fileID: 8389443576958485868}
   - component: {fileID: 5348482898437230186}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CrossbowEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

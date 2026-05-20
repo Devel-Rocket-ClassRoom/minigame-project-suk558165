@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5260761518289867689}
   - component: {fileID: 1061679332373563726}
   - component: {fileID: 653864372982173630}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StarEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

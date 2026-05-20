@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4433409651144941361}
   - component: {fileID: 1363251731637940429}
   - component: {fileID: 5263856304553941435}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: WizardEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}

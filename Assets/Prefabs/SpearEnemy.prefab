@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2409149294056701467}
   - component: {fileID: 1949110717735003683}
   - component: {fileID: 3427827913436165532}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SpearEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
