@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7320bb17f2992243ba93838d76530d0, type: 3}
+  m_Name: Bow
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Bow
+  sprite: {fileID: 0}
+  damage: 15
+  attackCooldown: 0.8
+  swingAngle: 0
+  swingDuration: 0
+  attackClip: {fileID: 7400000, guid: 7063265198bda2444b9b7d5068965a88, type: 2}
