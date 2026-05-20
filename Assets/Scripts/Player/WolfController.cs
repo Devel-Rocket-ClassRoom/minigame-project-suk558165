@@ -19,26 +19,45 @@ public class WolfController : MonoBehaviour
     public float dashCooldown = 1f;
     public int maxDashCharges = 2;
 
+    [Header("Attack")]
+    public PlayerWeapon weapon;
+    public WeaponInventory weaponInventory;
+
+    [Header("Ranged Attack")]
+    public GameObject projectilePrefab;
+    public Transform firePoint;
+    public float projectileSpeed = 12f;
+    public float rangedDamage = 15f;
+    public float rangedCooldown = 0.8f;
+
+    [Header("Debug")]
+    public bool previewDeath;
+
+    private PlayerHealth health;
+
     private Rigidbody2D rb;
     private Animator animator;
+    private AnimatorOverrideController overrideController;
+    private SpriteRenderer sr;
+    private Transform visuals;
+
     private bool isGrounded;
     private float moveInput;
     private int jumpCharges;
-    private bool facingRight = true;
-
     private bool wasGrounded;
     private bool isDashing;
     private float dashTimer;
     private float dashCooldownTimer;
     private int dashCharges;
-
-    [Header("Debug")]
-    public bool previewDeath;
+    private float attackTimer;
+    private float attackCooldown = 0.5f;
+    private bool isAttacking;
+    private float rangedAttackTimer;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
-    private static readonly int HashBowAttack = Animator.StringToHash("BowAttack");
     private static readonly int HashSwordAttack = Animator.StringToHash("SwordAttack");
+    private static readonly int HashBowAttack = Animator.StringToHash("BowAttack");
     private static readonly int HashDash = Animator.StringToHash("Dash");
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
 
@@ -46,9 +65,43 @@ public class WolfController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
+        visuals = transform.Find("Visuals");
+
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
+
+        health = GetComponent<PlayerHealth>();
+
+        overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+        animator.runtimeAnimatorController = overrideController;
+
+        if (weaponInventory != null)
+            weaponInventory.OnWeaponChanged += ApplyWeapon;
+    }
+
+    void Start()
+    {
+        if (weaponInventory != null && weaponInventory.Current != null)
+            ApplyWeapon(weaponInventory.Current);
+    }
+
+    void OnDestroy()
+    {
+        if (weaponInventory != null)
+            weaponInventory.OnWeaponChanged -= ApplyWeapon;
+    }
+
+    void ApplyWeapon(WeaponData data)
+    {
+        if (data.attackClip != null)
+            overrideController["Wolf_SwordAttack"] = data.attackClip;
+
+        if (weapon != null)
+            weapon.ApplyWeaponData(data);
+
+        attackCooldown = data.attackCooldown;
     }
 
     void Update()
@@ -62,7 +115,6 @@ public class WolfController : MonoBehaviour
                 moveInput = 1f;
         }
 
-        // 착지 순간에만 점프 충전 복구
         if (isGrounded && !wasGrounded)
             jumpCharges = maxJumpCharges;
         wasGrounded = isGrounded;
@@ -76,7 +128,6 @@ public class WolfController : MonoBehaviour
         if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
 
-        // 대쉬 쿨타임
         if (dashCharges == 0)
         {
             dashCooldownTimer -= Time.deltaTime;
@@ -101,29 +152,72 @@ public class WolfController : MonoBehaviour
                 isDashing = false;
         }
 
-        if (isGrounded)
-        {
-            if (Input.GetKeyDown(KeyCode.F))
-                animator.SetTrigger(HashBowAttack);
+        attackTimer -= Time.deltaTime;
+        rangedAttackTimer -= Time.deltaTime;
+        isAttacking = false;
 
-            if (Input.GetKeyDown(KeyCode.G))
-                animator.SetTrigger(HashSwordAttack);
+        if (Input.GetKeyDown(KeyCode.X) && weapon != null)
+        {
+            isAttacking = true;
+            bool facingLeftNow =
+                visuals != null ? visuals.localScale.x < 0f : (sr != null && sr.flipX);
+            Vector3 fakeTarget =
+                transform.position + (facingLeftNow ? Vector3.left : Vector3.right) * 5f;
+            weapon.Attack(fakeTarget);
+            animator.Play("SwordAttack", 0, 0f);
         }
 
-        animator.SetBool(HashIsDead, previewDeath);
+        if (Input.GetKeyDown(KeyCode.C) && rangedAttackTimer <= 0f && projectilePrefab != null)
+        {
+            rangedAttackTimer = rangedCooldown;
+            isAttacking = true;
+            animator.Play("BowAttack", 0, 0f);
+            ShootForward();
+        }
+
+        bool dead = (health != null && health.IsDead) || previewDeath;
+        animator.SetBool(HashIsDead, dead);
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
-        if (moveInput > 0f && !facingRight)
-            Flip();
-        else if (moveInput < 0f && facingRight)
-            Flip();
+        if (!isAttacking)
+        {
+            if (moveInput > 0f)
+                Flip(false);
+            else if (moveInput < 0f)
+                Flip(true);
+        }
+    }
+
+    void ShootForward()
+    {
+        bool facingLeft = visuals != null ? visuals.localScale.x < 0f : (sr != null && sr.flipX);
+        Vector2 dir = facingLeft ? Vector2.left : Vector2.right;
+        Vector3 origin = transform.position + (Vector3)(dir * 0.7f);
+        var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
+        var projComp = proj.GetComponent<Projectile>();
+        if (projComp != null)
+            projComp.Init(dir, projectileSpeed, rangedDamage, gameObject);
+    }
+
+    private void Flip(bool flipX)
+    {
+        if (visuals != null)
+        {
+            Vector3 scale = visuals.localScale;
+            scale.x = flipX ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
+            visuals.localScale = scale;
+        }
+        else if (sr != null)
+        {
+            sr.flipX = flipX;
+        }
     }
 
     void FixedUpdate()
     {
-        float currentSpeed = isDashing ? walkSpeed * dashSpeedMultiplier : walkSpeed;
-        rb.linearVelocity = new Vector2(moveInput * currentSpeed, rb.linearVelocity.y);
+        float speed = isDashing ? walkSpeed * dashSpeedMultiplier : walkSpeed;
+        rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
 
         if (rb.linearVelocity.y < 0f)
             rb.linearVelocity +=
@@ -134,16 +228,4 @@ public class WolfController : MonoBehaviour
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
-
-    void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1f;
-        transform.localScale = scale;
-    }
-
-    public bool IsFacingRight => facingRight;
-    public bool IsGrounded => isGrounded;
-    public bool IsDashing => isDashing;
 }
