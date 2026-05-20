@@ -1879,16 +1879,62 @@ PrefabInstance:
       propertyPath: m_Offset.y
       value: -0.05
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6719906860774937824, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 8824331899402044827, guid: 2c4dde150fc2e664eb4018760363f6d7, type: 3}
+    m_RemovedComponents:
+    - {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+    - {fileID: 6507411717424860390, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 461253826}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 461253825}
   m_SourcePrefab: {fileID: 100100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
 --- !u!4 &461253823 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
   m_PrefabInstance: {fileID: 461253822}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &461253824 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+  m_PrefabInstance: {fileID: 461253822}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &461253825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461253824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 489e51aa04d0f3941a579a7fb799002f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHp: 100
+  iFrameDuration: 1
+  knockbackForce: 6
+  hitFlashInterval: 0.08
+  respawnDelay: 2.5
+--- !u!114 &461253826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461253824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
 --- !u!1 &588525199
 GameObject:
   m_ObjectHideFlags: 0
@@ -2194,7 +2240,7 @@ Transform:
   m_GameObject: {fileID: 1596013819}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8, y: -2.5, z: 0}
+  m_LocalPosition: {x: 2.63, y: 3.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2411,7 +2457,7 @@ Transform:
   m_GameObject: {fileID: 1870530009}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10, y: -2.5, z: 0}
+  m_LocalPosition: {x: 8.27, y: 6.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
