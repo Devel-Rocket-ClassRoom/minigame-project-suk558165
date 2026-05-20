@@ -7,6 +7,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private float hp;
 
     public bool IsDead => hp <= 0f;
+    public float CurrentHp => hp;
 
     void Awake()
     {
