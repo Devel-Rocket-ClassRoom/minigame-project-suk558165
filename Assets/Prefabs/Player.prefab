@@ -214,7 +214,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 400001}
-  groundCheckRadius: 0.2
+  groundCheckRadius: 0.35
   gravityScale: 1.2
   fallGravityMultiplier: 1.2
   dashSpeedMultiplier: 5
@@ -257,6 +257,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
+  playerHealth: {fileID: 0}
+  barSize: {x: 200, y: 20}
+  barPosition: {x: 20, y: -20}
+  fillColor: {r: 1, g: 0, b: 0, a: 1}
+  bgColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
 --- !u!114 &6507411717424860390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,10 +275,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHp: 120
-  iFrameDuration: 1
-  knockbackForce: 6
-  hitFlashInterval: 0.08
-  respawnDelay: 2.5
 --- !u!1 &100001
 GameObject:
   m_ObjectHideFlags: 0

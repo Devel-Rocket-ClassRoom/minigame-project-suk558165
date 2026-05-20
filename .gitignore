@@ -40,23 +40,8 @@ publish/
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
-# Imported assets (외부 에셋 제외, PlayerSprites는 직접 제작 스프라이트라 추적)
-/[Aa]ssets/[Ii]mported/Cainos/
-/[Aa]ssets/[Ii]mported/Cainos.meta
-/[Aa]ssets/[Ii]mported/Enemy/
-/[Aa]ssets/[Ii]mported/Enemy.meta
-/[Aa]ssets/[Ii]mported/EnemySprites/
-/[Aa]ssets/[Ii]mported/EnemySprites.meta
-/[Aa]ssets/[Ii]mported/Font/
-/[Aa]ssets/[Ii]mported/Font.meta
-/[Aa]ssets/[Ii]mported/Ground/
-/[Aa]ssets/[Ii]mported/Ground.meta
-/[Aa]ssets/[Ii]mported/Ground2/
-/[Aa]ssets/[Ii]mported/Ground2.meta
-/[Aa]ssets/[Ii]mported/Ground3/
-/[Aa]ssets/[Ii]mported/Ground3.meta
-/[Aa]ssets/[Ii]mported/Object/
-/[Aa]ssets/[Ii]mported/Object.meta
+# Imported assets (별도 저장소 관리)
+/[Aa]ssets/[Ii]mported/
 /[Aa]ssets/[Ii]mported.meta
 /[Ii]mported/
 

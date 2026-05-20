@@ -212,3 +212,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   patrolDistance: 4
+  isRanged: 0
+  projectilePrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  projectileSpeed: 8
+  safeDistance: 3
+  meleeHitbox: {fileID: 0}
+  meleeHitDuration: 0.15
