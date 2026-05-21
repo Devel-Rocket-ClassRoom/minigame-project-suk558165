@@ -5,16 +5,16 @@ public class PlayerHealthDisplay : MonoBehaviour
 {
     public PlayerHealth playerHealth;
 
-    [Header("Sprites (Hp.png = frame, gauge.png = fill)")]
-    public Sprite frameSprite; // Hp.png  — skull border frame
-    public Sprite gaugeSprite; // gauge.png — red fill bar
-    public Font pixelFont; // DungGeunMo.ttf
+    [Header("Sprites")]
+    public Sprite frameSprite;
+    public Sprite gaugeSprite;
+    public Font pixelFont;
 
     [Header("Bar Layout")]
     public Vector2 barSize = new Vector2(480f, 60f);
     public Vector2 barPosition = new Vector2(20f, -20f);
 
-    [Header("Fill Area Padding (px at barSize scale)")]
+    [Header("Fill Area Padding (px)")]
     public float padLeft = 23f;
     public float padBottom = 5f;
     public float padRight = 23f;
@@ -23,120 +23,135 @@ public class PlayerHealthDisplay : MonoBehaviour
     private RectTransform fillRect;
     private Text hpText;
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
     void Awake()
     {
         if (playerHealth == null)
-            playerHealth = GetComponent<PlayerHealth>();
-        if (playerHealth == null)
-            playerHealth = FindFirstObjectByType<PlayerHealth>();
+            playerHealth = GetComponent<PlayerHealth>() ?? FindFirstObjectByType<PlayerHealth>();
     }
 
     void Start() => BuildUI();
 
-    // ── Build UI ──────────────────────────────────────────────────────────────
     void BuildUI()
     {
-        // Canvas
-        var canvasGO = new GameObject("HpCanvas");
-        var canvas = canvasGO.AddComponent<Canvas>();
+        var canvas = CreateCanvas();
+        var frame = CreateFrame(canvas.transform);
+        var mask = CreateMask(frame);
+        fillRect = CreateFill(mask).GetComponent<RectTransform>();
+        hpText = CreateHpText(frame);
+    }
+
+    Canvas CreateCanvas()
+    {
+        var go = new GameObject("HpCanvas");
+        var canvas = go.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
-        var scaler = canvasGO.AddComponent<CanvasScaler>();
+
+        var scaler = go.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.matchWidthOrHeight = 0.5f;
-        canvasGO.AddComponent<GraphicRaycaster>();
 
-        // ── Frame (Hp.png, 9-sliced) ──────────────────────────────────────────
-        var frameGO = new GameObject("HpBar_Frame");
-        frameGO.transform.SetParent(canvasGO.transform, false);
-        var frameImg = frameGO.AddComponent<Image>();
-        if (frameSprite != null)
-        {
-            frameImg.sprite = frameSprite;
-            frameImg.type = Image.Type.Sliced;
-        }
-        else
-        {
-            frameImg.color = new Color(0.08f, 0.07f, 0.12f, 1f);
-        }
-        var frameRT = frameGO.GetComponent<RectTransform>();
-        frameRT.anchorMin = frameRT.anchorMax = new Vector2(0f, 1f);
-        frameRT.pivot = new Vector2(0f, 1f);
-        frameRT.sizeDelta = barSize;
-        frameRT.anchoredPosition = barPosition;
-
-        // ── Fill mask ─────────────────────────────────────────────────────────
-        var maskGO = new GameObject("HpBar_FillMask");
-        maskGO.transform.SetParent(frameGO.transform, false);
-        maskGO.AddComponent<RectMask2D>(); // RequireComponent adds RectTransform
-        var maskRT = maskGO.GetComponent<RectTransform>();
-        maskRT.anchorMin = Vector2.zero;
-        maskRT.anchorMax = Vector2.one;
-        maskRT.offsetMin = new Vector2(padLeft, padBottom);
-        maskRT.offsetMax = new Vector2(-padRight, -padTop);
-
-        // ── Gauge fill (gauge.png) ────────────────────────────────────────────
-        var fillGO = new GameObject("HpBar_Gauge");
-        fillGO.transform.SetParent(maskGO.transform, false);
-        var fillImg = fillGO.AddComponent<Image>();
-        if (gaugeSprite != null)
-        {
-            fillImg.sprite = gaugeSprite;
-            fillImg.type = Image.Type.Simple;
-            fillImg.preserveAspect = false;
-        }
-        else
-        {
-            fillImg.color = new Color(0.85f, 0.12f, 0.12f, 1f);
-        }
-        fillRect = fillGO.GetComponent<RectTransform>();
-        fillRect.anchorMin = Vector2.zero;
-        fillRect.anchorMax = Vector2.one;
-        fillRect.offsetMin = Vector2.zero;
-        fillRect.offsetMax = Vector2.zero;
-
-        // ── HP text ───────────────────────────────────────────────────────────
-        var textGO = new GameObject("HpBar_Text");
-        textGO.transform.SetParent(frameGO.transform, false);
-        hpText = textGO.AddComponent<Text>();
-        hpText.font = pixelFont != null ? pixelFont : Font.CreateDynamicFontFromOSFont("Arial", 14);
-        hpText.fontSize = 20;
-        hpText.fontStyle = FontStyle.Bold;
-        hpText.alignment = TextAnchor.MiddleCenter;
-        hpText.color = Color.white;
-        hpText.horizontalOverflow = HorizontalWrapMode.Overflow;
-        hpText.verticalOverflow = VerticalWrapMode.Overflow;
-        var outl = textGO.AddComponent<Outline>();
-        outl.effectColor = new Color(0f, 0f, 0f, 1f);
-        outl.effectDistance = new Vector2(1, -1);
-        var textRT = textGO.GetComponent<RectTransform>();
-        textRT.anchorMin = Vector2.zero;
-        textRT.anchorMax = Vector2.one;
-        textRT.offsetMin = Vector2.zero;
-        textRT.offsetMax = Vector2.zero;
+        go.AddComponent<GraphicRaycaster>();
+        return canvas;
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
+    RectTransform CreateFrame(Transform parent)
+    {
+        var go = new GameObject("HpBar_Frame");
+        go.transform.SetParent(parent, false);
+
+        var img = go.AddComponent<Image>();
+        if (frameSprite != null)
+        {
+            img.sprite = frameSprite;
+            img.type = Image.Type.Sliced;
+        }
+        else
+        {
+            img.color = new Color(0.08f, 0.07f, 0.12f, 1f);
+        }
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+        rt.pivot = new Vector2(0f, 1f);
+        rt.sizeDelta = barSize;
+        rt.anchoredPosition = barPosition;
+        return rt;
+    }
+
+    RectTransform CreateMask(RectTransform parent)
+    {
+        var go = new GameObject("HpBar_FillMask");
+        go.transform.SetParent(parent, false);
+        go.AddComponent<RectMask2D>();
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = new Vector2(padLeft, padBottom);
+        rt.offsetMax = new Vector2(-padRight, -padTop);
+        return rt;
+    }
+
+    GameObject CreateFill(RectTransform parent)
+    {
+        var go = new GameObject("HpBar_Gauge");
+        go.transform.SetParent(parent, false);
+
+        var img = go.AddComponent<Image>();
+        if (gaugeSprite != null)
+        {
+            img.sprite = gaugeSprite;
+            img.preserveAspect = false;
+        }
+        else
+        {
+            img.color = new Color(0.85f, 0.12f, 0.12f, 1f);
+        }
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        return go;
+    }
+
+    Text CreateHpText(RectTransform parent)
+    {
+        var go = new GameObject("HpBar_Text");
+        go.transform.SetParent(parent, false);
+
+        var text = go.AddComponent<Text>();
+        text.font = pixelFont != null ? pixelFont : Font.CreateDynamicFontFromOSFont("Arial", 14);
+        text.fontSize = 20;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.color = Color.white;
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
+
+        var outline = go.AddComponent<Outline>();
+        outline.effectColor = Color.black;
+        outline.effectDistance = new Vector2(1, -1);
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        return text;
+    }
+
     void Update()
     {
-        if (playerHealth == null)
-            playerHealth = GetComponent<PlayerHealth>();
         if (playerHealth == null || fillRect == null)
             return;
 
         float ratio = Mathf.Clamp01(playerHealth.CurrentHp / playerHealth.maxHp);
-
-        // Shrink the fill bar from the right
         fillRect.anchorMax = new Vector2(ratio, 1f);
 
-        // HP number display
         if (hpText != null)
-        {
-            int cur = Mathf.Max(0, Mathf.CeilToInt(playerHealth.CurrentHp));
-            int max = Mathf.CeilToInt(playerHealth.maxHp);
-            hpText.text = $"{cur} / {max}";
-        }
+            hpText.text =
+                $"{Mathf.Max(0, Mathf.CeilToInt(playerHealth.CurrentHp))} / {Mathf.CeilToInt(playerHealth.maxHp)}";
     }
 }

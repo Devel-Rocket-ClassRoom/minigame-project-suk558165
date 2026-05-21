@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Sword
   sprite: {fileID: 0}
+  weaponType: 0
   damage: 20
   attackCooldown: 0.5
   swingAngle: 120
   swingDuration: 0.25
+  projectileSpeed: 12
   attackClip: {fileID: 7400000, guid: f62aa5797bd692747be04424a25a113c, type: 2}
+  idleClip: {fileID: 7400000, guid: e2bcb5480c28f9a45b7db7755d6ad7e4, type: 2}

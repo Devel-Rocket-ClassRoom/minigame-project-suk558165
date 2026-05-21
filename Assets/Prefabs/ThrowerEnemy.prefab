@@ -212,7 +212,7 @@ MonoBehaviour:
   attackCooldown: 2.5
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   patrolDistance: 4
   isRanged: 1
   projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
@@ -220,4 +220,5 @@ MonoBehaviour:
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 0}
+  edgeCheckDepth: 1.5
   attackDamageDelay: 0.4

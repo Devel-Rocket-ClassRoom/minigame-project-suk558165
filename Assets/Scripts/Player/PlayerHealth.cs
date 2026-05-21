@@ -19,6 +19,5 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (IsDead)
             return;
         hp -= amount;
-        Debug.Log($"[Player] 피격 -{amount}  HP: {Mathf.Max(hp, 0):F0} / {maxHp:F0}");
     }
 }
