@@ -85,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 490876716, guid: c165f3ed30983a54b97be1f695fd6051, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 06f7f835d1d8a18438aaf80286c6e248, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -178,17 +178,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.56, y: 2.56}
+    oldSize: {x: 2.21875, y: 2.5}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 2}
+  m_Size: {x: 1.15, y: 2.56}
   m_EdgeRadius: 0
 --- !u!114 &5348482898437230186
 MonoBehaviour:
@@ -205,6 +205,8 @@ MonoBehaviour:
   maxHp: 45
   moveSpeed: 1.8
   damage: 10
+  contactDamage: 5
+  contactCooldown: 0.5
   detectionRange: 10
   attackRange: 7
   attackCooldown: 2.5

@@ -10,6 +10,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float maxHp = 50f;
     public float moveSpeed = 2f;
     public float damage = 10f;
+    public float contactDamage = 5f;
+    public float contactCooldown = 0.5f;
 
     [Header("Detection")]
     public float detectionRange = 6f;
@@ -38,6 +40,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float hp;
     private bool isDead;
     private float attackTimer;
+    private float contactTimer;
 
     private Transform player;
     private Vector2 patrolOrigin;
@@ -73,6 +76,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         attackTimer -= Time.deltaTime;
+        contactTimer -= Time.deltaTime;
 
         float dist =
             player != null ? Vector2.Distance(transform.position, player.position) : float.MaxValue;
@@ -221,6 +225,21 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
     }
 
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (isDead || contactTimer > 0f)
+            return;
+        if (!col.gameObject.CompareTag("Player"))
+            return;
+
+        var damageable = col.gameObject.GetComponentInParent<IDamageable>();
+        if (damageable == null)
+            return;
+
+        contactTimer = contactCooldown;
+        damageable.TakeDamage(contactDamage);
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (meleeHitbox == null || !meleeHitbox.enabled)
@@ -269,16 +288,31 @@ public class EnemyController : MonoBehaviour, IDamageable
         Destroy(gameObject, 2f);
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        // 감지 범위 (노랑)
+        Gizmos.color = new Color(1f, 1f, 0f, 0.5f);
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-        Gizmos.color = Color.red;
+
+        // 공격 범위 (빨강)
+        Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.7f);
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
         if (isRanged)
         {
-            Gizmos.color = Color.cyan;
+            // 원거리 후퇴 거리 (하늘)
+            Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
             Gizmos.DrawWireSphere(transform.position, safeDistance);
+        }
+
+        // 근접 히트박스 활성 시 강조 (주황 반투명)
+        if (meleeHitbox != null && meleeHitbox.enabled)
+        {
+            Gizmos.color = new Color(1f, 0.4f, 0f, 0.35f);
+            var b = meleeHitbox.bounds;
+            Gizmos.DrawCube(b.center, b.size);
+            Gizmos.color = new Color(1f, 0.4f, 0f, 0.9f);
+            Gizmos.DrawWireCube(b.center, b.size);
         }
     }
 }

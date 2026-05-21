@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -53,6 +55,7 @@ public class WolfController : MonoBehaviour
     private float attackCooldown = 0.5f;
     private bool isAttacking;
     private float rangedAttackTimer;
+    private bool deathHandled;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -106,6 +109,20 @@ public class WolfController : MonoBehaviour
 
     void Update()
     {
+        bool dead = (health != null && health.IsDead) || previewDeath;
+        if (dead)
+        {
+            animator.SetBool(HashIsDead, true);
+            if (!deathHandled)
+            {
+                deathHandled = true;
+                rb.linearVelocity = Vector2.zero;
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                StartCoroutine(ReloadAfterDelay(3f));
+            }
+            return;
+        }
+
         moveInput = Input.GetAxisRaw("Horizontal");
         if (moveInput == 0f)
         {
@@ -175,8 +192,6 @@ public class WolfController : MonoBehaviour
             ShootForward();
         }
 
-        bool dead = (health != null && health.IsDead) || previewDeath;
-        animator.SetBool(HashIsDead, dead);
         animator.SetFloat(HashSpeed, Mathf.Abs(moveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, isGrounded || isDashing);
 
@@ -227,5 +242,11 @@ public class WolfController : MonoBehaviour
                 * Time.fixedDeltaTime;
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+    }
+
+    IEnumerator ReloadAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

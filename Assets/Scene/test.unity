@@ -1715,6 +1715,14 @@ PrefabInstance:
       propertyPath: enemyLayer.m_Bits
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6719906860774937824, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -3643107421165482990, guid: 696df115c3784d94a83b7a41522a9d44, type: 3}
+    - target: {fileID: 6719906860774937824, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
       propertyPath: barSize.x
       value: 200
@@ -1915,12 +1923,12 @@ Transform:
   m_GameObject: {fileID: 600806625}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.85, z: -10}
+  m_LocalPosition: {x: 0.56, y: -0.5, z: -9.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0, y: 0, z: 0}
 --- !u!114 &600806629
 MonoBehaviour:
   m_ObjectHideFlags: 0

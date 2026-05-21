@@ -131,4 +131,27 @@ public class PlayerWeapon : MonoBehaviour
         if (weaponSr != null)
             weaponSr.flipY = parentSr.flipX;
     }
+
+    void OnDrawGizmos()
+    {
+        Transform root = transform.root;
+        Transform vis = root.Find("Visuals");
+        bool facingLeft = vis != null && vis.localScale.x < 0f;
+        float facing = facingLeft ? -1f : 1f;
+
+        Vector2 origin = (Vector2)root.position;
+        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.2f);
+
+        // 무기 사거리
+        Gizmos.color = new Color(1f, 1f, 0f, 0.4f);
+        Gizmos.DrawWireSphere(origin, attackRadius);
+
+        // 플레이어 → 무기 끝 선
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine(origin, tipPos);
+
+        // 실제 피격 판정 원
+        Gizmos.color = isSwinging ? Color.red : new Color(1f, 0.5f, 0f);
+        Gizmos.DrawWireSphere(tipPos, hitRadius);
+    }
 }

@@ -95,7 +95,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.56, y: 2.56}
+  m_Size: {x: 0.42666668, y: 0.42666668}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -188,7 +188,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 2.56, y: 2.56}
-    newSize: {x: 2.56, y: 2.56}
+    newSize: {x: 0.42666668, y: 0.42666668}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -257,11 +257,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
-  playerHealth: {fileID: 0}
+  playerHealth: {fileID: 6507411717424860390}
+  frameSprite: {fileID: -2746871947293079583, guid: 0fce8b0af539a174bb622bf3834273a7, type: 3}
+  fillSprite: {fileID: -5607716931588494402, guid: 0fce8b0af539a174bb622bf3834273a7, type: 3}
   barSize: {x: 200, y: 20}
   barPosition: {x: 20, y: -20}
-  fillColor: {r: 1, g: 0, b: 0, a: 1}
-  bgColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+  padLeft: 21
+  padBottom: 12
+  padRight: 21
+  padTop: 9
 --- !u!114 &6507411717424860390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,7 +431,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3030820797579888942
 GameObject:
@@ -643,6 +647,7 @@ MonoBehaviour:
   swingDuration: 0.5
   restAngle: -90
   attackRadius: 1.5
+  hitRadius: 0.7
   damage: 20
   enemyLayer:
     serializedVersion: 2
@@ -803,7 +808,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &7648394525237394948
 GameObject:
@@ -927,5 +932,5 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
