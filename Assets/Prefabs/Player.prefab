@@ -297,7 +297,6 @@ MonoBehaviour:
   projectileSpeed: 12
   rangedDamage: 15
   rangedCooldown: 0.8
-  defaultAttackCooldown: 0.5
   swordAttackStateName: SwordAttack
   bowAttackStateName: BowAttack
   swordOverrideClipName: Player_SwordAttack
@@ -520,7 +519,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3580415539754441683
 Transform:
   m_ObjectHideFlags: 0
@@ -688,7 +687,7 @@ MonoBehaviour:
   damage: 20
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!1 &5518840226994352023
 GameObject:
   m_ObjectHideFlags: 0

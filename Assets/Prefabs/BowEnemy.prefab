@@ -219,5 +219,5 @@ MonoBehaviour:
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 0}
-  edgeCheckDepth: 1.5
+  edgeCheckDepth: 0.4
   attackDamageDelay: 0.4

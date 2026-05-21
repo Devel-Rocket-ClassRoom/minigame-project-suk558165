@@ -181,8 +181,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (dir == 0f)
             return false;
         var col = GetComponent<Collider2D>();
-        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.2f;
-        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, transform.position.y);
+        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.1f;
+        // 발 바닥 높이에서 레이를 쏴야 정확하게 감지됨
+        float footY = col != null ? col.bounds.min.y : transform.position.y;
+        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, footY + 0.05f);
         return Physics2D.Raycast(origin, Vector2.down, edgeCheckDepth, groundLayer).collider
             == null;
     }
@@ -232,6 +234,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
+        Debug.Log($"[Enemy] {gameObject.name} 데미지 {amount} 받음 → HP {hp:F0}/{maxHp:F0}");
         animator.SetTrigger(HashIsHit);
 
         if (hp <= 0f)
@@ -246,12 +249,52 @@ public class EnemyController : MonoBehaviour, IDamageable
         StopAllCoroutines();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
-        animator.SetBool(HashIsDead, true);
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
-        Destroy(gameObject, 2f);
+        StartCoroutine(DeathEffect());
+    }
+
+    IEnumerator DeathEffect()
+    {
+        // 모든 SpriteRenderer 수집 (자식 포함)
+        var renderers = GetComponentsInChildren<SpriteRenderer>();
+
+        // 0.6초간 깜빡임 (0.08초 간격)
+        float blinkDuration = 0.6f;
+        float blinkInterval = 0.08f;
+        float elapsed = 0f;
+        bool visible = false;
+        while (elapsed < blinkDuration)
+        {
+            visible = !visible;
+            foreach (var r in renderers)
+                r.enabled = visible;
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+
+        // 0.4초간 페이드아웃
+        foreach (var r in renderers)
+            r.enabled = true;
+
+        float fadeDuration = 0.4f;
+        elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
+            foreach (var r in renderers)
+            {
+                Color c = r.color;
+                c.a = alpha;
+                r.color = c;
+            }
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 
     void OnDrawGizmos()

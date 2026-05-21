@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8656440490748505928}
   - component: {fileID: 8663207341760413900}
+  - component: {fileID: 2090046895928927102}
   m_Layer: 0
   m_Name: MeleeHitbox
   m_TagString: Untagged
@@ -78,6 +79,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.9, y: 0.7}
   m_EdgeRadius: 0
+--- !u!114 &2090046895928927102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3246097568976572687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97110b62e47d176458beb6df1e19bd6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeHitbox
+  damage: 12
 --- !u!1 &6174295281681821268
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,5 +312,5 @@ MonoBehaviour:
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 8663207341760413900}
-  edgeCheckDepth: 1.5
+  edgeCheckDepth: 0.4
   attackDamageDelay: 0.4
