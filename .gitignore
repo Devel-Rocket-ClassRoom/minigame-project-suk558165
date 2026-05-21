@@ -40,7 +40,7 @@ publish/
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
-# Imported assets
+# Imported assets (별도 저장소 관리)
 /[Aa]ssets/[Ii]mported/
 /[Aa]ssets/[Ii]mported.meta
 /[Ii]mported/

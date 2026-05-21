@@ -28,4 +28,21 @@ public class MeleeHitbox : MonoBehaviour
             return;
         other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
     }
+
+    void OnDrawGizmos()
+    {
+        var c = col != null ? col : GetComponent<Collider2D>();
+        if (c == null)
+            return;
+
+        bool active = c.enabled;
+        Gizmos.color = active ? new Color(1f, 0.1f, 0.1f, 0.9f) : new Color(0.6f, 0.6f, 0.6f, 0.3f);
+        var b = c.bounds;
+        Gizmos.DrawWireCube(b.center, b.size);
+        if (active)
+        {
+            Gizmos.color = new Color(1f, 0.1f, 0.1f, 0.2f);
+            Gizmos.DrawCube(b.center, b.size);
+        }
+    }
 }

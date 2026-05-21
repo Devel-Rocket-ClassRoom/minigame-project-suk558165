@@ -14,13 +14,13 @@ GameObject:
   - component: {fileID: 4433409651144941361}
   - component: {fileID: 1363251731637940429}
   - component: {fileID: 5263856304553941435}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: WizardEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3942808119113251400
 Transform:
   m_ObjectHideFlags: 0
@@ -178,7 +178,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.25}
+  m_Offset: {x: 0, y: 1.28}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -188,7 +188,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.5, y: 2.5}
+  m_Size: {x: 1.15, y: 2.56}
   m_EdgeRadius: 0
 --- !u!114 &5263856304553941435
 MonoBehaviour:
@@ -205,6 +205,8 @@ MonoBehaviour:
   maxHp: 60
   moveSpeed: 1.5
   damage: 12
+  contactDamage: 5
+  contactCooldown: 0.5
   detectionRange: 7
   attackRange: 1.5
   attackCooldown: 1.5
@@ -212,3 +214,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   patrolDistance: 4
+  isRanged: 1
+  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  firePoint: {fileID: 0}
+  projectileSpeed: 8
+  safeDistance: 3
+  meleeHitbox: {fileID: 0}
+  attackDamageDelay: 0.4

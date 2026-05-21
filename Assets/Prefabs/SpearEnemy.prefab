@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2409149294056701467}
   - component: {fileID: 1949110717735003683}
   - component: {fileID: 3427827913436165532}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SpearEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -188,7 +188,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 2}
+  m_Size: {x: 1.15, y: 2.56}
   m_EdgeRadius: 0
 --- !u!114 &3427827913436165532
 MonoBehaviour:
@@ -205,10 +205,19 @@ MonoBehaviour:
   maxHp: 60
   moveSpeed: 2.2
   damage: 12
+  contactDamage: 5
+  contactCooldown: 0.5
   detectionRange: 7
-  attackRange: 1.8
+  attackRange: 2.5
   attackCooldown: 1.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
   patrolDistance: 4
+  isRanged: 0
+  projectilePrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  projectileSpeed: 8
+  safeDistance: 3
+  meleeHitbox: {fileID: 0}
+  attackDamageDelay: 0.4

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7740948866993071214}
   - component: {fileID: 7588921145118788374}
   - component: {fileID: 6507411717424860390}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -90,12 +90,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2134297332, guid: 1e0d15ffb8afbd541a56232c252bd26d, type: 3}
+  m_Sprite: {fileID: -3643107421165482990, guid: 696df115c3784d94a83b7a41522a9d44, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.56, y: 2.56}
+  m_Size: {x: 0.42666668, y: 0.42666668}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -188,7 +188,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 2.56, y: 2.56}
-    newSize: {x: 2.56, y: 2.56}
+    newSize: {x: 0.42666668, y: 0.42666668}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -214,7 +214,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 400001}
-  groundCheckRadius: 0.2
+  groundCheckRadius: 0.35
   gravityScale: 1.2
   fallGravityMultiplier: 1.2
   dashSpeedMultiplier: 5
@@ -228,6 +228,11 @@ MonoBehaviour:
   projectileSpeed: 12
   rangedDamage: 15
   rangedCooldown: 0.8
+  defaultAttackCooldown: 0.5
+  swordAttackStateName: SwordAttack
+  bowAttackStateName: BowAttack
+  swordOverrideClipName: Wolf_SwordAttack
+  deathReloadDelay: 3
   previewDeath: 0
 --- !u!114 &7740948866993071214
 MonoBehaviour:
@@ -257,6 +262,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
+  playerHealth: {fileID: 6507411717424860390}
+  frameSprite: {fileID: 21300000, guid: 7c1634de58e0d5e4cb087ac99144ebf3, type: 3}
+  gaugeSprite: {fileID: 21300000, guid: 6fcaee26ec6e9b4428d1bbdfd3a89c0a, type: 3}
+  pixelFont: {fileID: 12800000, guid: 7e1e79d7727d29a4aad4fa7a0928ecfb, type: 3}
+  barSize: {x: 480, y: 60}
+  barPosition: {x: 20, y: -20}
+  padLeft: 23
+  padBottom: 5
+  padRight: 23
+  padTop: 5
 --- !u!114 &6507411717424860390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,10 +285,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHp: 120
-  iFrameDuration: 1
-  knockbackForce: 6
-  hitFlashInterval: 0.08
-  respawnDelay: 2.5
 --- !u!1 &100001
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,7 +429,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -3195670591013023326, guid: 2c4dde150fc2e664eb4018760363f6d7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 159e3bba97aef7545be619a8cfe3d2f7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -426,7 +437,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3030820797579888942
 GameObject:
@@ -642,6 +653,7 @@ MonoBehaviour:
   swingDuration: 0.5
   restAngle: -90
   attackRadius: 1.5
+  hitRadius: 0.7
   damage: 20
   enemyLayer:
     serializedVersion: 2
@@ -794,7 +806,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 4635681405818388303, guid: f1cef8833b33e93408f146afcb595f12, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f48ac43319df4d34792d2f3d408ee415, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -802,7 +814,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &7648394525237394948
 GameObject:
@@ -918,7 +930,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -4023000542353664425, guid: f1cef8833b33e93408f146afcb595f12, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 55d6e40d773c51f4d8d39370b09b1a9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -926,5 +938,5 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
