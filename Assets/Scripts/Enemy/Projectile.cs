@@ -33,8 +33,31 @@ public class Projectile : MonoBehaviour
     {
         if (!ready)
             return;
+
         if (shooter != null && other.transform.IsChildOf(shooter.transform))
             return;
+
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        int playerLayer = LayerMask.NameToLayer("Player");
+        int shooterLayer = shooter != null ? shooter.layer : -1;
+        int targetLayer = other.gameObject.layer;
+
+        Debug.Log(
+            $"[Projectile] shooter={shooter?.name}(layer={LayerMask.LayerToName(shooterLayer)}) → hit={other.gameObject.name}(layer={LayerMask.LayerToName(targetLayer)}) rootLayer={LayerMask.LayerToName(other.transform.root.gameObject.layer)}"
+        );
+
+        if (shooter != null)
+        {
+            bool shooterIsEnemy = shooterLayer == enemyLayer;
+            // 히트 대상의 루트 오브젝트 레이어로 팀 판별 (자식 콜라이더 레이어 불일치 대응)
+            int rootLayer = other.transform.root.gameObject.layer;
+            bool targetIsEnemy = rootLayer == enemyLayer;
+
+            if (shooterIsEnemy && targetIsEnemy)
+                return; // 적 → 적 무시
+            if (!shooterIsEnemy && !targetIsEnemy)
+                return; // 플레이어 → 플레이어 무시
+        }
 
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable != null)
