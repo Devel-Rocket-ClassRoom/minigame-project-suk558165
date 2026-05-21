@@ -120,7 +120,6 @@ public class PlayerWeapon : MonoBehaviour
 
             hitIds.Add(id);
             damageable.TakeDamage(damage);
-            Debug.Log("[PlayerWeapon] " + hit.name + " hit — damage " + damage);
         }
     }
 
