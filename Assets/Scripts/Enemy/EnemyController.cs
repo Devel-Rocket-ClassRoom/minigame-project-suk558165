@@ -31,7 +31,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Melee")]
     public Collider2D meleeHitbox;
-    public float meleeHitDuration = 0.15f;
+
+    [Tooltip(
+        "공격 애니메이션에서 실제 타격 판정이 나오는 타이밍 (초). 애니메이션 길이에 맞게 조정하세요."
+    )]
+    public float attackDamageDelay = 1f;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -67,7 +71,11 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         var playerGO = GameObject.FindGameObjectWithTag("Player");
         if (playerGO != null)
+        {
             player = playerGO.transform;
+            // 적 레이어와 플레이어 레이어 간 물리 충돌 무시 (서로 통과)
+            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+        }
     }
 
     void Update()
@@ -89,20 +97,23 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateMelee(float dist)
     {
-        if (dist <= attackRange)
+        if (dist <= detectionRange)
         {
-            Move(0f);
-            if (attackTimer <= 0f)
+            // 공격 범위 안이면 멈추고 공격, 아니면 추격
+            if (dist <= attackRange)
+                Move(0f);
+            else
+            {
+                float dir = player.position.x > transform.position.x ? 1f : -1f;
+                Move(dir);
+            }
+
+            if (attackTimer <= 0f && dist <= attackRange)
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
-                StartCoroutine(ActivateMeleeHitbox());
+                StartCoroutine(DealDamageAfterDelay(attackDamageDelay));
             }
-        }
-        else if (dist <= detectionRange)
-        {
-            float dir = player.position.x > transform.position.x ? 1f : -1f;
-            Move(dir);
         }
         else
         {
@@ -112,7 +123,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateRanged(float dist)
     {
-        if (dist <= attackRange)
+        if (dist <= detectionRange)
         {
             // 너무 가까우면 뒤로 물러남
             if (dist < safeDistance)
@@ -129,13 +140,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
-                ShootProjectile();
+                StartCoroutine(ShootAfterDelay(attackDamageDelay));
             }
-        }
-        else if (dist <= detectionRange)
-        {
-            float dir = player.position.x > transform.position.x ? 1f : -1f;
-            Move(dir);
         }
         else
         {
@@ -188,65 +194,26 @@ public class EnemyController : MonoBehaviour, IDamageable
             sr.flipX = true;
     }
 
-    IEnumerator ActivateMeleeHitbox()
+    // 근접: 애니메이션 타이밍에 맞춰 데미지 적용
+    IEnumerator DealDamageAfterDelay(float delay)
     {
-        yield return new WaitForSeconds(meleeHitDuration * 0.5f);
-
-        if (meleeHitbox != null)
+        yield return new WaitForSeconds(delay);
+        if (isDead || player == null)
+            yield break;
+        if (Vector2.Distance(transform.position, player.position) <= attackRange * 1.5f)
         {
-            meleeHitbox.enabled = true;
-            var results = new Collider2D[4];
-            int count = Physics2D.OverlapCollider(
-                meleeHitbox,
-                new ContactFilter2D().NoFilter(),
-                results
-            );
-            for (int i = 0; i < count; i++)
-            {
-                if (results[i].CompareTag("Player"))
-                {
-                    results[i].GetComponent<IDamageable>()?.TakeDamage(damage);
-                    Debug.Log($"[{name}] 근접 공격 명중 — 데미지 {damage}");
-                    break;
-                }
-            }
-            meleeHitbox.enabled = false;
-        }
-        else
-        {
-            if (
-                player != null
-                && Vector2.Distance(transform.position, player.position) <= attackRange
-            )
-            {
-                player.GetComponent<IDamageable>()?.TakeDamage(damage);
-                Debug.Log($"[{name}] 근접 공격 명중(거리 판정) — 데미지 {damage}");
-            }
+            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+            Debug.Log($"[{name}] 근접 공격 명중 — 데미지 {damage}");
         }
     }
 
-    void OnCollisionStay2D(Collision2D col)
+    // 원거리: 애니메이션 타이밍에 맞춰 투사체 발사
+    IEnumerator ShootAfterDelay(float delay)
     {
-        if (isDead || contactTimer > 0f)
-            return;
-        if (!col.gameObject.CompareTag("Player"))
-            return;
-
-        var damageable = col.gameObject.GetComponentInParent<IDamageable>();
-        if (damageable == null)
-            return;
-
-        contactTimer = contactCooldown;
-        damageable.TakeDamage(contactDamage);
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (meleeHitbox == null || !meleeHitbox.enabled)
-            return;
-        if (!other.CompareTag("Player"))
-            return;
-        other.GetComponent<IDamageable>()?.TakeDamage(damage);
+        yield return new WaitForSeconds(delay);
+        if (isDead)
+            yield break;
+        ShootProjectile();
     }
 
     public void DealDamageToPlayer()

@@ -205,8 +205,10 @@ MonoBehaviour:
   maxHp: 70
   moveSpeed: 2
   damage: 12
+  contactDamage: 5
+  contactCooldown: 0.5
   detectionRange: 7
-  attackRange: 1.5
+  attackRange: 2.5
   attackCooldown: 1.5
   groundLayer:
     serializedVersion: 2
@@ -218,4 +220,4 @@ MonoBehaviour:
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 0}
-  meleeHitDuration: 0.15
+  attackDamageDelay: 0.4

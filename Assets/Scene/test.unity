@@ -1723,14 +1723,6 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
-      propertyPath: barSize.x
-      value: 200
-      objectReference: {fileID: 0}
-    - target: {fileID: 7588921145118788374, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
-      propertyPath: barSize.y
-      value: 30
-      objectReference: {fileID: 0}
     - target: {fileID: 7740948866993071214, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
       propertyPath: 'weapons.Array.data[0]'
       value: 
@@ -1898,7 +1890,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3.6
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1944,6 +1936,7 @@ MonoBehaviour:
   target: {fileID: 461253823}
   smoothSpeed: 5
   offset: {x: 0, y: 1, z: -10}
+  orthographicSize: 7
   minX: -Infinity
   maxX: Infinity
   minY: -Infinity
@@ -2091,7 +2084,7 @@ MonoBehaviour:
   - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
     spawnPoint: {fileID: 1870530010}
     activeEnemy: {fileID: 0}
-  - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+  - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
     spawnPoint: {fileID: 1596013820}
     activeEnemy: {fileID: 0}
   respawnDelay: 3

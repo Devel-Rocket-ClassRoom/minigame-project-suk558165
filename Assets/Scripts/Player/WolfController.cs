@@ -32,6 +32,23 @@ public class WolfController : MonoBehaviour
     public float rangedDamage = 15f;
     public float rangedCooldown = 0.8f;
 
+    [Header("Attack Settings")]
+    [SerializeField]
+    private float defaultAttackCooldown = 0.5f;
+
+    [SerializeField]
+    private string swordAttackStateName = "SwordAttack";
+
+    [SerializeField]
+    private string bowAttackStateName = "BowAttack";
+
+    [SerializeField]
+    private string swordOverrideClipName = "Wolf_SwordAttack";
+
+    [Header("Death")]
+    [SerializeField]
+    private float deathReloadDelay = 3f;
+
     [Header("Debug")]
     public bool previewDeath;
 
@@ -52,7 +69,7 @@ public class WolfController : MonoBehaviour
     private float dashCooldownTimer;
     private int dashCharges;
     private float attackTimer;
-    private float attackCooldown = 0.5f;
+    private float attackCooldown;
     private bool isAttacking;
     private float rangedAttackTimer;
     private bool deathHandled;
@@ -74,6 +91,7 @@ public class WolfController : MonoBehaviour
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
+        attackCooldown = defaultAttackCooldown;
 
         health = GetComponent<PlayerHealth>();
 
@@ -99,7 +117,7 @@ public class WolfController : MonoBehaviour
     void ApplyWeapon(WeaponData data)
     {
         if (data.attackClip != null)
-            overrideController["Wolf_SwordAttack"] = data.attackClip;
+            overrideController[swordOverrideClipName] = data.attackClip;
 
         if (weapon != null)
             weapon.ApplyWeaponData(data);
@@ -118,7 +136,7 @@ public class WolfController : MonoBehaviour
                 deathHandled = true;
                 rb.linearVelocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Kinematic;
-                StartCoroutine(ReloadAfterDelay(3f));
+                StartCoroutine(ReloadAfterDelay(deathReloadDelay));
             }
             return;
         }
@@ -181,14 +199,14 @@ public class WolfController : MonoBehaviour
             Vector3 fakeTarget =
                 transform.position + (facingLeftNow ? Vector3.left : Vector3.right) * 5f;
             weapon.Attack(fakeTarget);
-            animator.Play("SwordAttack", 0, 0f);
+            animator.Play(swordAttackStateName, 0, 0f);
         }
 
         if (Input.GetKeyDown(KeyCode.C) && rangedAttackTimer <= 0f && projectilePrefab != null)
         {
             rangedAttackTimer = rangedCooldown;
             isAttacking = true;
-            animator.Play("BowAttack", 0, 0f);
+            animator.Play(bowAttackStateName, 0, 0f);
             ShootForward();
         }
 

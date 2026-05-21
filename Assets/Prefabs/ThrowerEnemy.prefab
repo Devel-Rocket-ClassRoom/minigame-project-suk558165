@@ -205,6 +205,8 @@ MonoBehaviour:
   maxHp: 50
   moveSpeed: 2
   damage: 10
+  contactDamage: 5
+  contactCooldown: 0.5
   detectionRange: 8
   attackRange: 6
   attackCooldown: 2.5
@@ -213,9 +215,9 @@ MonoBehaviour:
     m_Bits: 0
   patrolDistance: 4
   isRanged: 1
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 0}
-  meleeHitDuration: 0.15
+  attackDamageDelay: 0.4

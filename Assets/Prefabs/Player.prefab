@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7740948866993071214}
   - component: {fileID: 7588921145118788374}
   - component: {fileID: 6507411717424860390}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -228,6 +228,11 @@ MonoBehaviour:
   projectileSpeed: 12
   rangedDamage: 15
   rangedCooldown: 0.8
+  defaultAttackCooldown: 0.5
+  swordAttackStateName: SwordAttack
+  bowAttackStateName: BowAttack
+  swordOverrideClipName: Wolf_SwordAttack
+  deathReloadDelay: 3
   previewDeath: 0
 --- !u!114 &7740948866993071214
 MonoBehaviour:
@@ -258,14 +263,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
   playerHealth: {fileID: 6507411717424860390}
-  frameSprite: {fileID: -2746871947293079583, guid: 0fce8b0af539a174bb622bf3834273a7, type: 3}
-  fillSprite: {fileID: -5607716931588494402, guid: 0fce8b0af539a174bb622bf3834273a7, type: 3}
-  barSize: {x: 200, y: 20}
+  frameSprite: {fileID: 21300000, guid: 7c1634de58e0d5e4cb087ac99144ebf3, type: 3}
+  gaugeSprite: {fileID: 21300000, guid: 6fcaee26ec6e9b4428d1bbdfd3a89c0a, type: 3}
+  pixelFont: {fileID: 12800000, guid: 7e1e79d7727d29a4aad4fa7a0928ecfb, type: 3}
+  barSize: {x: 480, y: 60}
   barPosition: {x: 20, y: -20}
-  padLeft: 21
-  padBottom: 12
-  padRight: 21
-  padTop: 9
+  padLeft: 23
+  padBottom: 5
+  padRight: 23
+  padTop: 5
 --- !u!114 &6507411717424860390
 MonoBehaviour:
   m_ObjectHideFlags: 0
