@@ -19,6 +19,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Patrol")]
     public float patrolDistance = 4f;
+    public float chaseYThreshold = 1.2f;
 
     [Header("Ranged")]
     public bool isRanged = false;
@@ -33,9 +34,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
 
-    [Tooltip("공격 애니메이션에서 실제 타격 판정이 나오는 타이밍 (초).")]
-    public float attackDamageDelay = 1f;
-
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
@@ -43,6 +41,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float hp;
     private bool isDead;
     private float attackTimer;
+    public float attackDamageDelay = 0.2f;
 
     private Transform player;
     private Vector2 patrolOrigin;
@@ -93,7 +92,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateMelee(float dist)
     {
-        if (dist <= detectionRange)
+        bool sameLevel = Mathf.Abs(player.position.y - transform.position.y) <= chaseYThreshold;
+        if (dist <= detectionRange && sameLevel)
         {
             if (dist > attackRange)
             {
@@ -109,7 +109,6 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
-                StartCoroutine(DealDamageAfterDelay(attackDamageDelay));
             }
         }
         else
@@ -131,6 +130,9 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 Move(0f);
             }
+
+            // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
+            sr.flipX = player.position.x < transform.position.x;
 
             if (attackTimer <= 0f)
             {
@@ -196,13 +198,25 @@ public class EnemyController : MonoBehaviour, IDamageable
             sr.flipX = true;
     }
 
-    IEnumerator DealDamageAfterDelay(float delay)
+    public void EnableHitbox()
     {
-        yield return new WaitForSeconds(delay);
-        if (isDead || player == null)
-            yield break;
-        if (Vector2.Distance(transform.position, player.position) <= attackRange * 1.5f)
-            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+        if (meleeHitbox != null)
+            meleeHitbox.enabled = true;
+    }
+
+    public void DisableHitbox()
+    {
+        if (meleeHitbox != null)
+            meleeHitbox.enabled = false;
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (isDead || meleeHitbox == null || !meleeHitbox.enabled)
+            return;
+        if (!other.CompareTag("Player"))
+            return;
+        other.GetComponent<IDamageable>()?.TakeDamage(damage);
     }
 
     IEnumerator ShootAfterDelay(float delay)
@@ -210,11 +224,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         yield return new WaitForSeconds(delay);
         if (!isDead)
             ShootProjectile();
-    }
-
-    public void DealDamageToPlayer()
-    {
-        player?.GetComponent<IDamageable>()?.TakeDamage(damage);
     }
 
     public void TakeDamage(float amount)
