@@ -19,6 +19,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Patrol")]
     public float patrolDistance = 4f;
+    public float chaseYThreshold = 1.2f;
 
     [Header("Ranged")]
     public bool isRanged = false;
@@ -33,9 +34,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
 
-    [Tooltip("공격 애니메이션에서 실제 타격 판정이 나오는 타이밍 (초).")]
-    public float attackDamageDelay = 1f;
-
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
@@ -43,6 +41,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float hp;
     private bool isDead;
     private float attackTimer;
+    public float attackDamageDelay = 0.2f;
 
     private Transform player;
     private Vector2 patrolOrigin;
@@ -93,7 +92,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateMelee(float dist)
     {
-        if (dist <= detectionRange)
+        bool sameLevel = Mathf.Abs(player.position.y - transform.position.y) <= chaseYThreshold;
+        if (dist <= detectionRange && sameLevel)
         {
             if (dist > attackRange)
             {
@@ -109,7 +109,6 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
-                StartCoroutine(DealDamageAfterDelay(attackDamageDelay));
             }
         }
         else
@@ -131,6 +130,9 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 Move(0f);
             }
+
+            // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
+            sr.flipX = player.position.x < transform.position.x;
 
             if (attackTimer <= 0f)
             {
@@ -179,8 +181,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (dir == 0f)
             return false;
         var col = GetComponent<Collider2D>();
-        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.2f;
-        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, transform.position.y);
+        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.1f;
+        // 발 바닥 높이에서 레이를 쏴야 정확하게 감지됨
+        float footY = col != null ? col.bounds.min.y : transform.position.y;
+        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, footY + 0.05f);
         return Physics2D.Raycast(origin, Vector2.down, edgeCheckDepth, groundLayer).collider
             == null;
     }
@@ -196,13 +200,25 @@ public class EnemyController : MonoBehaviour, IDamageable
             sr.flipX = true;
     }
 
-    IEnumerator DealDamageAfterDelay(float delay)
+    public void EnableHitbox()
     {
-        yield return new WaitForSeconds(delay);
-        if (isDead || player == null)
-            yield break;
-        if (Vector2.Distance(transform.position, player.position) <= attackRange * 1.5f)
-            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+        if (meleeHitbox != null)
+            meleeHitbox.enabled = true;
+    }
+
+    public void DisableHitbox()
+    {
+        if (meleeHitbox != null)
+            meleeHitbox.enabled = false;
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (isDead || meleeHitbox == null || !meleeHitbox.enabled)
+            return;
+        if (!other.CompareTag("Player"))
+            return;
+        other.GetComponent<IDamageable>()?.TakeDamage(damage);
     }
 
     IEnumerator ShootAfterDelay(float delay)
@@ -212,17 +228,13 @@ public class EnemyController : MonoBehaviour, IDamageable
             ShootProjectile();
     }
 
-    public void DealDamageToPlayer()
-    {
-        player?.GetComponent<IDamageable>()?.TakeDamage(damage);
-    }
-
     public void TakeDamage(float amount)
     {
         if (isDead)
             return;
 
         hp -= amount;
+        Debug.Log($"[Enemy] {gameObject.name} 데미지 {amount} 받음 → HP {hp:F0}/{maxHp:F0}");
         animator.SetTrigger(HashIsHit);
 
         if (hp <= 0f)
@@ -237,12 +249,52 @@ public class EnemyController : MonoBehaviour, IDamageable
         StopAllCoroutines();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
-        animator.SetBool(HashIsDead, true);
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
-        Destroy(gameObject, 2f);
+        StartCoroutine(DeathEffect());
+    }
+
+    IEnumerator DeathEffect()
+    {
+        // 모든 SpriteRenderer 수집 (자식 포함)
+        var renderers = GetComponentsInChildren<SpriteRenderer>();
+
+        // 0.6초간 깜빡임 (0.08초 간격)
+        float blinkDuration = 0.6f;
+        float blinkInterval = 0.08f;
+        float elapsed = 0f;
+        bool visible = false;
+        while (elapsed < blinkDuration)
+        {
+            visible = !visible;
+            foreach (var r in renderers)
+                r.enabled = visible;
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+
+        // 0.4초간 페이드아웃
+        foreach (var r in renderers)
+            r.enabled = true;
+
+        float fadeDuration = 0.4f;
+        elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
+            foreach (var r in renderers)
+            {
+                Color c = r.color;
+                c.a = alpha;
+                r.color = c;
+            }
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 
     void OnDrawGizmos()

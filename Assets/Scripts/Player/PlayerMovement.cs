@@ -187,16 +187,18 @@ public class PlayerMovement : MonoBehaviour
         if (platGO == null)
             yield break;
 
-        var cols = platGO.GetComponents<Collider2D>();
-        foreach (var c in cols)
-            c.enabled = false;
+        var playerCol = GetComponent<Collider2D>();
+        var platCols = platGO.GetComponents<Collider2D>();
+
+        foreach (var c in platCols)
+            Physics2D.IgnoreCollision(playerCol, c, true);
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        foreach (var c in cols)
+        foreach (var c in platCols)
             if (c != null)
-                c.enabled = true;
+                Physics2D.IgnoreCollision(playerCol, c, false);
     }
 }

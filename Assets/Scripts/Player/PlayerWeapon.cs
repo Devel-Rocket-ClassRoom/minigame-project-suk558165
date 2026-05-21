@@ -60,6 +60,9 @@ public class PlayerWeapon : MonoBehaviour
 
     public void Attack(Vector3 mouseWorld)
     {
+        Debug.Log(
+            $"[PlayerWeapon] Attack 호출 | isSwinging={isSwinging} | active={gameObject.activeInHierarchy} | enemyLayer={enemyLayer.value}"
+        );
         if (isSwinging || !gameObject.activeInHierarchy)
             return;
         StartCoroutine(DoSwing(mouseWorld));
@@ -106,6 +109,10 @@ public class PlayerWeapon : MonoBehaviour
         Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.2f);
 
         var hits = Physics2D.OverlapCircleAll(tipPos, hitRadius, enemyLayer);
+        Debug.Log(
+            $"[PlayerWeapon] CheckHit | tipPos={tipPos} | enemyLayer={enemyLayer.value} | hits={hits.Length}"
+        );
+
         foreach (var hit in hits)
         {
             int id = hit.GetInstanceID();
@@ -116,7 +123,10 @@ public class PlayerWeapon : MonoBehaviour
 
             var damageable = hit.GetComponentInParent<IDamageable>();
             if (damageable == null)
+            {
+                Debug.Log($"[PlayerWeapon] hit {hit.gameObject.name} 하지만 IDamageable 없음");
                 continue;
+            }
 
             hitIds.Add(id);
             damageable.TakeDamage(damage);

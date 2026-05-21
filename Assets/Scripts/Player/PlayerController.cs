@@ -1,6 +1,4 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -8,10 +6,6 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlayerCombat))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Death")]
-    [SerializeField]
-    private float deathReloadDelay = 3f;
-
     [Header("Debug")]
     public bool previewDeath;
 
@@ -44,7 +38,6 @@ public class PlayerController : MonoBehaviour
                 deathHandled = true;
                 rb.linearVelocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Kinematic;
-                StartCoroutine(ReloadAfterDelay(deathReloadDelay));
             }
             return;
         }
@@ -57,11 +50,5 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         movement.FixedUpdateMovement();
-    }
-
-    IEnumerator ReloadAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

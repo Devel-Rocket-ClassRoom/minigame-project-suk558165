@@ -205,8 +205,6 @@ MonoBehaviour:
   maxHp: 40
   moveSpeed: 1.8
   damage: 8
-  contactDamage: 5
-  contactCooldown: 0.5
   detectionRange: 8
   attackRange: 5
   attackCooldown: 2
@@ -214,11 +212,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 576
   patrolDistance: 4
+  chaseYThreshold: 1.2
   isRanged: 1
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 0}
-  edgeCheckDepth: 1.5
+  edgeCheckDepth: 0.4
   attackDamageDelay: 0.4
