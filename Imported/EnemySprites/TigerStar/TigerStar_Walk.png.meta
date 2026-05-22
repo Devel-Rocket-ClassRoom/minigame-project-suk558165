@@ -1,9 +1,55 @@
 fileFormatVersion: 2
 guid: 74f88f47b7a29124dbd25a2f47989180
-labels:
-- UnityAI
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 154454384
+    second: SWlk_0
+  - first:
+      213: 310991958
+    second: SWlk_1
+  - first:
+      213: 1657869333
+    second: SWlk_2
+  - first:
+      213: 1047195537
+    second: SWlk_3
+  - first:
+      213: 142121951
+    second: SWlk_4
+  - first:
+      213: -1774047860
+    second: SWlk_5
+  - first:
+      213: 2048454735
+    second: SWlk_6
+  - first:
+      213: 307681588
+    second: SWlk_7
+  - first:
+      213: -204401119
+    second: SWlk_8
+  - first:
+      213: -2122558989
+    second: SWlk_9
+  - first:
+      213: -29755124
+    second: SWlk_10
+  - first:
+      213: -620876403
+    second: SWlk_11
+  - first:
+      213: 1350876851
+    second: SWlk_12
+  - first:
+      213: 2051618146
+    second: SWlk_13
+  - first:
+      213: -1566188284
+    second: SWlk_14
+  - first:
+      213: -163713377
+    second: SWlk_15
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,8 +92,8 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 0
-  spriteMeshType: 0
+  spriteExtrude: 1
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -74,7 +120,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,7 +158,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TigerStar_Walk_0
+      name: SWlk_0
       rect:
         serializedVersion: 2
         x: 0
@@ -120,21 +166,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 7b493009c32c6a749a91f8430b965299
+      spriteID: 079c4390000000000800000000000000
       internalID: 154454384
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_1
+      name: SWlk_1
       rect:
         serializedVersion: 2
         x: 256
@@ -142,21 +188,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 385ada2cf60fdef44a3a26cb8c369fa5
+      spriteID: 65c59821000000000800000000000000
       internalID: 310991958
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_2
+      name: SWlk_2
       rect:
         serializedVersion: 2
         x: 512
@@ -164,21 +210,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 6f36f0fa159afb14a9e6f6caa8513d29
+      spriteID: 51411d26000000000800000000000000
       internalID: 1657869333
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_3
+      name: SWlk_3
       rect:
         serializedVersion: 2
         x: 768
@@ -186,21 +232,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 3f7ccfc328848784b98e3334125e7738
+      spriteID: 19fea6e3000000000800000000000000
       internalID: 1047195537
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_4
+      name: SWlk_4
       rect:
         serializedVersion: 2
         x: 0
@@ -208,21 +254,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 95a7d09df9a74314ab4053305408f34f
+      spriteID: fdb98780000000000800000000000000
       internalID: 142121951
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_5
+      name: SWlk_5
       rect:
         serializedVersion: 2
         x: 256
@@ -230,21 +276,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ddac4bbb4484dea469963baf27314ebe
+      spriteID: c8d22469ffffffff0800000000000000
       internalID: -1774047860
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_6
+      name: SWlk_6
       rect:
         serializedVersion: 2
         x: 512
@@ -252,21 +298,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 300e7d86609a9014a8fddadef7234704
+      spriteID: f40f81a7000000000800000000000000
       internalID: 2048454735
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_7
+      name: SWlk_7
       rect:
         serializedVersion: 2
         x: 768
@@ -274,21 +320,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ef914441c98412e4b9a849f2a268bcac
+      spriteID: 439d6521000000000800000000000000
       internalID: 307681588
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_8
+      name: SWlk_8
       rect:
         serializedVersion: 2
         x: 0
@@ -296,21 +342,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 29f7ef3d3f096dc41b5afe48053fbf6e
+      spriteID: 12611d3fffffffff0800000000000000
       internalID: -204401119
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_9
+      name: SWlk_9
       rect:
         serializedVersion: 2
         x: 256
@@ -318,21 +364,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 4494488ebc42dbb4582bdaf535e64171
+      spriteID: 3f15c718ffffffff0800000000000000
       internalID: -2122558989
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_10
+      name: SWlk_10
       rect:
         serializedVersion: 2
         x: 512
@@ -340,21 +386,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2993eca3f34525f479b793f5b77e6cd1
+      spriteID: c09f93efffffffff0800000000000000
       internalID: -29755124
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_11
+      name: SWlk_11
       rect:
         serializedVersion: 2
         x: 768
@@ -362,21 +408,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: a3be9c12d1dc0854c9213e9bf83b0413
+      spriteID: d8d2efadffffffff0800000000000000
       internalID: -620876403
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_12
+      name: SWlk_12
       rect:
         serializedVersion: 2
         x: 0
@@ -384,21 +430,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: a4fc5bf671921f74db360f882191b292
+      spriteID: 3beb4805000000000800000000000000
       internalID: 1350876851
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_13
+      name: SWlk_13
       rect:
         serializedVersion: 2
         x: 256
@@ -406,21 +452,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 20f72deae40a10e45b0678c008a99fbc
+      spriteID: 265394a7000000000800000000000000
       internalID: 2051618146
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_14
+      name: SWlk_14
       rect:
         serializedVersion: 2
         x: 512
@@ -428,21 +474,21 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: c3bc3d2517ab29040a75dcaee51f8d91
+      spriteID: 40dd5a2affffffff0800000000000000
       internalID: -1566188284
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerStar_Walk_15
+      name: SWlk_15
       rect:
         serializedVersion: 2
         x: 768
@@ -450,14 +496,14 @@ TextureImporter:
         width: 256
         height: 256
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: b40cb61ce41d06a449beebaf8a078597
+      spriteID: f9eed36fffffffff0800000000000000
       internalID: -163713377
       vertices: []
       indices: 
@@ -467,7 +513,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -477,38 +523,22 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      TigerStar_Walk_0: 154454384
-      TigerStar_Walk_1: 310991958
-      TigerStar_Walk_10: -29755124
-      TigerStar_Walk_11: -620876403
-      TigerStar_Walk_12: 1350876851
-      TigerStar_Walk_13: 2051618146
-      TigerStar_Walk_14: -1566188284
-      TigerStar_Walk_15: -163713377
-      TigerStar_Walk_2: 1657869333
-      TigerStar_Walk_3: 1047195537
-      TigerStar_Walk_4: 142121951
-      TigerStar_Walk_5: -1774047860
-      TigerStar_Walk_6: 2048454735
-      TigerStar_Walk_7: 307681588
-      TigerStar_Walk_8: -204401119
-      TigerStar_Walk_9: -2122558989
-      frame_0: 1535505571
-      frame_1: -49914374
-      frame_10: 1783170237
-      frame_11: 1970495878
-      frame_12: -2073890315
-      frame_13: 1403656485
-      frame_14: 510750219
-      frame_15: -24141076
-      frame_2: -154128933
-      frame_3: -1242403337
-      frame_4: -1644805885
-      frame_5: -1459924649
-      frame_6: 1444568439
-      frame_7: 1333096918
-      frame_8: 636486134
-      frame_9: -1523882257
+      SWlk_0: 154454384
+      SWlk_1: 310991958
+      SWlk_10: -29755124
+      SWlk_11: -620876403
+      SWlk_12: 1350876851
+      SWlk_13: 2051618146
+      SWlk_14: -1566188284
+      SWlk_15: -163713377
+      SWlk_2: 1657869333
+      SWlk_3: 1047195537
+      SWlk_4: 142121951
+      SWlk_5: -1774047860
+      SWlk_6: 2048454735
+      SWlk_7: 307681588
+      SWlk_8: -204401119
+      SWlk_9: -2122558989
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

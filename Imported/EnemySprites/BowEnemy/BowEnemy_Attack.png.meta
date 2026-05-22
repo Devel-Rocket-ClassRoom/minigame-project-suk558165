@@ -1,9 +1,55 @@
 fileFormatVersion: 2
 guid: c13b952b39fb50f46a202aef9163c02b
-labels:
-- UnityAI
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 431490331
+    second: BAtk_0
+  - first:
+      213: -910404177
+    second: BAtk_1
+  - first:
+      213: -210782873
+    second: BAtk_2
+  - first:
+      213: 145627527
+    second: BAtk_3
+  - first:
+      213: 1448825686
+    second: BAtk_4
+  - first:
+      213: 1527955861
+    second: BAtk_5
+  - first:
+      213: 1509943786
+    second: BAtk_6
+  - first:
+      213: -770067316
+    second: BAtk_7
+  - first:
+      213: 251678404
+    second: BAtk_8
+  - first:
+      213: -1851946578
+    second: BAtk_9
+  - first:
+      213: 999630298
+    second: BAtk_10
+  - first:
+      213: -1483526692
+    second: BAtk_11
+  - first:
+      213: -1526900063
+    second: BAtk_12
+  - first:
+      213: 282465308
+    second: BAtk_13
+  - first:
+      213: -1671414416
+    second: BAtk_14
+  - first:
+      213: -1806458253
+    second: BAtk_15
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -47,10 +93,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 50
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -74,7 +120,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,352 +158,352 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: frame_0
+      name: BAtk_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 768
-        width: 256
-        height: 256
+        y: 375
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 76d460a188d15a0419f91d915d7cb7d3
+      spriteID: b1508b91000000000800000000000000
       internalID: 431490331
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_1
+      name: BAtk_1
       rect:
         serializedVersion: 2
-        x: 256
-        y: 768
-        width: 256
-        height: 256
+        x: 125
+        y: 375
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: aaced60bd3ed1894d9adc095913d9dc7
+      spriteID: fa55cb9cffffffff0800000000000000
       internalID: -910404177
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_2
+      name: BAtk_2
       rect:
         serializedVersion: 2
-        x: 512
-        y: 768
-        width: 256
-        height: 256
+        x: 250
+        y: 375
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 115c5021e6b6d374a9183445ec5714eb
+      spriteID: 765bf63fffffffff0800000000000000
       internalID: -210782873
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_3
+      name: BAtk_3
       rect:
         serializedVersion: 2
-        x: 768
-        y: 768
-        width: 256
-        height: 256
+        x: 375
+        y: 375
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: a6f7efc449cefde42b38427dbd6770eb
+      spriteID: 7891ea80000000000800000000000000
       internalID: 145627527
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_4
+      name: BAtk_4
       rect:
         serializedVersion: 2
         x: 0
-        y: 512
-        width: 256
-        height: 256
+        y: 250
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: f7815a3a77ad30141b8cb0fd79280e75
+      spriteID: 6535b565000000000800000000000000
       internalID: 1448825686
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_5
+      name: BAtk_5
       rect:
         serializedVersion: 2
-        x: 256
-        y: 512
-        width: 256
-        height: 256
+        x: 125
+        y: 250
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 60a14082e98dc8944987cdc01a2a88ba
+      spriteID: 591c21b5000000000800000000000000
       internalID: 1527955861
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_6
+      name: BAtk_6
       rect:
         serializedVersion: 2
-        x: 512
-        y: 512
-        width: 256
-        height: 256
+        x: 250
+        y: 250
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: f88b90a62e9f1dc4082a734f3ac3c831
+      spriteID: ae9eff95000000000800000000000000
       internalID: 1509943786
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_7
+      name: BAtk_7
       rect:
         serializedVersion: 2
-        x: 768
-        y: 512
-        width: 256
-        height: 256
+        x: 375
+        y: 250
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: f5b9433f9a9578c4c843381daaa93f8d
+      spriteID: c84b912dffffffff0800000000000000
       internalID: -770067316
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_8
+      name: BAtk_8
       rect:
         serializedVersion: 2
         x: 0
-        y: 256
-        width: 256
-        height: 256
+        y: 125
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: fe3516fcffa922340abc66c385666b56
+      spriteID: 4ce400f0000000000800000000000000
       internalID: 251678404
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_9
+      name: BAtk_9
       rect:
         serializedVersion: 2
-        x: 256
-        y: 256
-        width: 256
-        height: 256
+        x: 125
+        y: 125
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 9af9fb89436f1dc4fbf259e34ce0fb56
+      spriteID: ea98d919ffffffff0800000000000000
       internalID: -1851946578
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_10
+      name: BAtk_10
       rect:
         serializedVersion: 2
-        x: 512
-        y: 256
-        width: 256
-        height: 256
+        x: 250
+        y: 125
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 24ea24fb03e45a8428d290caab765f36
+      spriteID: ad5259b3000000000800000000000000
       internalID: 999630298
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_11
+      name: BAtk_11
       rect:
         serializedVersion: 2
-        x: 768
-        y: 256
-        width: 256
-        height: 256
+        x: 375
+        y: 125
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 4abd39ba9bdaf4146bdfe249f663143c
+      spriteID: cdd2397affffffff0800000000000000
       internalID: -1483526692
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_12
+      name: BAtk_12
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 256
-        height: 256
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: a5ee52515356ac541a047a7033390e5c
+      spriteID: 1aa5df4affffffff0800000000000000
       internalID: -1526900063
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_13
+      name: BAtk_13
       rect:
         serializedVersion: 2
-        x: 256
+        x: 125
         y: 0
-        width: 256
-        height: 256
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 08c790b70263faf45b512ce8d0872d94
+      spriteID: c1416d01000000000800000000000000
       internalID: 282465308
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_14
+      name: BAtk_14
       rect:
         serializedVersion: 2
-        x: 512
+        x: 250
         y: 0
-        width: 256
-        height: 256
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 147ddf3cac3a19f4fb89e3f346c1beb9
+      spriteID: 07d306c9ffffffff0800000000000000
       internalID: -1671414416
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: frame_15
+      name: BAtk_15
       rect:
         serializedVersion: 2
-        x: 768
+        x: 375
         y: 0
-        width: 256
-        height: 256
+        width: 125
+        height: 125
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ee743371fa328764fa8d714a1b5d423f
+      spriteID: 372a3549ffffffff0800000000000000
       internalID: -1806458253
       vertices: []
       indices: 
@@ -467,7 +513,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -477,22 +523,22 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      frame_0: 431490331
-      frame_1: -910404177
-      frame_10: 999630298
-      frame_11: -1483526692
-      frame_12: -1526900063
-      frame_13: 282465308
-      frame_14: -1671414416
-      frame_15: -1806458253
-      frame_2: -210782873
-      frame_3: 145627527
-      frame_4: 1448825686
-      frame_5: 1527955861
-      frame_6: 1509943786
-      frame_7: -770067316
-      frame_8: 251678404
-      frame_9: -1851946578
+      BAtk_0: 431490331
+      BAtk_1: -910404177
+      BAtk_10: 999630298
+      BAtk_11: -1483526692
+      BAtk_12: -1526900063
+      BAtk_13: 282465308
+      BAtk_14: -1671414416
+      BAtk_15: -1806458253
+      BAtk_2: -210782873
+      BAtk_3: 145627527
+      BAtk_4: 1448825686
+      BAtk_5: 1527955861
+      BAtk_6: 1509943786
+      BAtk_7: -770067316
+      BAtk_8: 251678404
+      BAtk_9: -1851946578
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,9 +1,55 @@
 fileFormatVersion: 2
 guid: 762ef80ddedc35b409f0e618a0549aa1
-labels:
-- UnityAI
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 1016960521
+    second: CBAtk_0
+  - first:
+      213: 2021011227
+    second: CBAtk_1
+  - first:
+      213: -241989273
+    second: CBAtk_2
+  - first:
+      213: 491082617
+    second: CBAtk_3
+  - first:
+      213: -1358822427
+    second: CBAtk_4
+  - first:
+      213: -595764979
+    second: CBAtk_5
+  - first:
+      213: 1327679148
+    second: CBAtk_6
+  - first:
+      213: -304498218
+    second: CBAtk_7
+  - first:
+      213: 517202256
+    second: CBAtk_8
+  - first:
+      213: -1343573127
+    second: CBAtk_9
+  - first:
+      213: -1098703850
+    second: CBAtk_10
+  - first:
+      213: -101478361
+    second: CBAtk_11
+  - first:
+      213: 649012394
+    second: CBAtk_12
+  - first:
+      213: 1243873187
+    second: CBAtk_13
+  - first:
+      213: 2097607682
+    second: CBAtk_14
+  - first:
+      213: -533739472
+    second: CBAtk_15
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -74,7 +120,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,7 +158,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_0
+      name: CBAtk_0
       rect:
         serializedVersion: 2
         x: 0
@@ -125,16 +171,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 7155a7ddfac8a834487733cf55660b5b
-      internalID: 14255013
+      spriteID: 9069d9c3000000000800000000000000
+      internalID: 1016960521
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_1
+      name: CBAtk_1
       rect:
         serializedVersion: 2
         x: 256
@@ -147,16 +193,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 7bfaa8a349270dc4cb47c6d3336a8ada
-      internalID: 1966290832
+      spriteID: b1f26787000000000800000000000000
+      internalID: 2021011227
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_2
+      name: CBAtk_2
       rect:
         serializedVersion: 2
         x: 512
@@ -169,16 +215,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2e29f6b81377e52438e69006c8fa7b88
-      internalID: 1123704528
+      spriteID: 7698391fffffffff0800000000000000
+      internalID: -241989273
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_3
+      name: CBAtk_3
       rect:
         serializedVersion: 2
         x: 768
@@ -191,16 +237,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5b0ba06dcdeaf3d4f862c0723559ec9e
-      internalID: 892033437
+      spriteID: 973554d1000000000800000000000000
+      internalID: 491082617
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_4
+      name: CBAtk_4
       rect:
         serializedVersion: 2
         x: 0
@@ -213,16 +259,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 42d5b663e176cc649a5f1aa319227cff
-      internalID: -425006082
+      spriteID: 5e3020faffffffff0800000000000000
+      internalID: -1358822427
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_5
+      name: CBAtk_5
       rect:
         serializedVersion: 2
         x: 256
@@ -235,16 +281,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: c743fd1598b9b354ea6c67992b08c470
-      internalID: -1532902831
+      spriteID: d095d7cdffffffff0800000000000000
+      internalID: -595764979
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_6
+      name: CBAtk_6
       rect:
         serializedVersion: 2
         x: 512
@@ -257,16 +303,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 1c866b0e747014b4abf4f572030461c0
-      internalID: -20929816
+      spriteID: ca6c22f4000000000800000000000000
+      internalID: 1327679148
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_7
+      name: CBAtk_7
       rect:
         serializedVersion: 2
         x: 768
@@ -279,16 +325,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 927d4d61df3946941ba8ce432870fe66
-      internalID: 2133301671
+      spriteID: 6d9b9ddeffffffff0800000000000000
+      internalID: -304498218
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_8
+      name: CBAtk_8
       rect:
         serializedVersion: 2
         x: 0
@@ -301,16 +347,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: b51fd409e48ce5544946dcbcb7eee198
-      internalID: 303729294
+      spriteID: 051e3de1000000000800000000000000
+      internalID: 517202256
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_9
+      name: CBAtk_9
       rect:
         serializedVersion: 2
         x: 256
@@ -323,16 +369,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 51e9626e245622247b30e25b4a291497
-      internalID: -138470108
+      spriteID: 973baefaffffffff0800000000000000
+      internalID: -1343573127
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_10
+      name: CBAtk_10
       rect:
         serializedVersion: 2
         x: 512
@@ -345,16 +391,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 89d369e873e6f6a4c8d1f4f98f9d3da2
-      internalID: 1830710651
+      spriteID: 61c138ebffffffff0800000000000000
+      internalID: -1098703850
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_11
+      name: CBAtk_11
       rect:
         serializedVersion: 2
         x: 768
@@ -367,16 +413,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 6bca96c086d15b04e9db8d10e01106a9
-      internalID: 1968074702
+      spriteID: 72093f9fffffffff0800000000000000
+      internalID: -101478361
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_12
+      name: CBAtk_12
       rect:
         serializedVersion: 2
         x: 0
@@ -389,16 +435,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: dcddd132703e8974fad7ad0d6a3accda
-      internalID: 500871747
+      spriteID: aa42fa62000000000800000000000000
+      internalID: 649012394
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_13
+      name: CBAtk_13
       rect:
         serializedVersion: 2
         x: 256
@@ -411,16 +457,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: f8fa8bf98fda16d4a9a48b4995d70c11
-      internalID: -923057032
+      spriteID: 3aff32a4000000000800000000000000
+      internalID: 1243873187
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_14
+      name: CBAtk_14
       rect:
         serializedVersion: 2
         x: 512
@@ -433,16 +479,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 3f23c6bd04ad775439dd4e697a485e38
-      internalID: 418403583
+      spriteID: 204f60d7000000000800000000000000
+      internalID: 2097607682
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TigerCrossbow_Attack_15
+      name: CBAtk_15
       rect:
         serializedVersion: 2
         x: 768
@@ -455,10 +501,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e852a532ffc343e458dfb617ec7b2e3d
-      internalID: -1124656962
+      spriteID: 038cf20effffffff0800000000000000
+      internalID: -533739472
       vertices: []
       indices: 
       edges: []
@@ -467,7 +513,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -477,38 +523,22 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      TigerCrossbow_Attack_0: 14255013
-      TigerCrossbow_Attack_1: 1966290832
-      TigerCrossbow_Attack_10: 1830710651
-      TigerCrossbow_Attack_11: 1968074702
-      TigerCrossbow_Attack_12: 500871747
-      TigerCrossbow_Attack_13: -923057032
-      TigerCrossbow_Attack_14: 418403583
-      TigerCrossbow_Attack_15: -1124656962
-      TigerCrossbow_Attack_2: 1123704528
-      TigerCrossbow_Attack_3: 892033437
-      TigerCrossbow_Attack_4: -425006082
-      TigerCrossbow_Attack_5: -1532902831
-      TigerCrossbow_Attack_6: -20929816
-      TigerCrossbow_Attack_7: 2133301671
-      TigerCrossbow_Attack_8: 303729294
-      TigerCrossbow_Attack_9: -138470108
-      frame_0: 1201521120
-      frame_1: -1450008678
-      frame_10: 1338040221
-      frame_11: -1807236824
-      frame_12: -743463033
-      frame_13: -1836358730
-      frame_14: -506735325
-      frame_15: 511896815
-      frame_2: 114884529
-      frame_3: -1476113622
-      frame_4: -1810086678
-      frame_5: 1238677169
-      frame_6: 1963845685
-      frame_7: 1807608300
-      frame_8: -709856080
-      frame_9: 1165148856
+      CBAtk_0: 1016960521
+      CBAtk_1: 2021011227
+      CBAtk_10: -1098703850
+      CBAtk_11: -101478361
+      CBAtk_12: 649012394
+      CBAtk_13: 1243873187
+      CBAtk_14: 2097607682
+      CBAtk_15: -533739472
+      CBAtk_2: -241989273
+      CBAtk_3: 491082617
+      CBAtk_4: -1358822427
+      CBAtk_5: -595764979
+      CBAtk_6: 1327679148
+      CBAtk_7: -304498218
+      CBAtk_8: 517202256
+      CBAtk_9: -1343573127
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
