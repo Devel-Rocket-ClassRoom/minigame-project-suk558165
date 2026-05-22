@@ -186,7 +186,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!95 &5299861750410523060
 Animator:
@@ -271,7 +271,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1.28}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -313,4 +313,7 @@ MonoBehaviour:
   safeDistance: 3
   meleeHitbox: {fileID: 6858283969042510740}
   edgeCheckDepth: 0.4
+  platformLayer:
+    serializedVersion: 2
+    m_Bits: 512
   attackDamageDelay: 0.4

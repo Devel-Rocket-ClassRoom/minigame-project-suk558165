@@ -313,4 +313,7 @@ MonoBehaviour:
   safeDistance: 3
   meleeHitbox: {fileID: 2114419280557197980}
   edgeCheckDepth: 0.4
+  platformLayer:
+    serializedVersion: 2
+    m_Bits: 512
   attackDamageDelay: 0.4

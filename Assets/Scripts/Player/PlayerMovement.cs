@@ -10,8 +10,8 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask groundLayer;
     public LayerMask platformLayer;
     public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
-    public float dropDownDuration = 0.3f;
+    public Vector2 groundCheckSize = new Vector2(0.65f, 0.3f);
+    public float dropDownDuration = 0.15f;
 
     [Header("Gravity")]
     public float gravityScale = 4f;
@@ -77,9 +77,15 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         bool pressingDown = Input.GetKey(KeyCode.DownArrow);
+        Vector2 pCheckPos = groundCheck.position;
+        float pHalfW = groundCheckSize.x * 0.5f;
         bool onPlatform =
             platformLayer.value != 0
-            && Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, platformLayer);
+            && (
+                Physics2D.OverlapCircle(pCheckPos, 0.15f, platformLayer)
+                || Physics2D.OverlapCircle(pCheckPos + Vector2.left * pHalfW, 0.12f, platformLayer)
+                || Physics2D.OverlapCircle(pCheckPos + Vector2.right * pHalfW, 0.12f, platformLayer)
+            );
 
         if (pressingDown && onPlatform)
         {
@@ -177,27 +183,54 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
-        bool hit = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-        IsGrounded = hit && rb.linearVelocity.y <= 0.1f;
+        Vector2 checkPos = groundCheck.position;
+        // 낙하 중엔 넓게 (끝부분 착지), 서있을 땐 좁게 (발판 끝 공중 서기 방지)
+        bool falling = rb.linearVelocity.y < -0.5f;
+        float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
+        bool hit =
+            Physics2D.OverlapCircle(checkPos, 0.15f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, groundLayer);
+        IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
     }
 
     IEnumerator DropDown()
     {
-        var platGO = GameObject.Find("Tilemap_Platform");
-        if (platGO == null)
+        var playerCol = GetComponent<Collider2D>();
+        Vector2 dCheckPos = groundCheck.position;
+        float dHalfW = groundCheckSize.x * 0.5f;
+        var hitSet = new System.Collections.Generic.HashSet<Collider2D>();
+        foreach (var c in Physics2D.OverlapCircleAll(dCheckPos, 0.15f, platformLayer))
+            hitSet.Add(c);
+        foreach (
+            var c in Physics2D.OverlapCircleAll(
+                dCheckPos + Vector2.left * dHalfW,
+                0.12f,
+                platformLayer
+            )
+        )
+            hitSet.Add(c);
+        foreach (
+            var c in Physics2D.OverlapCircleAll(
+                dCheckPos + Vector2.right * dHalfW,
+                0.12f,
+                platformLayer
+            )
+        )
+            hitSet.Add(c);
+        var hits = new Collider2D[hitSet.Count];
+        hitSet.CopyTo(hits);
+        if (hits.Length == 0)
             yield break;
 
-        var playerCol = GetComponent<Collider2D>();
-        var platCols = platGO.GetComponents<Collider2D>();
-
-        foreach (var c in platCols)
+        foreach (var c in hits)
             Physics2D.IgnoreCollision(playerCol, c, true);
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        foreach (var c in platCols)
+        foreach (var c in hits)
             if (c != null)
                 Physics2D.IgnoreCollision(playerCol, c, false);
     }

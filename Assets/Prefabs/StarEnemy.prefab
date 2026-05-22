@@ -214,13 +214,16 @@ MonoBehaviour:
     m_Bits: 576
   patrolDistance: 4
   chaseYThreshold: 1.2
-  isRanged: 0
-  projectilePrefab: {fileID: 0}
+  isRanged: 1
+  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
   meleeHitbox: {fileID: 3317682275281999150}
   edgeCheckDepth: 0.4
+  platformLayer:
+    serializedVersion: 2
+    m_Bits: 512
   attackDamageDelay: 0.4
 --- !u!1 &8995280196249140786
 GameObject:

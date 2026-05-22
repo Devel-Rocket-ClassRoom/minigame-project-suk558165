@@ -33,10 +33,12 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
+    public LayerMask platformLayer;
 
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
+    private Collider2D col;
 
     private float hp;
     private bool isDead;
@@ -57,6 +59,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        col = GetComponent<Collider2D>();
         hp = maxHp;
         patrolOrigin = transform.position;
 
@@ -163,6 +166,13 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void Patrol()
     {
+        // 발 아래에 바닥이 없으면 즉시 수평 이동 중지 (안전망)
+        if (!IsGrounded())
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         float distFromOrigin = transform.position.x - patrolOrigin.x;
 
         if (distFromOrigin >= patrolDistance)
@@ -171,22 +181,40 @@ public class EnemyController : MonoBehaviour, IDamageable
             patrolDir = 1;
 
         if (IsEdgeAhead(patrolDir))
+        {
             patrolDir = -patrolDir;
+            Move(patrolDir); // 멈추지 않고 즉시 반대로 이동
+            return;
+        }
 
         Move(patrolDir);
+    }
+
+    bool IsGrounded()
+    {
+        float footY = col != null ? col.bounds.min.y : transform.position.y;
+        Vector2 origin = new Vector2(transform.position.x, footY + 0.05f);
+        return Physics2D.Raycast(origin, Vector2.down, 0.2f, groundLayer | platformLayer).collider
+            != null;
     }
 
     bool IsEdgeAhead(float dir)
     {
         if (dir == 0f)
             return false;
-        var col = GetComponent<Collider2D>();
-        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.1f;
-        // 발 바닥 높이에서 레이를 쏴야 정확하게 감지됨
+        float xOffset = (col != null ? col.bounds.extents.x : 0.3f) + 0.3f;
         float footY = col != null ? col.bounds.min.y : transform.position.y;
-        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, footY + 0.05f);
-        return Physics2D.Raycast(origin, Vector2.down, edgeCheckDepth, groundLayer).collider
-            == null;
+        // 레이를 발보다 0.3 위에서 시작 → 콜라이더 내부에서 시작하는 오작동 방지
+        const float rayStartOffset = 0.3f;
+        Vector2 origin = new Vector2(transform.position.x + dir * xOffset, footY + rayStartOffset);
+        return Physics2D
+                .Raycast(
+                    origin,
+                    Vector2.down,
+                    edgeCheckDepth + rayStartOffset,
+                    groundLayer | platformLayer
+                )
+                .collider == null;
     }
 
     void Move(float dir)
@@ -234,7 +262,6 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
-        Debug.Log($"[Enemy] {gameObject.name} 데미지 {amount} 받음 → HP {hp:F0}/{maxHp:F0}");
         animator.SetTrigger(HashIsHit);
 
         if (hp <= 0f)
@@ -253,44 +280,24 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
-        StartCoroutine(DeathEffect());
+        animator.SetBool(HashIsDead, true);
+        StartCoroutine(DeathRoutine());
     }
 
-    IEnumerator DeathEffect()
+    IEnumerator DeathRoutine()
     {
-        // 모든 SpriteRenderer 수집 (자식 포함)
-        var renderers = GetComponentsInChildren<SpriteRenderer>();
+        // 상태 전환 대기
+        yield return null;
 
-        // 0.6초간 깜빡임 (0.08초 간격)
-        float blinkDuration = 0.6f;
-        float blinkInterval = 0.08f;
+        // 데스 애니메이션 완료 대기 (최대 5초 타임아웃)
+        float timeout = 5f;
         float elapsed = 0f;
-        bool visible = false;
-        while (elapsed < blinkDuration)
+        while (elapsed < timeout)
         {
-            visible = !visible;
-            foreach (var r in renderers)
-                r.enabled = visible;
-            yield return new WaitForSeconds(blinkInterval);
-            elapsed += blinkInterval;
-        }
-
-        // 0.4초간 페이드아웃
-        foreach (var r in renderers)
-            r.enabled = true;
-
-        float fadeDuration = 0.4f;
-        elapsed = 0f;
-        while (elapsed < fadeDuration)
-        {
+            var state = animator.GetCurrentAnimatorStateInfo(0);
+            if (!animator.IsInTransition(0) && state.normalizedTime >= 1f)
+                break;
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
-            foreach (var r in renderers)
-            {
-                Color c = r.color;
-                c.a = alpha;
-                r.color = c;
-            }
             yield return null;
         }
 

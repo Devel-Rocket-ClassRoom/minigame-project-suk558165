@@ -15,11 +15,10 @@ public class WeaponInventory : MonoBehaviour
         if (weapons.Count < 2)
             return;
 
-        float scroll = Input.GetAxisRaw("Mouse ScrollWheel");
-        if (scroll == 0f)
-            return;
-
-        currentIndex = (currentIndex + (scroll > 0f ? -1 : 1) + weapons.Count) % weapons.Count;
-        OnWeaponChanged?.Invoke(Current);
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            currentIndex = (currentIndex + 1) % weapons.Count;
+            OnWeaponChanged?.Invoke(Current);
+        }
     }
 }

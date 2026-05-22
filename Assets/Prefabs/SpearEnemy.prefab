@@ -221,6 +221,9 @@ MonoBehaviour:
   safeDistance: 3
   meleeHitbox: {fileID: 1002739566803246385}
   edgeCheckDepth: 0.4
+  platformLayer:
+    serializedVersion: 2
+    m_Bits: 512
   attackDamageDelay: 0.4
 --- !u!1 &5281891531134171487
 GameObject:

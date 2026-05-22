@@ -196,7 +196,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Size: {x: 0.7, y: 2.2058895}
-  m_EdgeRadius: 0
+  m_EdgeRadius: 0.04
 --- !u!114 &7740948866993071214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,7 +270,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   groundCheck: {fileID: 400001}
-  groundCheckRadius: 0.15
+  groundCheckSize: {x: 0.65, y: 0.3}
   dropDownDuration: 0.3
   gravityScale: 4
   fallGravityMultiplier: 2.5
@@ -293,7 +293,7 @@ MonoBehaviour:
   weapon: {fileID: 1274484273918966404}
   weaponInventory: {fileID: 7740948866993071214}
   projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
-  firePoint: {fileID: 3580415539754441683}
+  firePoint: {fileID: 4200001}
   projectileSpeed: 12
   rangedDamage: 15
   rangedCooldown: 0.8
@@ -720,7 +720,39 @@ Transform:
   - {fileID: 4606872265142446899}
   - {fileID: 7971894412984809299}
   - {fileID: 7609795302661756741}
+  - {fileID: 4200001}
   m_Father: {fileID: 400000}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4200000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4200001}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4200001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4200000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5577368133512836079}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6399755090245629496
 GameObject:

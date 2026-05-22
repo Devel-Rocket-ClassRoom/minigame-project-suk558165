@@ -42,10 +42,6 @@ public class Projectile : MonoBehaviour
         int shooterLayer = shooter != null ? shooter.layer : -1;
         int targetLayer = other.gameObject.layer;
 
-        Debug.Log(
-            $"[Projectile] shooter={shooter?.name}(layer={LayerMask.LayerToName(shooterLayer)}) → hit={other.gameObject.name}(layer={LayerMask.LayerToName(targetLayer)}) rootLayer={LayerMask.LayerToName(other.transform.root.gameObject.layer)}"
-        );
-
         if (shooter != null)
         {
             bool shooterIsEnemy = shooterLayer == enemyLayer;
