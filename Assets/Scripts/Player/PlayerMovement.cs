@@ -40,6 +40,9 @@ public class PlayerMovement : MonoBehaviour
     private int dashCharges;
     private float dashDirection;
 
+    private Collider2D playerCollider;
+    private Collider2D[] platformBuffer = new Collider2D[16];
+
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
     private static readonly int HashDash = Animator.StringToHash("Dash");
@@ -49,6 +52,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         Sr = GetComponent<SpriteRenderer>();
+        playerCollider = GetComponent<Collider2D>();
         Visuals = transform.Find("Visuals");
 
         rb.gravityScale = gravityScale;
@@ -183,15 +187,32 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
+        UpdatePlatformCollision();
+
         Vector2 checkPos = groundCheck.position;
-        // 낙하 중엔 넓게 (끝부분 착지), 서있을 땐 좁게 (발판 끝 공중 서기 방지)
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
+        LayerMask combinedLayer = groundLayer | platformLayer;
         bool hit =
-            Physics2D.OverlapCircle(checkPos, 0.15f, groundLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, groundLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, groundLayer);
+            Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
+    }
+
+    void UpdatePlatformCollision()
+    {
+        if (platformLayer.value == 0 || playerCollider == null) return;
+
+        bool goingUp = rb.linearVelocity.y > 0.1f;
+        int count = Physics2D.OverlapBoxNonAlloc(
+            transform.position, new Vector2(2f, 3f), 0f, platformBuffer, platformLayer);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (platformBuffer[i] != null)
+                Physics2D.IgnoreCollision(playerCollider, platformBuffer[i], goingUp);
+        }
     }
 
     IEnumerator DropDown()
