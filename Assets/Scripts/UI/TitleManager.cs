@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
 {
-    [SerializeField] private string gameSceneName = "Maptest";
+    [SerializeField] private string gameSceneName = "Village";
 
     public void OnNewGame()
     {

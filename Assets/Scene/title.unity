@@ -592,7 +592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleManager
-  gameSceneName: Maptest
+  gameSceneName: Village
 --- !u!4 &911415620
 Transform:
   m_ObjectHideFlags: 0

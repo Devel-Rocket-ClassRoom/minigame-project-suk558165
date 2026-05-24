@@ -3,23 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 
+public enum RoomType
+{
+    Normal,
+    Shop,
+    MiniBoss,
+    Boss
+}
+
 public class RoomManager : MonoBehaviour
 {
-    [Header("Room Pool")]
-    [SerializeField] private GameObject[] roomPrefabs;
+    private const int TotalRooms = 10;
+    private const int ShopRoom = 4;
+    private const int MiniBossRoom = 7;
+    private const int BossRoom = 10;
 
-    [Header("Stage Settings")]
-    [SerializeField] private int roomsPerStage = 5;
+    [Header("Normal Room Pool")]
+    [SerializeField] private GameObject[] normalRoomPrefabs;
+
+    [Header("Special Room Prefabs")]
+    [SerializeField] private GameObject shopRoomPrefab;
+    [SerializeField] private GameObject miniBossRoomPrefab;
+    [SerializeField] private GameObject bossRoomPrefab;
 
     [Header("References")]
     [SerializeField] private Transform player;
     [SerializeField] private CinemachineConfiner2D confiner;
 
-    public int CurrentRoomIndex { get; private set; }
-    public int CurrentStage { get; private set; } = 1;
+    public int CurrentRoomNumber { get; private set; }
+    public RoomType CurrentRoomType { get; private set; }
 
     private GameObject currentRoom;
-    private List<int> roomOrder;
+    private List<int> normalRoomOrder;
+    private int normalRoomCursor;
     private Portal currentPortal;
 
     void Start()
@@ -36,40 +52,66 @@ public class RoomManager : MonoBehaviour
             if (cmCam != null) confiner = cmCam.GetComponent<CinemachineConfiner2D>();
         }
 
-        GenerateRoomOrder();
-        StartCoroutine(LoadRoomWithFade(0, true));
+        ShuffleNormalRooms();
+        StartCoroutine(LoadRoomWithFade(1, true));
     }
 
-    void GenerateRoomOrder()
+    void ShuffleNormalRooms()
     {
-        roomOrder = new List<int>();
-        var available = new List<int>();
-        for (int i = 0; i < roomPrefabs.Length; i++)
-            available.Add(i);
+        normalRoomOrder = new List<int>();
+        for (int i = 0; i < normalRoomPrefabs.Length; i++)
+            normalRoomOrder.Add(i);
 
-        for (int i = 0; i < roomsPerStage; i++)
+        for (int i = normalRoomOrder.Count - 1; i > 0; i--)
         {
-            if (available.Count == 0)
-            {
-                for (int j = 0; j < roomPrefabs.Length; j++)
-                    available.Add(j);
-            }
-            int pick = Random.Range(0, available.Count);
-            roomOrder.Add(available[pick]);
-            available.RemoveAt(pick);
+            int j = Random.Range(0, i + 1);
+            (normalRoomOrder[i], normalRoomOrder[j]) = (normalRoomOrder[j], normalRoomOrder[i]);
         }
+
+        normalRoomCursor = 0;
     }
 
-    void LoadRoom(int index)
+    int PickNormalRoomIndex()
+    {
+        if (normalRoomCursor >= normalRoomOrder.Count)
+            ShuffleNormalRooms();
+
+        return normalRoomOrder[normalRoomCursor++];
+    }
+
+    RoomType GetRoomType(int roomNumber)
+    {
+        return roomNumber switch
+        {
+            ShopRoom => RoomType.Shop,
+            MiniBossRoom => RoomType.MiniBoss,
+            BossRoom => RoomType.Boss,
+            _ => RoomType.Normal
+        };
+    }
+
+    GameObject GetRoomPrefab(RoomType type)
+    {
+        return type switch
+        {
+            RoomType.Shop => shopRoomPrefab,
+            RoomType.MiniBoss => miniBossRoomPrefab,
+            RoomType.Boss => bossRoomPrefab,
+            _ => normalRoomPrefabs[PickNormalRoomIndex()]
+        };
+    }
+
+    void LoadRoom(int roomNumber)
     {
         if (currentRoom != null)
             Destroy(currentRoom);
 
-        CurrentRoomIndex = index;
-        int prefabIndex = roomOrder[index];
-        currentRoom = Instantiate(roomPrefabs[prefabIndex]);
+        CurrentRoomNumber = roomNumber;
+        CurrentRoomType = GetRoomType(roomNumber);
 
-        // 플레이어 위치 이동
+        var prefab = GetRoomPrefab(CurrentRoomType);
+        currentRoom = Instantiate(prefab);
+
         var spawnPoint = currentRoom.GetComponentInChildren<PlayerSpawnPoint>();
         if (spawnPoint != null && player != null)
         {
@@ -78,7 +120,6 @@ public class RoomManager : MonoBehaviour
             if (rb != null) rb.linearVelocity = Vector2.zero;
         }
 
-        // 카메라 바운드 갱신
         if (confiner != null)
         {
             var bounds = currentRoom.GetComponentInChildren<PolygonCollider2D>();
@@ -89,10 +130,15 @@ public class RoomManager : MonoBehaviour
             }
         }
 
-        // 포탈 연결
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
 
-        // SpawnManager 클리어 이벤트 연결
+        if (CurrentRoomType == RoomType.Shop)
+        {
+            if (currentPortal != null)
+                currentPortal.SetActive(true);
+            return;
+        }
+
         var spawnMgr = currentRoom.GetComponentInChildren<SpawnManager>();
         if (spawnMgr != null)
             spawnMgr.onAllEnemiesDead += OnRoomCleared;
@@ -106,25 +152,27 @@ public class RoomManager : MonoBehaviour
 
     public void GoToNextRoom()
     {
-        int next = CurrentRoomIndex + 1;
-        if (next >= roomsPerStage)
+        int next = CurrentRoomNumber + 1;
+        if (next > TotalRooms)
         {
-            CurrentStage++;
-            GenerateRoomOrder();
-            StartCoroutine(LoadRoomWithFade(0, false));
+            OnGameClear();
+            return;
         }
-        else
-        {
-            StartCoroutine(LoadRoomWithFade(next, false));
-        }
+
+        StartCoroutine(LoadRoomWithFade(next, false));
     }
 
-    IEnumerator LoadRoomWithFade(int index, bool isFirst)
+    void OnGameClear()
+    {
+        Debug.Log("Game Clear!");
+    }
+
+    IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
     {
         if (!isFirst && ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeOut();
 
-        LoadRoom(index);
+        LoadRoom(roomNumber);
 
         yield return null;
 
