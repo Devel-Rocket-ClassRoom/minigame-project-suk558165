@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Collider2D playerCollider;
     private Collider2D[] platformBuffer = new Collider2D[16];
+    private bool isDropping;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -203,20 +204,24 @@ public class PlayerMovement : MonoBehaviour
     void UpdatePlatformCollision()
     {
         if (platformLayer.value == 0 || playerCollider == null) return;
+        if (isDropping) return;
 
-        bool goingUp = rb.linearVelocity.y > 0.1f;
+        float playerCenterY = playerCollider.bounds.center.y;
         int count = Physics2D.OverlapBoxNonAlloc(
             transform.position, new Vector2(2f, 3f), 0f, platformBuffer, platformLayer);
 
         for (int i = 0; i < count; i++)
         {
-            if (platformBuffer[i] != null)
-                Physics2D.IgnoreCollision(playerCollider, platformBuffer[i], goingUp);
+            if (platformBuffer[i] == null) continue;
+            float platformTopY = platformBuffer[i].bounds.max.y;
+            bool shouldIgnore = rb.linearVelocity.y > 0.1f || playerCenterY < platformTopY;
+            Physics2D.IgnoreCollision(playerCollider, platformBuffer[i], shouldIgnore);
         }
     }
 
     IEnumerator DropDown()
     {
+        isDropping = true;
         var playerCol = GetComponent<Collider2D>();
         Vector2 dCheckPos = groundCheck.position;
         float dHalfW = groundCheckSize.x * 0.5f;
@@ -250,6 +255,8 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
 
         yield return new WaitForSeconds(dropDownDuration);
+
+        isDropping = false;
 
         foreach (var c in hits)
             if (c != null)
