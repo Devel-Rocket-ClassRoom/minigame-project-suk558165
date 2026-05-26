@@ -5,20 +5,31 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject titlePanel;
 
-    public void OnNewGame()
+    void OnEnable()
     {
-        GameFlowController.Instance.StartNewGame();
+        SetHUD(false);
     }
 
-    public void OnContinue()
+    void OnDisable()
     {
-        Debug.Log("Continue: 세이브 시스템 미구현");
+        SetHUD(true);
     }
 
-    public void OnOptions()
+    private void SetHUD(bool visible)
     {
-        Debug.Log("Options: 미구현");
+        var hpBar = GameObject.Find("HpBar_Frame");
+        var controls = GameObject.Find("ControlsPanel");
+        if (hpBar != null)
+            hpBar.SetActive(visible);
+        if (controls != null)
+            controls.SetActive(visible);
     }
+
+    public void OnNewGame() => GameFlowController.Instance.StartNewGame();
+
+    public void OnContinue() => Debug.Log("Continue: 세이브 시스템 미구현");
+
+    public void OnOptions() => Debug.Log("Options: 미구현");
 
     public void OnQuit()
     {
