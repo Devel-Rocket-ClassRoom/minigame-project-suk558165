@@ -60,9 +60,6 @@ public class PlayerWeapon : MonoBehaviour
 
     public void Attack(Vector3 mouseWorld)
     {
-        Debug.Log(
-            $"[PlayerWeapon] Attack 호출 | isSwinging={isSwinging} | active={gameObject.activeInHierarchy} | enemyLayer={enemyLayer.value}"
-        );
         if (isSwinging || !gameObject.activeInHierarchy)
             return;
         StartCoroutine(DoSwing(mouseWorld));
@@ -106,12 +103,9 @@ public class PlayerWeapon : MonoBehaviour
         bool facingLeft = visuals != null && visuals.localScale.x < 0f;
         float facing = facingLeft ? -1f : 1f;
         Vector2 origin = (Vector2)playerRoot.position;
-        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.2f);
+        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.4f);
 
         var hits = Physics2D.OverlapCircleAll(tipPos, hitRadius, enemyLayer);
-        Debug.Log(
-            $"[PlayerWeapon] CheckHit | tipPos={tipPos} | enemyLayer={enemyLayer.value} | hits={hits.Length}"
-        );
 
         foreach (var hit in hits)
         {
@@ -123,10 +117,7 @@ public class PlayerWeapon : MonoBehaviour
 
             var damageable = hit.GetComponentInParent<IDamageable>();
             if (damageable == null)
-            {
-                Debug.Log($"[PlayerWeapon] hit {hit.gameObject.name} 하지만 IDamageable 없음");
                 continue;
-            }
 
             hitIds.Add(id);
             damageable.TakeDamage(damage);
@@ -149,7 +140,7 @@ public class PlayerWeapon : MonoBehaviour
         float facing = facingLeft ? -1f : 1f;
 
         Vector2 origin = (Vector2)root.position;
-        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.2f);
+        Vector2 tipPos = origin + new Vector2(facing * attackRadius, 0.4f);
 
         // 무기 사거리
         Gizmos.color = new Color(1f, 1f, 0f, 0.4f);

@@ -15,12 +15,21 @@ public class SpawnManager : MonoBehaviour
     }
 
     public List<SpawnEntry> entries = new List<SpawnEntry>();
-    public float respawnDelay = 3f;
+    [SerializeField] private bool respawnEnabled = false;
+    [SerializeField] private float respawnDelay = 3f;
+
+    public System.Action onAllEnemiesDead;
+
+    private int aliveCount;
 
     void Start()
     {
+        aliveCount = 0;
         foreach (var entry in entries)
+        {
             SpawnEnemy(entry);
+            aliveCount++;
+        }
     }
 
     void SpawnEnemy(SpawnEntry entry)
@@ -31,12 +40,29 @@ public class SpawnManager : MonoBehaviour
         var go = Instantiate(entry.prefab, entry.spawnPoint.position, Quaternion.identity);
         entry.activeEnemy = go.GetComponent<EnemyController>();
         if (entry.activeEnemy != null)
-            entry.activeEnemy.onDeath += () => StartCoroutine(Respawn(entry));
+        {
+            entry.activeEnemy.onDeath += () => OnEnemyDied(entry);
+        }
+    }
+
+    void OnEnemyDied(SpawnEntry entry)
+    {
+        aliveCount--;
+
+        if (respawnEnabled)
+        {
+            StartCoroutine(Respawn(entry));
+            return;
+        }
+
+        if (aliveCount <= 0)
+            onAllEnemiesDead?.Invoke();
     }
 
     IEnumerator Respawn(SpawnEntry entry)
     {
         yield return new WaitForSeconds(respawnDelay);
+        aliveCount++;
         SpawnEnemy(entry);
     }
 }
