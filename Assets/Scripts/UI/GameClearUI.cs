@@ -1,7 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameClearUI : MonoBehaviour
 {
@@ -29,14 +29,12 @@ public class GameClearUI : MonoBehaviour
     {
         if (triggered)
             return;
-
         triggered = true;
         StartCoroutine(ShowAndReturn());
     }
 
     IEnumerator ShowAndReturn()
     {
-        // 페이드 인
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
@@ -46,7 +44,6 @@ public class GameClearUI : MonoBehaviour
             yield return null;
         }
 
-        // 카운트다운 후 타이틀로 복귀
         float remaining = returnDelay;
         while (remaining > 0f)
         {
@@ -56,6 +53,18 @@ public class GameClearUI : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        GameFlowController.Instance?.GoToTitle();
+    }
+
+    public void ResetUI()
+    {
+        triggered = false;
+        StopAllCoroutines();
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 }

@@ -4,20 +4,17 @@ using UnityEngine.UI;
 
 public class PlayerHealthDisplay : MonoBehaviour
 {
-    public PlayerHealth playerHealth;
-
-    [Header("UI References (씬에서 연결)")]
+    [Header("UI References")]
     public Image fillImage;
     public TextMeshProUGUI hpText;
 
-    void Awake()
-    {
-        if (playerHealth == null)
-            playerHealth = GetComponent<PlayerHealth>() ?? FindFirstObjectByType<PlayerHealth>();
-    }
+    private PlayerHealth playerHealth;
 
     void Update()
     {
+        if (playerHealth == null)
+            playerHealth = FindFirstObjectByType<PlayerHealth>();
+
         if (playerHealth == null)
             return;
 

@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour
 {
-    [Header("References")]
-    public PlayerHealth playerHealth;
-
     [Header("UI")]
     public CanvasGroup canvasGroup;
     public TextMeshProUGUI countdownText;
@@ -16,13 +13,11 @@ public class GameOverUI : MonoBehaviour
     public float reloadDelay = 3f;
     public float fadeInDuration = 0.6f;
 
+    private PlayerHealth playerHealth;
     private bool triggered;
 
     void Awake()
     {
-        if (playerHealth == null)
-            playerHealth = FindFirstObjectByType<PlayerHealth>();
-
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 0f;
@@ -33,7 +28,13 @@ public class GameOverUI : MonoBehaviour
 
     void Update()
     {
-        if (triggered || playerHealth == null || !playerHealth.IsDead)
+        if (triggered)
+            return;
+
+        if (playerHealth == null)
+            playerHealth = FindFirstObjectByType<PlayerHealth>();
+
+        if (playerHealth == null || !playerHealth.IsDead)
             return;
 
         triggered = true;
@@ -42,7 +43,6 @@ public class GameOverUI : MonoBehaviour
 
     IEnumerator ShowAndReload()
     {
-        // 페이드 인
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
@@ -52,7 +52,6 @@ public class GameOverUI : MonoBehaviour
             yield return null;
         }
 
-        // 카운트다운
         float remaining = reloadDelay;
         while (remaining > 0f)
         {
@@ -62,8 +61,19 @@ public class GameOverUI : MonoBehaviour
             yield return null;
         }
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
-        );
+        GameFlowController.Instance?.GoToTitle();
+    }
+
+    public void ResetUI()
+    {
+        triggered = false;
+        playerHealth = null;
+        StopAllCoroutines();
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 }

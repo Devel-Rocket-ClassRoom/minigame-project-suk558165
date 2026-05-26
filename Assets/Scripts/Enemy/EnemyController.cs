@@ -28,6 +28,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Header("Knockback")]
+    public float knockbackForce = 6f;
+    public float knockbackDuration = 0.15f;
+
     [Header("Melee")]
     public Collider2D meleeHitbox;
 
@@ -262,10 +266,30 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
-        animator.SetTrigger(HashIsHit);
 
         if (hp <= 0f)
+        {
             Die();
+            return;
+        }
+
+        animator.SetTrigger(HashIsHit);
+
+        if (player != null)
+            StartCoroutine(Knockback((transform.position - player.position).normalized));
+    }
+
+    IEnumerator Knockback(Vector2 dir)
+    {
+        float elapsed = 0f;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        while (elapsed < knockbackDuration)
+        {
+            rb.linearVelocity = new Vector2(dir.x * knockbackForce, rb.linearVelocity.y);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
     public System.Action onDeath;
@@ -280,22 +304,25 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
+        animator.ResetTrigger(HashIsHit);
+        animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);
         StartCoroutine(DeathRoutine());
     }
 
     IEnumerator DeathRoutine()
     {
-        // 상태 전환 대기
+        yield return null;
         yield return null;
 
-        // 데스 애니메이션 완료 대기 (최대 5초 타임아웃)
-        float timeout = 5f;
+        while (animator.IsInTransition(0))
+            yield return null;
+
         float elapsed = 0f;
-        while (elapsed < timeout)
+        while (elapsed < 5f)
         {
-            var state = animator.GetCurrentAnimatorStateInfo(0);
-            if (!animator.IsInTransition(0) && state.normalizedTime >= 1f)
+            var info = animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName("Death") && info.normalizedTime >= 1f)
                 break;
             elapsed += Time.deltaTime;
             yield return null;

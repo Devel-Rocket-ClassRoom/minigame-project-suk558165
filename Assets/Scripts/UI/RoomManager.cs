@@ -53,16 +53,26 @@ public class RoomManager : MonoBehaviour
 
     void Start()
     {
-        if (player == null)
-        {
-            var p = GameObject.FindWithTag("Player");
-            if (p != null)
-                player = p.transform;
-        }
-
         cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
         if (confiner == null && cinemachineCamera != null)
             confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
+    }
+
+    public void SetPlayer(Transform playerTransform)
+    {
+        player = playerTransform;
+    }
+
+    public void ResetDungeon()
+    {
+        StopAllCoroutines();
+        if (currentRoom != null)
+        {
+            Destroy(currentRoom);
+            currentRoom = null;
+        }
+        CurrentRoomNumber = 0;
+        player = null;
     }
 
     public void StartGame()

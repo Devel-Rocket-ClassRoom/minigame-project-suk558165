@@ -1,103 +1,107 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-/// <summary>
-/// 단일 씬에서 타이틀 → 마을 → 던전 → 클리어 흐름을 관리합니다.
-/// </summary>
 public class GameFlowController : MonoBehaviour
 {
     public static GameFlowController Instance { get; private set; }
 
-    [Header("UI")]
+    [Header("프리팹")]
     [SerializeField]
-    private GameObject titlePanel;
-
-    [Header("마을")]
-    [SerializeField]
-    private GameObject villageRoot; // Village 맵 + DungeonEntrance 묶음
+    private GameObject titlePrefab;
 
     [SerializeField]
-    private Transform villageSpawn; // 마을 플레이어 스폰 위치
+    private GameObject villagePrefab;
 
     [SerializeField]
-    private PolygonCollider2D villageCamBounds; // 마을 카메라 경계
+    private GameObject playerPrefab;
 
-    [Header("던전")]
+    [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
 
-    [Header("플레이어")]
     [SerializeField]
-    private GameObject player;
+    private CinemachineCamera cinemachineCamera;
 
-    [Header("카메라")]
-    [SerializeField]
-    private CinemachineConfiner2D confiner;
+    private GameObject titleInstance;
+    private GameObject villageInstance;
+    private GameObject playerInstance;
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    void Awake() => Instance = this;
 
-    void Start()
-    {
-        GoToTitle();
-    }
+    void Start() => GoToTitle();
 
-    // ── 타이틀 화면 ─────────────────────────────────────
     public void GoToTitle()
     {
-        if (titlePanel)
-            titlePanel.SetActive(true);
-        if (villageRoot)
-            villageRoot.SetActive(false);
-        if (player)
-            player.SetActive(false);
+        roomManager.ResetDungeon();
+
+        if (villageInstance != null)
+        {
+            Destroy(villageInstance);
+            villageInstance = null;
+        }
+        if (playerInstance != null)
+        {
+            Destroy(playerInstance);
+            playerInstance = null;
+        }
+
+        FindFirstObjectByType<GameOverUI>()?.ResetUI();
+        FindFirstObjectByType<GameClearUI>()?.ResetUI();
+
+        titleInstance = Instantiate(titlePrefab);
     }
 
-    // TitleUI.OnNewGame() 에서 호출
     public void StartNewGame()
     {
-        if (titlePanel)
-            titlePanel.SetActive(false);
-
-        if (villageRoot != null)
-            GoToVillage();
-        else
+        if (titleInstance != null)
         {
-            if (player)
-                player.SetActive(true);
-            roomManager.StartGame();
+            Destroy(titleInstance);
+            titleInstance = null;
         }
+
+        playerInstance = Instantiate(playerPrefab);
+
+        if (cinemachineCamera != null)
+            cinemachineCamera.Follow = playerInstance.transform;
+
+        roomManager.SetPlayer(playerInstance.transform);
+        GoToVillage();
     }
 
-    // ── 마을 ─────────────────────────────────────────────
     void GoToVillage()
     {
-        villageRoot.SetActive(true);
-        player.SetActive(true);
+        villageInstance = Instantiate(villagePrefab);
 
-        if (villageSpawn != null)
+        var spawn = villageInstance.GetComponentInChildren<PlayerSpawnPoint>();
+        if (spawn != null)
         {
-            player.transform.position = villageSpawn.position;
-            var rb = player.GetComponent<Rigidbody2D>();
-            if (rb)
+            playerInstance.transform.position = spawn.transform.position;
+            var rb = playerInstance.GetComponent<Rigidbody2D>();
+            if (rb != null)
                 rb.linearVelocity = Vector2.zero;
         }
 
-        if (confiner != null && villageCamBounds != null)
+        var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
+        if (confiner != null)
         {
-            confiner.BoundingShape2D = villageCamBounds;
-            confiner.InvalidateBoundingShapeCache();
+            var bounds = villageInstance
+                .transform.Find("CameraBounds")
+                ?.GetComponent<PolygonCollider2D>();
+            if (bounds != null)
+            {
+                confiner.BoundingShape2D = bounds;
+                confiner.InvalidateBoundingShapeCache();
+            }
         }
     }
 
-    // ── 던전 진입 (DungeonEntrance 에서 호출) ────────────
     public void EnterDungeon()
     {
-        if (villageRoot)
-            villageRoot.SetActive(false);
+        if (villageInstance != null)
+        {
+            Destroy(villageInstance);
+            villageInstance = null;
+        }
         roomManager.StartGame();
-        // RoomManager.LoadRoom() 이 방마다 confiner 경계를 자동 갱신함
     }
 }
