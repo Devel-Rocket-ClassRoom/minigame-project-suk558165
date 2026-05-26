@@ -100,7 +100,7 @@ SpriteRenderer:
   m_Size: {x: 0.42666668, y: 0.42666668}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!50 &5000000
 Rigidbody2D:
@@ -225,7 +225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
-  playerHealth: {fileID: 6507411717424860390}
   fillImage: {fileID: 0}
   hpText: {fileID: 0}
 --- !u!114 &6507411717424860390
@@ -482,7 +481,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -3643107421165482990, guid: 696df115c3784d94a83b7a41522a9d44, type: 3}
+  m_Sprite: {fileID: 8438446034852393464, guid: 5b4c943dc360e5044846d42fdb90925e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -607,12 +606,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 4912755445ade7848bcaa29ba221b697, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 136d6e120f1eaeb46b638c4ca1719f15, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 28.16229, y: 15.359999}
+  m_Size: {x: 6.77, y: 3.69}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -680,10 +679,10 @@ BoxCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 4}
   m_SpriteTilingProperty:
-    border: {x: 11.80096, y: 1.37, z: 11.790959, w: 1.33}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 28.16229, y: 15.359999}
-    newSize: {x: 28.16229, y: 15.359999}
+    oldSize: {x: 6.77, y: 3.69}
+    newSize: {x: 6.77, y: 3.69}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -868,7 +867,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!1 &7648394525237394948
 GameObject:
@@ -992,5 +991,5 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
