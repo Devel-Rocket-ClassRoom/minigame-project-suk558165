@@ -38,9 +38,7 @@ public class Projectile : MonoBehaviour
             return;
 
         int enemyLayer = LayerMask.NameToLayer("Enemy");
-        int playerLayer = LayerMask.NameToLayer("Player");
         int shooterLayer = shooter != null ? shooter.layer : -1;
-        int targetLayer = other.gameObject.layer;
 
         if (shooter != null)
         {

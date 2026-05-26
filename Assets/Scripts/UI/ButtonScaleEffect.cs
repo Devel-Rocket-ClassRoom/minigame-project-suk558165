@@ -1,12 +1,21 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ButtonScaleEffect : MonoBehaviour,
-    IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class ButtonScaleEffect
+    : MonoBehaviour,
+        IPointerEnterHandler,
+        IPointerExitHandler,
+        IPointerDownHandler,
+        IPointerUpHandler
 {
-    [SerializeField] private float hoverScale = 1.1f;
-    [SerializeField] private float pressScale = 0.9f;
-    [SerializeField] private float speed = 12f;
+    [SerializeField]
+    private float hoverScale = 1.1f;
+
+    [SerializeField]
+    private float pressScale = 0.9f;
+
+    [SerializeField]
+    private float speed = 12f;
 
     private Vector3 baseScale;
     private Vector3 targetScale;
@@ -19,26 +28,18 @@ public class ButtonScaleEffect : MonoBehaviour,
 
     void Update()
     {
-        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.unscaledDeltaTime * speed);
+        transform.localScale = Vector3.Lerp(
+            transform.localScale,
+            targetScale,
+            Time.unscaledDeltaTime * speed
+        );
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        targetScale = baseScale * hoverScale;
-    }
+    public void OnPointerEnter(PointerEventData _) => targetScale = baseScale * hoverScale;
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        targetScale = baseScale;
-    }
+    public void OnPointerExit(PointerEventData _) => targetScale = baseScale;
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        targetScale = baseScale * pressScale;
-    }
+    public void OnPointerDown(PointerEventData _) => targetScale = baseScale * pressScale;
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        targetScale = baseScale * hoverScale;
-    }
+    public void OnPointerUp(PointerEventData _) => targetScale = baseScale * hoverScale;
 }

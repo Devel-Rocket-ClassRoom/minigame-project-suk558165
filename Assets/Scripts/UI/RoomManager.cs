@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine;
 
 public enum RoomType
 {
     Normal,
     Shop,
     MiniBoss,
-    Boss
+    Boss,
 }
 
 public class RoomManager : MonoBehaviour
@@ -19,16 +19,28 @@ public class RoomManager : MonoBehaviour
     private const int BossRoom = 10;
 
     [Header("Normal Room Pool")]
-    [SerializeField] private GameObject[] normalRoomPrefabs;
+    [SerializeField]
+    private GameObject[] normalRoomPrefabs;
 
     [Header("Special Room Prefabs")]
-    [SerializeField] private GameObject shopRoomPrefab;
-    [SerializeField] private GameObject miniBossRoomPrefab;
-    [SerializeField] private GameObject bossRoomPrefab;
+    [SerializeField]
+    private GameObject shopRoomPrefab;
+
+    [SerializeField]
+    private GameObject miniBossRoomPrefab;
+
+    [SerializeField]
+    private GameObject bossRoomPrefab;
 
     [Header("References")]
-    [SerializeField] private Transform player;
-    [SerializeField] private CinemachineConfiner2D confiner;
+    [SerializeField]
+    private Transform player;
+
+    [SerializeField]
+    private CinemachineConfiner2D confiner;
+
+    [SerializeField]
+    private GameClearUI gameClearUI;
 
     public int CurrentRoomNumber { get; private set; }
     public RoomType CurrentRoomType { get; private set; }
@@ -37,21 +49,24 @@ public class RoomManager : MonoBehaviour
     private List<int> normalRoomOrder;
     private int normalRoomCursor;
     private Portal currentPortal;
+    private CinemachineCamera cinemachineCamera;
 
     void Start()
     {
         if (player == null)
         {
             var p = GameObject.FindWithTag("Player");
-            if (p != null) player = p.transform;
+            if (p != null)
+                player = p.transform;
         }
 
-        if (confiner == null)
-        {
-            var cmCam = FindAnyObjectByType<CinemachineCamera>();
-            if (cmCam != null) confiner = cmCam.GetComponent<CinemachineConfiner2D>();
-        }
+        cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
+        if (confiner == null && cinemachineCamera != null)
+            confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
+    }
 
+    public void StartGame()
+    {
         ShuffleNormalRooms();
         StartCoroutine(LoadRoomWithFade(1, true));
     }
@@ -86,7 +101,7 @@ public class RoomManager : MonoBehaviour
             ShopRoom => RoomType.Shop,
             MiniBossRoom => RoomType.MiniBoss,
             BossRoom => RoomType.Boss,
-            _ => RoomType.Normal
+            _ => RoomType.Normal,
         };
     }
 
@@ -97,7 +112,7 @@ public class RoomManager : MonoBehaviour
             RoomType.Shop => shopRoomPrefab,
             RoomType.MiniBoss => miniBossRoomPrefab,
             RoomType.Boss => bossRoomPrefab,
-            _ => normalRoomPrefabs[PickNormalRoomIndex()]
+            _ => normalRoomPrefabs[PickNormalRoomIndex()],
         };
     }
 
@@ -117,7 +132,8 @@ public class RoomManager : MonoBehaviour
         {
             player.position = spawnPoint.transform.position;
             var rb = player.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.linearVelocity = Vector2.zero;
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
         }
 
         if (confiner != null)
@@ -128,6 +144,17 @@ public class RoomManager : MonoBehaviour
                 confiner.BoundingShape2D = bounds;
                 confiner.InvalidateBoundingShapeCache();
             }
+        }
+
+        // 카메라를 플레이어 위치로 즉시 스냅 (부드러운 추적 시작 전 초기 위치 보정)
+        if (cinemachineCamera != null && player != null)
+        {
+            var targetPos = new Vector3(
+                player.position.x,
+                player.position.y,
+                cinemachineCamera.transform.position.z
+            );
+            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
         }
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
@@ -165,6 +192,12 @@ public class RoomManager : MonoBehaviour
     void OnGameClear()
     {
         Debug.Log("Game Clear!");
+
+        if (gameClearUI == null)
+            gameClearUI = FindAnyObjectByType<GameClearUI>();
+
+        if (gameClearUI != null)
+            gameClearUI.Show();
     }
 
     IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
