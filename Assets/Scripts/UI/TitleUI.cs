@@ -5,8 +5,13 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject titlePanel;
 
+    private GameObject hpBar;
+    private GameObject controls;
+
     void OnEnable()
     {
+        hpBar = GameObject.Find("HpBar_Frame");
+        controls = GameObject.Find("ControlsPanel");
         SetHUD(false);
     }
 
@@ -17,8 +22,6 @@ public class TitleUI : MonoBehaviour
 
     private void SetHUD(bool visible)
     {
-        var hpBar = GameObject.Find("HpBar_Frame");
-        var controls = GameObject.Find("ControlsPanel");
         if (hpBar != null)
             hpBar.SetActive(visible);
         if (controls != null)
