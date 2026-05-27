@@ -26,6 +26,19 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField]
     private string idleOverrideClipName = "Player_Idle";
 
+    [Header("Type-based Clips")]
+    [SerializeField]
+    private AnimationClip meleeAttackClip;
+
+    [SerializeField]
+    private AnimationClip meleeIdleClip;
+
+    [SerializeField]
+    private AnimationClip rangedAttackClip;
+
+    [SerializeField]
+    private AnimationClip rangedIdleClip;
+
     public bool IsAttacking { get; private set; }
 
     private Animator animator;
@@ -78,8 +91,6 @@ public class PlayerCombat : MonoBehaviour
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
-            Vector3 target = transform.position + (Vector3)(attackDir * 10f);
-            weapon.Attack(target);
             animator.Play(swordAttackStateName, 0, 0f);
         }
         else if (
@@ -133,12 +144,17 @@ public class PlayerCombat : MonoBehaviour
 
     void ApplyWeapon(WeaponData data)
     {
-        if (data.attackClip != null)
-            overrideController[swordOverrideClipName] = data.attackClip;
+        AnimationClip attackClip =
+            data.weaponType == WeaponType.Ranged ? rangedAttackClip : meleeAttackClip;
+        AnimationClip idleClip =
+            data.weaponType == WeaponType.Ranged ? rangedIdleClip : meleeIdleClip;
 
-        if (data.idleClip != null)
+        if (attackClip != null)
+            overrideController[swordOverrideClipName] = attackClip;
+
+        if (idleClip != null)
         {
-            overrideController[idleOverrideClipName] = data.idleClip;
+            overrideController[idleOverrideClipName] = idleClip;
             var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (stateInfo.IsName("Idle"))
                 animator.Play("Idle", 0, stateInfo.normalizedTime);

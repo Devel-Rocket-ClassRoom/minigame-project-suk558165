@@ -165,10 +165,9 @@ public class PlayerMovement : MonoBehaviour
             scale.x = flipLeft ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
             Visuals.localScale = scale;
         }
-        else if (Sr != null)
-        {
+
+        if (Sr != null)
             Sr.flipX = flipLeft;
-        }
     }
 
     public void FixedUpdateMovement()
