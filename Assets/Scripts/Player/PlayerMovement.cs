@@ -58,6 +58,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleInput()
     {
+        if (InventoryUI.IsOpen)
+        {
+            MoveInput = 0f;
+            return;
+        }
+
         MoveInput = Input.GetAxisRaw("Horizontal");
 
         if (IsGrounded && !wasGrounded)

@@ -62,6 +62,9 @@ public class PlayerCombat : MonoBehaviour
         rangedAttackTimer -= Time.deltaTime;
         IsAttacking = false;
 
+        if (InventoryUI.IsOpen)
+            return;
+
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;
         if (!Input.GetKeyDown(KeyCode.X) || currentWeapon == null)
             return;

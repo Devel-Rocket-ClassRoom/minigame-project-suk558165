@@ -1,304 +1,386 @@
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    [Header("Sprites (TravelBookLite)")]
-    [SerializeField] private Sprite frameSprite;
-    [SerializeField] private Sprite slotSprite;
-    [SerializeField] private Sprite slotHighlightSprite;
-    [SerializeField] private Sprite coinIconSprite;
+    [Header("Weapon Slots")]
+    [SerializeField]
+    private List<InventorySlotUI> weaponSlots = new List<InventorySlotUI>();
+
+    [Header("Accessory Slots")]
+    [SerializeField]
+    private List<InventorySlotUI> accessorySlots = new List<InventorySlotUI>();
+
+    [Header("Backpack Slots")]
+    [SerializeField]
+    private List<InventorySlotUI> backpackSlots = new List<InventorySlotUI>();
+
+    [Header("Gold")]
+    [SerializeField]
+    private TextMeshProUGUI goldText;
+
+    [Header("Drag Ghost")]
+    [SerializeField]
+    private Image dragGhost;
 
     private Inventory inventory;
-    private GameObject panel;
-    private TextMeshProUGUI goldText;
-    private TextMeshProUGUI detailNameText;
-    private TextMeshProUGUI detailDescText;
-    private Image detailIcon;
-    private List<SlotEntry> weaponSlots = new List<SlotEntry>();
-    private List<SlotEntry> accessorySlots = new List<SlotEntry>();
-    private bool isOpen;
-
-    struct SlotEntry
-    {
-        public Image icon;
-        public Image highlight;
-    }
+    private GameObject frame;
+    private CanvasGroup canvasGroup;
+    public static bool IsOpen { get; private set; }
 
     void Start()
     {
-        BuildUI();
-        panel.SetActive(false);
+        frame = transform.Find("Frame")?.gameObject;
+        canvasGroup = GetComponent<CanvasGroup>();
+
+        inventory = FindFirstObjectByType<Inventory>();
+        InitSlotMeta();
+        ClearAllSlots();
+        BindEvents();
+
+        if (dragGhost != null)
+            dragGhost.gameObject.SetActive(false);
+
+        if (frame != null)
+            frame.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        InventorySlotUI.OnSlotDropped -= HandleSlotDrop;
+        InventorySlotUI.OnDragStarted -= HandleDragStarted;
+        InventorySlotUI.OnDragEnded -= HandleDragEnded;
+    }
+
+    void InitSlotMeta()
+    {
+        for (int i = 0; i < weaponSlots.Count; i++)
+        {
+            if (weaponSlots[i] == null)
+                continue;
+            weaponSlots[i].slotType = SlotType.Weapon;
+            weaponSlots[i].slotIndex = i;
+        }
+        for (int i = 0; i < accessorySlots.Count; i++)
+        {
+            if (accessorySlots[i] == null)
+                continue;
+            accessorySlots[i].slotType = SlotType.Accessory;
+            accessorySlots[i].slotIndex = i;
+        }
+        for (int i = 0; i < backpackSlots.Count; i++)
+        {
+            if (backpackSlots[i] == null)
+                continue;
+            backpackSlots[i].slotType = SlotType.Backpack;
+            backpackSlots[i].slotIndex = i;
+        }
+    }
+
+    void ClearAllSlots()
+    {
+        foreach (var s in weaponSlots)
+            if (s != null)
+                s.Clear();
+        foreach (var s in accessorySlots)
+            if (s != null)
+                s.Clear();
+        foreach (var s in backpackSlots)
+            if (s != null)
+                s.Clear();
+    }
+
+    void BindEvents()
+    {
+        InventorySlotUI.OnSlotDropped += HandleSlotDrop;
+        InventorySlotUI.OnDragStarted += HandleDragStarted;
+        InventorySlotUI.OnDragEnded += HandleDragEnded;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
             Toggle();
+
+        if (IsOpen && dragGhost != null && dragGhost.gameObject.activeSelf)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                frame.GetComponent<RectTransform>(),
+                Input.mousePosition,
+                null,
+                out var localPos
+            );
+            dragGhost.rectTransform.anchoredPosition = localPos;
+        }
     }
 
     public void Toggle()
     {
-        if (isOpen) Close();
-        else Open();
+        if (IsOpen)
+            Close();
+        else
+            Open();
     }
 
     void Open()
     {
+        if (frame == null)
+            return;
+
         if (inventory == null)
         {
             inventory = FindFirstObjectByType<Inventory>();
-            if (inventory == null) return;
+            if (inventory == null)
+                return;
         }
 
-        isOpen = true;
-        panel.SetActive(true);
+        IsOpen = true;
+        frame.SetActive(true);
         Time.timeScale = 0f;
         Refresh();
     }
 
     void Close()
     {
-        isOpen = false;
-        panel.SetActive(false);
+        if (frame == null)
+            return;
+
+        IsOpen = false;
+        frame.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    void HandleDragStarted(InventorySlotUI source)
+    {
+        if (dragGhost == null)
+            return;
+        dragGhost.sprite = source.GetIcon();
+        dragGhost.enabled = true;
+        dragGhost.gameObject.SetActive(true);
+    }
+
+    void HandleDragEnded()
+    {
+        if (dragGhost == null)
+            return;
+        dragGhost.gameObject.SetActive(false);
+    }
+
+    void HandleSlotDrop(InventorySlotUI source, InventorySlotUI target)
+    {
+        if (inventory == null)
+            return;
+
+        var srcItem = GetItemAt(source.slotType, source.slotIndex);
+        if (srcItem == null)
+            return;
+
+        if (target.slotType == SlotType.Weapon && srcItem is WeaponData weapon)
+        {
+            RemoveItemFrom(source.slotType, source.slotIndex);
+            var old = inventory.EquipWeapon(target.slotIndex, weapon);
+            if (old != null)
+                PutItemInto(source.slotType, source.slotIndex, old);
+        }
+        else if (target.slotType == SlotType.Accessory && srcItem is AccessoryData accessory)
+        {
+            RemoveItemFrom(source.slotType, source.slotIndex);
+            var old = inventory.EquipAccessory(target.slotIndex, accessory);
+            if (old != null)
+                PutItemInto(source.slotType, source.slotIndex, old);
+        }
+        else if (target.slotType == SlotType.Backpack)
+        {
+            var targetItem = GetItemAt(SlotType.Backpack, target.slotIndex);
+
+            if (source.slotType == SlotType.Weapon)
+            {
+                if (targetItem != null && !(targetItem is WeaponData))
+                    return;
+                RemoveItemFrom(SlotType.Backpack, target.slotIndex);
+                var old = inventory.UnequipWeapon(source.slotIndex);
+                PutItemInto(SlotType.Backpack, target.slotIndex, old);
+                if (targetItem is WeaponData tw)
+                    inventory.EquipWeapon(source.slotIndex, tw);
+            }
+            else if (source.slotType == SlotType.Accessory)
+            {
+                if (targetItem != null && !(targetItem is AccessoryData))
+                    return;
+                RemoveItemFrom(SlotType.Backpack, target.slotIndex);
+                var old = inventory.UnequipAccessory(source.slotIndex);
+                PutItemInto(SlotType.Backpack, target.slotIndex, old);
+                if (targetItem is AccessoryData ta)
+                    inventory.EquipAccessory(source.slotIndex, ta);
+            }
+            else if (source.slotType == SlotType.Backpack)
+            {
+                SwapBackpack(source.slotIndex, target.slotIndex);
+            }
+        }
+        else if (source.slotType == target.slotType && source.slotType != SlotType.Backpack)
+        {
+            SwapEquipSlots(source, target);
+        }
+
+        Refresh();
+    }
+
+    ScriptableObject GetItemAt(SlotType type, int index)
+    {
+        switch (type)
+        {
+            case SlotType.Weapon:
+                var weapons = inventory.WeaponInventory;
+                if (weapons != null && index < weapons.weapons.Count)
+                    return weapons.weapons[index];
+                return null;
+            case SlotType.Accessory:
+                if (index < inventory.Accessories.Count)
+                    return inventory.Accessories[index];
+                return null;
+            case SlotType.Backpack:
+                if (index < inventory.Backpack.Count)
+                    return inventory.Backpack[index];
+                return null;
+        }
+        return null;
+    }
+
+    void RemoveItemFrom(SlotType type, int index)
+    {
+        switch (type)
+        {
+            case SlotType.Weapon:
+                inventory.UnequipWeapon(index);
+                break;
+            case SlotType.Accessory:
+                inventory.UnequipAccessory(index);
+                break;
+            case SlotType.Backpack:
+                inventory.RemoveFromBackpack(index);
+                break;
+        }
+    }
+
+    void PutItemInto(SlotType type, int index, ScriptableObject item)
+    {
+        if (item == null)
+            return;
+        switch (type)
+        {
+            case SlotType.Weapon:
+                if (item is WeaponData w)
+                    inventory.EquipWeapon(index, w);
+                break;
+            case SlotType.Accessory:
+                if (item is AccessoryData a)
+                    inventory.EquipAccessory(index, a);
+                break;
+            case SlotType.Backpack:
+                inventory.AddToBackpack(item);
+                break;
+        }
+    }
+
+    void SwapBackpack(int indexA, int indexB)
+    {
+        var bp = inventory.Backpack;
+        var a = indexA < bp.Count ? bp[indexA] : null;
+        var b = indexB < bp.Count ? bp[indexB] : null;
+        if (a != null)
+            inventory.RemoveFromBackpack(indexA);
+        if (b != null)
+        {
+            int bIdx = indexB > indexA && a != null ? indexB - 1 : indexB;
+            inventory.RemoveFromBackpack(bIdx);
+        }
+        if (b != null)
+            InsertBackpack(indexA, b);
+        if (a != null)
+            InsertBackpack(indexB, a);
+    }
+
+    void InsertBackpack(int index, ScriptableObject item)
+    {
+        inventory.AddToBackpack(item);
+    }
+
+    void SwapEquipSlots(InventorySlotUI a, InventorySlotUI b)
+    {
+        if (a.slotType == SlotType.Weapon)
+        {
+            var wa = inventory.UnequipWeapon(a.slotIndex);
+            var wb = inventory.UnequipWeapon(b.slotIndex);
+            if (wa != null)
+                inventory.EquipWeapon(b.slotIndex, wa);
+            if (wb != null)
+                inventory.EquipWeapon(a.slotIndex, wb);
+        }
+        else if (a.slotType == SlotType.Accessory)
+        {
+            var aa = inventory.UnequipAccessory(a.slotIndex);
+            var ab = inventory.UnequipAccessory(b.slotIndex);
+            if (aa != null)
+                inventory.EquipAccessory(b.slotIndex, aa);
+            if (ab != null)
+                inventory.EquipAccessory(a.slotIndex, ab);
+        }
     }
 
     void Refresh()
     {
-        if (inventory == null) return;
+        if (inventory == null)
+            return;
 
         var weapons = inventory.WeaponInventory;
         for (int i = 0; i < weaponSlots.Count; i++)
         {
-            if (weapons != null && i < weapons.weapons.Count)
-            {
-                weaponSlots[i].icon.sprite = weapons.weapons[i].sprite;
-                weaponSlots[i].icon.enabled = weapons.weapons[i].sprite != null;
-            }
+            if (weaponSlots[i] == null)
+                continue;
+            bool hasItem =
+                weapons != null && i < weapons.weapons.Count && weapons.weapons[i] != null;
+            if (hasItem)
+                weaponSlots[i].SetItem(weapons.weapons[i].sprite);
             else
-            {
-                weaponSlots[i].icon.enabled = false;
-            }
+                weaponSlots[i].Clear();
         }
 
         for (int i = 0; i < accessorySlots.Count; i++)
         {
-            if (i < inventory.Accessories.Count)
+            if (accessorySlots[i] == null)
+                continue;
+            bool hasItem = i < inventory.Accessories.Count && inventory.Accessories[i] != null;
+            if (hasItem)
+                accessorySlots[i].SetItem(inventory.Accessories[i].icon);
+            else
+                accessorySlots[i].Clear();
+        }
+
+        for (int i = 0; i < backpackSlots.Count; i++)
+        {
+            if (backpackSlots[i] == null)
+                continue;
+            if (i < inventory.Backpack.Count && inventory.Backpack[i] != null)
             {
-                accessorySlots[i].icon.sprite = inventory.Accessories[i].icon;
-                accessorySlots[i].icon.enabled = inventory.Accessories[i].icon != null;
+                var item = inventory.Backpack[i];
+                if (item is WeaponData w)
+                    backpackSlots[i].SetItem(w.sprite);
+                else if (item is AccessoryData a)
+                    backpackSlots[i].SetItem(a.icon);
+                else
+                    backpackSlots[i].Clear();
             }
             else
             {
-                accessorySlots[i].icon.enabled = false;
+                backpackSlots[i].Clear();
             }
         }
 
-        goldText.text = inventory.Gold.ToString();
-    }
-
-    void BuildUI()
-    {
-        var canvas = GetComponent<Canvas>();
-        if (canvas == null) canvas = GetComponentInParent<Canvas>();
-
-        panel = CreatePanel(transform);
-
-        var frame = CreateFrame(panel.transform);
-
-        var title = CreateTMP(frame.transform, "INVENTORY", 28, FontStyles.Bold,
-            new Color(1f, 0.9f, 0.7f));
-        SetRect(title, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-            new Vector2(0, -30), new Vector2(300, 40));
-
-        var weaponLabel = CreateTMP(frame.transform, "WEAPONS", 18, FontStyles.Bold,
-            new Color(0.9f, 0.85f, 0.7f));
-        SetRect(weaponLabel, new Vector2(0f, 1f), new Vector2(0f, 1f),
-            new Vector2(50, -70), new Vector2(200, 30));
-
-        var weaponGrid = CreateObj("WeaponGrid", frame.transform);
-        SetRect(weaponGrid, new Vector2(0f, 1f), new Vector2(0f, 1f),
-            new Vector2(50, -200), new Vector2(240, 120));
-        AddGridLayout(weaponGrid, new Vector2(100, 100), new Vector2(10, 10));
-
-        for (int i = 0; i < 2; i++)
-            weaponSlots.Add(CreateSlot(weaponGrid.transform));
-
-        var accLabel = CreateTMP(frame.transform, "ACCESSORIES", 18, FontStyles.Bold,
-            new Color(0.9f, 0.85f, 0.7f));
-        SetRect(accLabel, new Vector2(1f, 1f), new Vector2(1f, 1f),
-            new Vector2(-250, -70), new Vector2(200, 30));
-
-        var accGrid = CreateObj("AccessoryGrid", frame.transform);
-        SetRect(accGrid, new Vector2(1f, 1f), new Vector2(1f, 1f),
-            new Vector2(-250, -200), new Vector2(240, 240));
-        AddGridLayout(accGrid, new Vector2(100, 100), new Vector2(10, 10));
-
-        for (int i = 0; i < Inventory.MaxAccessories; i++)
-            accessorySlots.Add(CreateSlot(accGrid.transform));
-
-        var detailPanel = CreateObj("DetailPanel", frame.transform);
-        SetRect(detailPanel, new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(30, 20), new Vector2(-60, 80));
-
-        detailIcon = CreateImage(detailPanel.transform, null);
-        SetRect(detailIcon.gameObject, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
-            new Vector2(10, 0), new Vector2(60, 60));
-        detailIcon.enabled = false;
-
-        detailNameText = CreateTMP(detailPanel.transform, "", 20, FontStyles.Bold,
-            Color.white);
-        SetRect(detailNameText.gameObject, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-            new Vector2(80, 10), new Vector2(-90, 30));
-
-        detailDescText = CreateTMP(detailPanel.transform, "", 16, FontStyles.Normal,
-            new Color(0.8f, 0.8f, 0.8f));
-        SetRect(detailDescText.gameObject, new Vector2(0f, 0f), new Vector2(1f, 0f),
-            new Vector2(80, 5), new Vector2(-90, 25));
-
-        var goldRow = CreateObj("GoldRow", frame.transform);
-        SetRect(goldRow, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-            new Vector2(0, 105), new Vector2(160, 30));
-
-        if (coinIconSprite != null)
-        {
-            var coinImg = CreateImage(goldRow.transform, coinIconSprite);
-            SetRect(coinImg.gameObject, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
-                new Vector2(0, 0), new Vector2(28, 28));
-        }
-
-        goldText = CreateTMP(goldRow.transform, "0", 22, FontStyles.Bold,
-            new Color(1f, 0.85f, 0.4f));
-        SetRect(goldText.gameObject, new Vector2(0f, 0f), new Vector2(1f, 1f),
-            new Vector2(34, 0), new Vector2(-34, 0));
-        goldText.alignment = TextAlignmentOptions.Left;
-
-        var hint = CreateTMP(panel.transform, "TAB to close", 16, FontStyles.Italic,
-            new Color(0.6f, 0.6f, 0.6f));
-        SetRect(hint.gameObject, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-            new Vector2(0, 30), new Vector2(200, 30));
-    }
-
-    GameObject CreatePanel(Transform parent)
-    {
-        var go = CreateObj("InventoryPanel", parent);
-        SetRect(go, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-        var img = go.AddComponent<Image>();
-        img.color = new Color(0, 0, 0, 0.75f);
-        img.raycastTarget = true;
-        return go;
-    }
-
-    GameObject CreateFrame(Transform parent)
-    {
-        var go = CreateObj("Frame", parent);
-        SetRect(go, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-            Vector2.zero, new Vector2(700, 500));
-        var img = go.AddComponent<Image>();
-        if (frameSprite != null)
-        {
-            img.sprite = frameSprite;
-            img.type = Image.Type.Sliced;
-        }
-        else
-        {
-            img.color = new Color(0.15f, 0.12f, 0.1f, 0.95f);
-        }
-        return go;
-    }
-
-    SlotEntry CreateSlot(Transform parent)
-    {
-        var go = CreateObj("Slot", parent);
-        var rt = go.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(100, 100);
-
-        var bg = go.AddComponent<Image>();
-        if (slotSprite != null)
-        {
-            bg.sprite = slotSprite;
-            bg.type = Image.Type.Sliced;
-        }
-        else
-        {
-            bg.color = new Color(0.2f, 0.18f, 0.15f, 0.9f);
-        }
-
-        var hlGo = CreateObj("Highlight", go.transform);
-        SetRect(hlGo, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-        var hl = hlGo.AddComponent<Image>();
-        if (slotHighlightSprite != null)
-        {
-            hl.sprite = slotHighlightSprite;
-            hl.type = Image.Type.Sliced;
-        }
-        else
-        {
-            hl.color = new Color(1f, 0.9f, 0.5f, 0.3f);
-        }
-        hl.enabled = false;
-
-        var iconGo = CreateObj("Icon", go.transform);
-        SetRect(iconGo, Vector2.zero, Vector2.one,
-            new Vector2(8, 8), new Vector2(-16, -16));
-        var icon = iconGo.AddComponent<Image>();
-        icon.preserveAspect = true;
-        icon.enabled = false;
-        icon.raycastTarget = false;
-
-        return new SlotEntry { icon = icon, highlight = hl };
-    }
-
-    GameObject CreateObj(string name, Transform parent)
-    {
-        var go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        go.layer = 5;
-        return go;
-    }
-
-    void SetRect(GameObject go, Vector2 anchorMin, Vector2 anchorMax,
-        Vector2 anchoredPos, Vector2 sizeDelta)
-    {
-        var rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = anchorMin;
-        rt.anchorMax = anchorMax;
-        rt.anchoredPosition = anchoredPos;
-        rt.sizeDelta = sizeDelta;
-    }
-
-    Image CreateImage(Transform parent, Sprite sprite)
-    {
-        var go = CreateObj("Image", parent);
-        var img = go.AddComponent<Image>();
-        img.sprite = sprite;
-        img.preserveAspect = true;
-        img.raycastTarget = false;
-        return img;
-    }
-
-    TextMeshProUGUI CreateTMP(Transform parent, string text, float size,
-        FontStyles style, Color color)
-    {
-        var go = CreateObj("Text", parent);
-        var tmp = go.AddComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = size;
-        tmp.fontStyle = style;
-        tmp.color = color;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.raycastTarget = false;
-        return tmp;
-    }
-
-    void AddGridLayout(GameObject go, Vector2 cellSize, Vector2 spacing)
-    {
-        var grid = go.AddComponent<GridLayoutGroup>();
-        grid.cellSize = cellSize;
-        grid.spacing = spacing;
-        grid.childAlignment = TextAnchor.UpperLeft;
+        if (goldText != null)
+            goldText.text = inventory.Gold.ToString();
     }
 }
