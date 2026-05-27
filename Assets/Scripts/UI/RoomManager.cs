@@ -183,6 +183,12 @@ public class RoomManager : MonoBehaviour
 
     void OnRoomCleared()
     {
+        if (CurrentRoomType == RoomType.Boss)
+        {
+            OnGameClear();
+            return;
+        }
+
         if (currentPortal != null)
             currentPortal.SetActive(true);
     }
