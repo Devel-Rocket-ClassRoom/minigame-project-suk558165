@@ -190,8 +190,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.15}
-    oldSize: {x: 2.580645, y: 2.580645}
-    newSize: {x: 2.58, y: 2.58}
+    oldSize: {x: 2.55, y: 2.55}
+    newSize: {x: 2.55, y: 2.55}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
