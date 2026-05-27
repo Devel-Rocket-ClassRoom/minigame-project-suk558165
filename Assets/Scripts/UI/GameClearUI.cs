@@ -48,12 +48,12 @@ public class GameClearUI : MonoBehaviour
         while (remaining > 0f)
         {
             if (countdownText != null)
-                countdownText.text = $"{Mathf.CeilToInt(remaining)}초 후 타이틀로 복귀";
+                countdownText.text = $"{Mathf.CeilToInt(remaining)}초 후 마을로 복귀";
             remaining -= Time.deltaTime;
             yield return null;
         }
 
-        GameFlowController.Instance?.GoToTitle();
+        GameFlowController.Instance?.ReturnToVillage();
     }
 
     public void ResetUI()

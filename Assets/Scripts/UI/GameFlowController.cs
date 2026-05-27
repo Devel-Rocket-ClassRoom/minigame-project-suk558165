@@ -95,6 +95,13 @@ public class GameFlowController : MonoBehaviour
         }
     }
 
+    public void ReturnToVillage()
+    {
+        roomManager.ResetDungeon();
+        FindFirstObjectByType<GameClearUI>()?.ResetUI();
+        GoToVillage();
+    }
+
     public void EnterDungeon()
     {
         if (villageInstance != null)

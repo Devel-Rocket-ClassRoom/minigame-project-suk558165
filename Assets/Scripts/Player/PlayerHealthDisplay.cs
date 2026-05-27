@@ -18,13 +18,14 @@ public class PlayerHealthDisplay : MonoBehaviour
         if (playerHealth == null)
             return;
 
-        float ratio = Mathf.Clamp01(playerHealth.CurrentHp / playerHealth.maxHp);
+        float effectiveMax = playerHealth.EffectiveMaxHp;
+        float ratio = Mathf.Clamp01(playerHealth.CurrentHp / effectiveMax);
 
         if (fillImage != null)
             fillImage.fillAmount = ratio;
 
         if (hpText != null)
             hpText.text =
-                $"{Mathf.Max(0, Mathf.CeilToInt(playerHealth.CurrentHp))} / {Mathf.CeilToInt(playerHealth.maxHp)}";
+                $"{Mathf.Max(0, Mathf.CeilToInt(playerHealth.CurrentHp))} / {Mathf.CeilToInt(effectiveMax)}";
     }
 }

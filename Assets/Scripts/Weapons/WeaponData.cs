@@ -12,6 +12,9 @@ public class WeaponData : ScriptableObject
     public string weaponName;
     public Sprite sprite;
     public WeaponType weaponType;
+    [TextArea]
+    public string description;
+    public int price;
 
     [Header("Stats")]
     public float damage = 20f;

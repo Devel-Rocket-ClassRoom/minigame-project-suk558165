@@ -12,7 +12,7 @@ public class WeaponInventory : MonoBehaviour
 
     void Update()
     {
-        if (weapons.Count < 2)
+        if (weapons.Count < 2 || InventoryUI.IsOpen)
             return;
 
         if (Input.GetKeyDown(KeyCode.C))

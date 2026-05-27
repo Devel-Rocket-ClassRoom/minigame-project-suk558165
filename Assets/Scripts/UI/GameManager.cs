@@ -16,12 +16,12 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             var rm = FindAnyObjectByType<RoomManager>();
-            if (rm != null)
+            if (rm != null && rm.CurrentRoomNumber > 0)
             {
-                Debug.Log(
-                    $"[Debug] 방 스킵: Room {rm.CurrentRoomNumber} → {rm.CurrentRoomNumber + 1}"
-                );
-                rm.GoToNextRoom();
+                var enemies = FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
+                Debug.Log($"[Debug] 적 전멸: {enemies.Length}마리 처치");
+                foreach (var enemy in enemies)
+                    enemy.TakeDamage(99999f);
             }
         }
 #endif
