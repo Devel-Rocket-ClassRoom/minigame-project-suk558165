@@ -546,9 +546,11 @@ MonoBehaviour:
   shopRoomPrefab: {fileID: 7677070055771143526, guid: 03c2759f31d5c404087bd1920bfaf74b, type: 3}
   miniBossRoomPrefab: {fileID: 2033410180147792784, guid: 09aa310d8bbcdc048a8c5180fdbeba2d, type: 3}
   bossRoomPrefab: {fileID: 203403302495070545, guid: 25fe004c5c21f0c409c614a5e5ad0ee3, type: 3}
+  chestPrefab: {fileID: 3457266472583827726, guid: 95a9e2965e2d69941b4a689cacaa96f6, type: 3}
+  chestPortalOffset: {x: -2, y: 2, z: 0}
   player: {fileID: 400000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
   confiner: {fileID: 1426324697}
-  gameClearUI: {fileID: 0}
+  gameClearUI: {fileID: 1121891927430353267, guid: 3fc961b017e5c0b46b220e8c3d0fea10, type: 3}
 --- !u!4 &2085237428
 Transform:
   m_ObjectHideFlags: 0

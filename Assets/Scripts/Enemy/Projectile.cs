@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     public float lifetime = 5f;
 
     private float damage;
+    private float knockbackForce;
     private GameObject shooter;
     private bool ready;
 
@@ -18,9 +19,16 @@ public class Projectile : MonoBehaviour
         GetComponent<CircleCollider2D>().isTrigger = true;
     }
 
-    public void Init(Vector2 direction, float speed, float damage, GameObject shooter = null)
+    public void Init(
+        Vector2 direction,
+        float speed,
+        float damage,
+        GameObject shooter = null,
+        float knockbackForce = 8f
+    )
     {
         this.damage = damage;
+        this.knockbackForce = knockbackForce;
         this.shooter = shooter;
         GetComponent<Rigidbody2D>().linearVelocity = direction.normalized * speed;
         Invoke(nameof(Activate), 0.05f);
@@ -57,6 +65,17 @@ public class Projectile : MonoBehaviour
         if (damageable != null)
         {
             damageable.TakeDamage(damage);
+
+            if (other.CompareTag("Player"))
+            {
+                var playerCtrl = other.GetComponentInParent<PlayerController>();
+                if (playerCtrl != null)
+                {
+                    Vector2 dir = GetComponent<Rigidbody2D>().linearVelocity.normalized;
+                    playerCtrl.Knockback(new Vector2(dir.x, 0.3f).normalized * knockbackForce);
+                }
+            }
+
             Destroy(gameObject);
         }
     }

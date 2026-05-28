@@ -38,6 +38,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Melee")]
     public Collider2D meleeHitbox;
 
+    [Header("Drops")]
+    public GameObject goldDropPrefab;
+    public int goldDropMin = 3;
+    public int goldDropMax = 8;
+    public GameObject potionDropPrefab;
+
+    [Range(0f, 1f)]
+    public float potionDropChance = 0.2f;
+    public float potionHealAmount = 20f;
+
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
     public LayerMask platformLayer;
@@ -323,10 +333,36 @@ public class EnemyController : MonoBehaviour, IDamageable
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
         RunStats.Instance?.AddKill();
+        SpawnDrops();
         animator.ResetTrigger(HashIsHit);
         animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);
         StartCoroutine(DeathRoutine());
+    }
+
+    void SpawnDrops()
+    {
+        Vector3 pos = transform.position;
+
+        if (goldDropPrefab != null)
+        {
+            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
+            var worldGold = gold.GetComponent<WorldGold>();
+            if (worldGold != null)
+                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
+        }
+
+        if (potionDropPrefab != null && Random.value < potionDropChance)
+        {
+            var potion = Instantiate(
+                potionDropPrefab,
+                pos + Vector3.up * 0.4f,
+                Quaternion.identity
+            );
+            var worldPotion = potion.GetComponent<WorldPotion>();
+            if (worldPotion != null)
+                worldPotion.healAmount = potionHealAmount;
+        }
     }
 
     IEnumerator DeathRoutine()

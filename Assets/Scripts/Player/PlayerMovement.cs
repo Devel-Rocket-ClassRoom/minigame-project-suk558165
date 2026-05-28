@@ -17,6 +17,9 @@ public class PlayerMovement : MonoBehaviour
     public float gravityScale = 4f;
     public float fallGravityMultiplier = 2.5f;
 
+    [Header("Knockback")]
+    public float knockbackDuration = 0.15f;
+
     [Header("Dash")]
     public float dashSpeedMultiplier = 3f;
     public float dashDuration = 0.3f;
@@ -39,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
     private float dashCooldownTimer;
     private int dashCharges;
     private float dashDirection;
+    private Vector2 knockbackVelocity;
+    private float knockbackTimer;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -170,8 +175,21 @@ public class PlayerMovement : MonoBehaviour
             Sr.flipX = flipLeft;
     }
 
+    public void ApplyKnockback(Vector2 velocity)
+    {
+        knockbackVelocity = velocity;
+        knockbackTimer = knockbackDuration;
+    }
+
     public void FixedUpdateMovement()
     {
+        if (knockbackTimer > 0f)
+        {
+            knockbackTimer -= Time.fixedDeltaTime;
+            rb.linearVelocity = knockbackVelocity;
+            return;
+        }
+
         if (IsDashing)
         {
             rb.linearVelocity = new Vector2(dashDirection * walkSpeed * dashSpeedMultiplier, 0f);
