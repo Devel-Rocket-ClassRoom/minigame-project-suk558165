@@ -207,8 +207,6 @@ public class RoomManager : MonoBehaviour
 
     void OnGameClear()
     {
-        Debug.Log("Game Clear!");
-
         if (gameClearUI == null)
             gameClearUI = FindAnyObjectByType<GameClearUI>();
 

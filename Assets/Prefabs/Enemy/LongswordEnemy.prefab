@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 716762423808194902}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalPosition: {x: 1.01, y: 1.38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40,7 +40,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 716762423808194902}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -67,7 +67,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -1.0229317, y: 0.18712163}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -77,7 +77,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.1, y: 0.7}
+  m_Size: {x: 2.547074, y: 1.0742433}
   m_EdgeRadius: 0
 --- !u!114 &661798992933418161
 MonoBehaviour:
@@ -186,7 +186,7 @@ SpriteRenderer:
   m_Size: {x: 2.56, y: 2.56}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!95 &5299861750410523060
 Animator:
@@ -274,7 +274,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 1.28}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 2.56, y: 2.56}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
@@ -308,9 +308,12 @@ MonoBehaviour:
   chaseYThreshold: 1.2
   isRanged: 0
   projectilePrefab: {fileID: 0}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 2973972471597269142}
   projectileSpeed: 8
   safeDistance: 3
+  hpBarOffset: {x: 0, y: -0.6, z: 0}
+  knockbackForce: 6
+  knockbackDuration: 0.15
   meleeHitbox: {fileID: 6858283969042510740}
   edgeCheckDepth: 0.4
   platformLayer:

@@ -12,6 +12,7 @@ public class WeaponData : ScriptableObject
     public string weaponName;
     public Sprite sprite;
     public WeaponType weaponType;
+
     [TextArea]
     public string description;
     public int price;
@@ -26,8 +27,4 @@ public class WeaponData : ScriptableObject
 
     [Header("Ranged")]
     public float projectileSpeed = 12f;
-
-    [Header("Animation")]
-    public AnimationClip attackClip;
-    public AnimationClip idleClip;
 }

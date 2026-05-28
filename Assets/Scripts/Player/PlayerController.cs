@@ -51,4 +51,17 @@ public class PlayerController : MonoBehaviour
     {
         movement.FixedUpdateMovement();
     }
+
+    /// <summary>
+    /// 마을 귀환 시 죽음 상태를 완전히 초기화합니다.
+    /// HP 복구 + 물리/애니메이터 상태 복원
+    /// </summary>
+    public void Revive()
+    {
+        health?.Revive();
+
+        deathHandled = false;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        animator.SetBool(HashIsDead, false);
+    }
 }

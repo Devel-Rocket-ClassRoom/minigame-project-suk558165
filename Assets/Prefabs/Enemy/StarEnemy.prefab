@@ -179,7 +179,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.17806002}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -189,7 +189,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.15, y: 2.56}
+  m_Size: {x: 1.15, y: 2.212019}
   m_EdgeRadius: 0
 --- !u!114 &653864372982173630
 MonoBehaviour:
@@ -219,6 +219,9 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  hpBarOffset: {x: 0, y: -0.6, z: 0}
+  knockbackForce: 6
+  knockbackDuration: 0.15
   meleeHitbox: {fileID: 3317682275281999150}
   edgeCheckDepth: 0.4
   platformLayer:

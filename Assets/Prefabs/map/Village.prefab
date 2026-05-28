@@ -6118,10 +6118,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2467005597002487400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96073951f72281a43b4fe9919d547af3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DungeonEntrance
-  dungeonSceneName: MainTest
+  m_Script: {fileID: 11500000, guid: 43d896482db782b46ab3ba0f08fa23e6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Portal
+  portalType: 0
+  visualEffect: {fileID: 0}
 --- !u!95 &7895883955269906695
 Animator:
   serializedVersion: 7
