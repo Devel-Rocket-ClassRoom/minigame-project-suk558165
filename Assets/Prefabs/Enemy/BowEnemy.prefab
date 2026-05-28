@@ -218,6 +218,9 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  hpBarOffset: {x: 0, y: -3, z: 0}
+  knockbackForce: 6
+  knockbackDuration: 0.15
   meleeHitbox: {fileID: 0}
   edgeCheckDepth: 0.4
   platformLayer:

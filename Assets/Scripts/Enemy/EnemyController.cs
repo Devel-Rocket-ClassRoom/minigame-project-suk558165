@@ -28,6 +28,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Header("HP Bar")]
+    public Vector3 hpBarOffset = new Vector3(0f, -0.6f, 0f);
+
     [Header("Knockback")]
     public float knockbackForce = 6f;
     public float knockbackDuration = 0.15f;
@@ -47,6 +50,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float hp;
     private bool isDead;
     private float attackTimer;
+    private EnemyHealthBar healthBar;
     public float attackDamageDelay = 0.2f;
 
     private Transform player;
@@ -66,6 +70,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         col = GetComponent<Collider2D>();
         hp = maxHp;
         patrolOrigin = transform.position;
+        healthBar = gameObject.AddComponent<EnemyHealthBar>();
+        healthBar.Init(hpBarOffset);
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
@@ -99,6 +105,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateMelee(float dist)
     {
+        if (player == null)
+        {
+            Patrol();
+            return;
+        }
         bool sameLevel = Mathf.Abs(player.position.y - transform.position.y) <= chaseYThreshold;
         if (dist <= detectionRange && sameLevel)
         {
@@ -126,6 +137,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateRanged(float dist)
     {
+        if (player == null)
+        {
+            Patrol();
+            return;
+        }
         if (dist <= detectionRange)
         {
             if (dist < safeDistance)
@@ -266,6 +282,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
+        healthBar?.SetHealth(hp, maxHp);
 
         if (hp <= 0f)
         {
@@ -297,6 +314,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
@@ -304,6 +322,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
+        RunStats.Instance?.AddKill();
         animator.ResetTrigger(HashIsHit);
         animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);

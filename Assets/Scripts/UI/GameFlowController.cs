@@ -15,6 +15,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject playerPrefab;
 
+    [SerializeField]
+    private GameObject uiCanvasPrefab;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -26,7 +29,12 @@ public class GameFlowController : MonoBehaviour
     private GameObject villageInstance;
     private GameObject playerInstance;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        Instance = this;
+        if (uiCanvasPrefab != null)
+            Instantiate(uiCanvasPrefab);
+    }
 
     void Start() => GoToTitle();
 
@@ -109,6 +117,7 @@ public class GameFlowController : MonoBehaviour
             Destroy(villageInstance);
             villageInstance = null;
         }
+        RunStats.Instance?.StartRun();
         roomManager.StartGame();
     }
 }
