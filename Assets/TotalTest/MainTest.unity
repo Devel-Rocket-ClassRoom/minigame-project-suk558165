@@ -180,6 +180,7 @@ MonoBehaviour:
   villagePrefab: {fileID: 2690261797821886050, guid: a2425a380220c47478b4b7870589435e, type: 3}
   playerPrefab: {fileID: 100000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
   uiCanvasPrefab: {fileID: 4668893597031252979, guid: 5208a9ca8040f064a8b49feee4bce6b6, type: 3}
+  pauseMenuPrefab: {fileID: 329134092034828580, guid: 8b0e523b1f54db94fb32a257ea326eb5, type: 3}
   roomManager: {fileID: 2085237427}
   cinemachineCamera: {fileID: 1426324698}
 --- !u!1 &582639439
@@ -547,7 +548,6 @@ MonoBehaviour:
   miniBossRoomPrefab: {fileID: 2033410180147792784, guid: 09aa310d8bbcdc048a8c5180fdbeba2d, type: 3}
   bossRoomPrefab: {fileID: 203403302495070545, guid: 25fe004c5c21f0c409c614a5e5ad0ee3, type: 3}
   chestPrefab: {fileID: 3457266472583827726, guid: 95a9e2965e2d69941b4a689cacaa96f6, type: 3}
-  chestPortalOffset: {x: -2, y: 2, z: 0}
   player: {fileID: 400000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
   confiner: {fileID: 1426324697}
   gameClearUI: {fileID: 1121891927430353267, guid: 3fc961b017e5c0b46b220e8c3d0fea10, type: 3}

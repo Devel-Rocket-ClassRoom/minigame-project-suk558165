@@ -3,12 +3,11 @@ using UnityEngine;
 public class PauseMenu : MonoBehaviour
 {
     public static PauseMenu Instance { get; private set; }
+    public static bool IsPaused { get; private set; }
 
     [Header("Panels")]
     public CanvasGroup pausePanel;
     public CanvasGroup optionsPanel;
-
-    private bool isPaused;
 
     void Awake()
     {
@@ -17,34 +16,19 @@ public class PauseMenu : MonoBehaviour
         HidePanel(optionsPanel);
     }
 
-    void Update()
+    // ── GameFlowController 에서 호출 ──────────────────────
+
+    public void Open()
     {
-        if (!Input.GetKeyDown(KeyCode.Escape))
-            return;
-
-        // GameOver / GameClear 가 이미 화면을 점유 중이면 무시
-        if (Time.timeScale == 0f && !isPaused)
-            return;
-
-        if (isPaused)
-            Resume();
-        else
-            Pause();
-    }
-
-    // ── 퍼즈 토글 ─────────────────────────────────────────
-
-    void Pause()
-    {
-        isPaused = true;
+        IsPaused = true;
         Time.timeScale = 0f;
         ShowPanel(pausePanel);
         HidePanel(optionsPanel);
     }
 
-    public void Resume()
+    public void Close()
     {
-        isPaused = false;
+        IsPaused = false;
         Time.timeScale = 1f;
         HidePanel(pausePanel);
         HidePanel(optionsPanel);
@@ -52,7 +36,10 @@ public class PauseMenu : MonoBehaviour
 
     // ── 버튼 콜백 ─────────────────────────────────────────
 
-    public void OnResumeButton() => Resume();
+    public void OnResumeButton()
+    {
+        GameFlowController.Instance?.ClosePauseMenu();
+    }
 
     public void OnOptionsButton()
     {
@@ -62,10 +49,7 @@ public class PauseMenu : MonoBehaviour
 
     public void OnQuitButton()
     {
-        isPaused = false;
-        Time.timeScale = 1f;
-        HidePanel(pausePanel);
-        HidePanel(optionsPanel);
+        GameFlowController.Instance?.ClosePauseMenu();
         GameFlowController.Instance?.GoToTitle();
     }
 
@@ -79,7 +63,7 @@ public class PauseMenu : MonoBehaviour
 
     public void ForceClose()
     {
-        isPaused = false;
+        IsPaused = false;
         HidePanel(pausePanel);
         HidePanel(optionsPanel);
     }

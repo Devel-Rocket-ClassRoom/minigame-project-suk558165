@@ -296,6 +296,9 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (hp <= 0f)
         {
+            // 즉시 히트박스 비활성화하여 죽는 순간 데미지 방지
+            if (meleeHitbox != null)
+                meleeHitbox.enabled = false;
             Die();
             return;
         }
@@ -342,26 +345,33 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        Vector3 pos = transform.position;
+        float floorY = transform.position.y;
+        Vector3 pos = transform.position + Vector3.up * 0.3f;
 
         if (goldDropPrefab != null)
         {
             var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
             var worldGold = gold.GetComponent<WorldGold>();
             if (worldGold != null)
+            {
                 worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
+                float angle = Random.Range(50f, 130f) * Mathf.Deg2Rad;
+                float force = Random.Range(3f, 5f);
+                worldGold.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
+            }
         }
 
         if (potionDropPrefab != null && Random.value < potionDropChance)
         {
-            var potion = Instantiate(
-                potionDropPrefab,
-                pos + Vector3.up * 0.4f,
-                Quaternion.identity
-            );
+            var potion = Instantiate(potionDropPrefab, pos, Quaternion.identity);
             var worldPotion = potion.GetComponent<WorldPotion>();
             if (worldPotion != null)
+            {
                 worldPotion.healAmount = potionHealAmount;
+                float angle = Random.Range(70f, 110f) * Mathf.Deg2Rad;
+                float force = Random.Range(3f, 5f);
+                worldPotion.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
+            }
         }
     }
 

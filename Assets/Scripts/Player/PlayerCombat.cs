@@ -70,7 +70,7 @@ public class PlayerCombat : MonoBehaviour
         attackTimer -= Time.deltaTime;
         IsAttacking = false;
 
-        if (InventoryUI.IsOpen)
+        if (InventoryUI.IsOpen || PauseMenu.IsPaused)
             return;
 
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;

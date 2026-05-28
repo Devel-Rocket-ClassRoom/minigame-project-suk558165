@@ -52,6 +52,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreasureChest
   goldMin: 20
   goldMax: 40
+  goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
+  coinCount: 5
+  launchForceMin: 3
+  launchForceMax: 6
+  launchAngleMin: 60
+  launchAngleMax: 120
+  launchDuration: 0.5
   interactKey: 122
   interactRange: 1.5
   hintObject: {fileID: 5403062130086277630}
@@ -152,6 +159,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreasureChest
   goldMin: 20
   goldMax: 40
+  goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
+  coinCount: 5
+  launchForceMin: 3
+  launchForceMax: 6
+  launchAngleMin: 60
+  launchAngleMax: 120
+  launchDuration: 0.5
   interactKey: 97
   interactRange: 1.5
   hintObject: {fileID: 5403062130086277630}

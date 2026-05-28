@@ -8,8 +8,35 @@ public class WorldPotion : MonoBehaviour
     private Transform player;
     private PlayerHealth health;
 
+    // ── 방출 물리 ──
+    private Vector2 velocity;
+    private float gravity = 20f;
+    private float groundY;
+    private bool launched;
+
+    public void Launch(Vector2 force, float floorY)
+    {
+        velocity = force;
+        groundY = floorY;
+        launched = true;
+    }
+
     void Update()
     {
+        if (launched)
+        {
+            velocity.y -= gravity * Time.deltaTime;
+            transform.position += (Vector3)velocity * Time.deltaTime;
+
+            if (velocity.y < 0f && transform.position.y <= groundY)
+            {
+                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                launched = false;
+            }
+
+            return;
+        }
+
         if (player == null)
         {
             var go = GameObject.FindGameObjectWithTag("Player");

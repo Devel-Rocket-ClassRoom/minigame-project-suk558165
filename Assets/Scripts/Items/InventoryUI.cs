@@ -102,7 +102,7 @@ public class InventoryUI : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) && !PauseMenu.IsPaused)
             Toggle();
 
         if (IsOpen && dragGhost != null && dragGhost.gameObject.activeSelf)

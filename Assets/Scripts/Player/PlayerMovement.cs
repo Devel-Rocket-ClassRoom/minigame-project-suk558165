@@ -63,7 +63,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleInput()
     {
-        if (InventoryUI.IsOpen)
+        if (InventoryUI.IsOpen || PauseMenu.IsPaused)
         {
             MoveInput = 0f;
             return;

@@ -18,6 +18,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject uiCanvasPrefab;
 
+    [SerializeField]
+    private GameObject pauseMenuPrefab;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -28,6 +31,7 @@ public class GameFlowController : MonoBehaviour
     private GameObject titleInstance;
     private GameObject villageInstance;
     private GameObject playerInstance;
+    private GameObject pauseMenuInstance;
 
     void Awake()
     {
@@ -41,6 +45,53 @@ public class GameFlowController : MonoBehaviour
     }
 
     void Start() => GoToTitle();
+
+    void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.Escape))
+            return;
+
+        // 인벤토리가 열려있으면 ESC 무시
+        if (InventoryUI.IsOpen)
+            return;
+
+        // GameOver / GameClear 가 이미 화면을 점유 중이면 무시
+        if (Time.timeScale == 0f && !PauseMenu.IsPaused)
+            return;
+
+        if (PauseMenu.IsPaused)
+        {
+            ClosePauseMenu();
+        }
+        else
+        {
+            OpenPauseMenu();
+        }
+    }
+
+    void OpenPauseMenu()
+    {
+        if (pauseMenuInstance == null)
+        {
+            if (pauseMenuPrefab == null)
+                return;
+            pauseMenuInstance = Instantiate(pauseMenuPrefab);
+        }
+        else
+        {
+            pauseMenuInstance.SetActive(true);
+        }
+
+        PauseMenu.Instance.Open();
+    }
+
+    public void ClosePauseMenu()
+    {
+        if (PauseMenu.Instance != null)
+            PauseMenu.Instance.Close();
+        if (pauseMenuInstance != null)
+            pauseMenuInstance.SetActive(false);
+    }
 
     public void GoToTitle()
     {

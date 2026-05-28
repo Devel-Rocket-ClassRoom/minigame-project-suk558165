@@ -6,9 +6,18 @@ public class TreasureChest : MonoBehaviour
     [Header("Reward")]
     public int goldMin = 20;
     public int goldMax = 40;
+    public GameObject goldDropPrefab;
+
+    [Header("Launch")]
+    public int coinCount = 5;
+    public float launchForceMin = 3f;
+    public float launchForceMax = 6f;
+    public float launchAngleMin = 60f;
+    public float launchAngleMax = 120f;
+    public float launchDuration = 0.5f;
 
     [Header("Interaction")]
-    public KeyCode interactKey = KeyCode.Z;
+    public KeyCode interactKey = KeyCode.A;
     public float interactRange = 1.5f;
 
     [Header("UI")]
@@ -62,8 +71,7 @@ public class TreasureChest : MonoBehaviour
         if (hintObject != null)
             hintObject.SetActive(false);
 
-        int gold = Random.Range(goldMin, goldMax + 1);
-        player.GetComponent<Inventory>()?.AddGold(gold);
+        SpawnGoldCoins();
 
         if (animator != null)
             StartCoroutine(AnimatorOpenRoutine());
@@ -127,6 +135,36 @@ public class TreasureChest : MonoBehaviour
             yield return null;
         }
         transform.position = to;
+    }
+
+    void SpawnGoldCoins()
+    {
+        if (goldDropPrefab == null)
+            return;
+
+        int totalGold = Random.Range(goldMin, goldMax + 1);
+        int perCoin = Mathf.Max(1, totalGold / coinCount);
+        int remainder = totalGold - perCoin * coinCount;
+
+        float floorY = transform.position.y;
+        Vector3 spawnPos = transform.position + Vector3.up * 0.3f;
+
+        for (int i = 0; i < coinCount; i++)
+        {
+            var go = Instantiate(goldDropPrefab, spawnPos, Quaternion.identity);
+            var wg = go.GetComponent<WorldGold>();
+            if (wg == null)
+                continue;
+
+            wg.amount = perCoin + (i == 0 ? remainder : 0);
+
+            float angle = Random.Range(launchAngleMin, launchAngleMax);
+            float force = Random.Range(launchForceMin, launchForceMax);
+            float rad = angle * Mathf.Deg2Rad;
+            var dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+
+            wg.Launch(dir * force, floorY);
+        }
     }
 
     IEnumerator ScaleTo(Vector3 target, float duration)
