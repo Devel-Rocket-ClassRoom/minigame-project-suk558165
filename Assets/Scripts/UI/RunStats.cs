@@ -43,7 +43,44 @@ public class RunStats : MonoBehaviour
         running = true;
     }
 
-    public void StopTimer() => running = false;
+    public void StopTimer()
+    {
+        running = false;
+        SaveBestRun();
+    }
+
+    void SaveBestRun()
+    {
+        if (SaveManager.Instance == null)
+            return;
+
+        var best = SaveManager.Instance.Data.bestRun;
+        bool changed = false;
+
+        if (Kills > best.bestKills)
+        {
+            best.bestKills = Kills;
+            changed = true;
+        }
+        if (GoldEarned > best.bestGoldEarned)
+        {
+            best.bestGoldEarned = GoldEarned;
+            changed = true;
+        }
+        if (PlayTime > best.bestPlayTime)
+        {
+            best.bestPlayTime = PlayTime;
+            changed = true;
+        }
+        if (DamageDealt > best.bestDamageDealt)
+        {
+            best.bestDamageDealt = DamageDealt;
+            changed = true;
+        }
+
+        if (changed)
+            SaveManager.Instance.Save();
+    }
 
     public void AddKill() => Kills++;
 

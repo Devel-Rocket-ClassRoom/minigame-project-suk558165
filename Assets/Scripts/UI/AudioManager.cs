@@ -18,9 +18,26 @@ public class AudioManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        float master = PlayerPrefs.GetFloat("Vol_Master", 1f);
-        float bgm = PlayerPrefs.GetFloat("Vol_BGM", 1f);
-        float sfx = PlayerPrefs.GetFloat("Vol_SFX", 1f);
+        LoadVolumes();
+    }
+
+    void LoadVolumes()
+    {
+        float master, bgm, sfx;
+
+        if (SaveManager.Instance != null)
+        {
+            var data = SaveManager.Instance.Data;
+            master = data.volumeMaster;
+            bgm = data.volumeBGM;
+            sfx = data.volumeSFX;
+        }
+        else
+        {
+            master = PlayerPrefs.GetFloat("Vol_Master", 1f);
+            bgm = PlayerPrefs.GetFloat("Vol_BGM", 1f);
+            sfx = PlayerPrefs.GetFloat("Vol_SFX", 1f);
+        }
 
         AudioListener.volume = master;
         SetBGMVolume(bgm);

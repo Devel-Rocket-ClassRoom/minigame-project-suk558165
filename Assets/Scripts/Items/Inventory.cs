@@ -65,6 +65,7 @@ public class Inventory : MonoBehaviour
         var old = weaponInventory.weapons[slotIndex];
         weaponInventory.weapons[slotIndex] = weapon;
         OnInventoryChanged?.Invoke();
+        SaveEquippedWeapons();
         return old;
     }
 
@@ -78,7 +79,20 @@ public class Inventory : MonoBehaviour
         var old = weaponInventory.weapons[slotIndex];
         weaponInventory.weapons[slotIndex] = null;
         OnInventoryChanged?.Invoke();
+        SaveEquippedWeapons();
         return old;
+    }
+
+    void SaveEquippedWeapons()
+    {
+        if (SaveManager.Instance == null || weaponInventory == null)
+            return;
+
+        var names = SaveManager.Instance.Data.equippedWeapons;
+        names.Clear();
+        foreach (var w in weaponInventory.weapons)
+            names.Add(w != null ? w.weaponName : "");
+        SaveManager.Instance.Save();
     }
 
     public AccessoryData EquipAccessory(int slotIndex, AccessoryData accessory)
@@ -125,6 +139,7 @@ public class Inventory : MonoBehaviour
         gold += amount;
         RunStats.Instance?.AddGold(amount);
         OnInventoryChanged?.Invoke();
+        SaveGold();
     }
 
     public bool SpendGold(int amount)
@@ -133,7 +148,22 @@ public class Inventory : MonoBehaviour
             return false;
         gold -= amount;
         OnInventoryChanged?.Invoke();
+        SaveGold();
         return true;
+    }
+
+    void SaveGold()
+    {
+        if (SaveManager.Instance == null)
+            return;
+        SaveManager.Instance.Data.gold = gold;
+        SaveManager.Instance.Save();
+    }
+
+    public void LoadGold()
+    {
+        if (SaveManager.Instance != null)
+            gold = SaveManager.Instance.Data.gold;
     }
 
     public StatBonus GetTotalStatBonus()
