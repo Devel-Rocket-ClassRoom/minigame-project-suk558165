@@ -29,35 +29,22 @@ public class WorldGold : MonoBehaviour
 
     void Update()
     {
+        FindPlayer();
+
         // 방출 물리 처리
         if (launched)
         {
             velocity.y -= gravity * Time.deltaTime;
             transform.position += (Vector3)velocity * Time.deltaTime;
 
-            // 바닥에 닿으면 착지
             if (velocity.y < 0f && transform.position.y <= groundY)
             {
                 transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
                 launched = false;
             }
-
-            return;
         }
 
-        if (player == null)
-        {
-            var go = GameObject.FindGameObjectWithTag("Player");
-            if (go == null)
-                return;
-            player = go.transform;
-            inventory =
-                go.GetComponent<Inventory>()
-                ?? go.GetComponentInChildren<Inventory>()
-                ?? go.GetComponentInParent<Inventory>();
-        }
-
-        if (inventory == null)
+        if (player == null || inventory == null)
             return;
 
         float dist = Vector2.Distance(transform.position, player.position);
@@ -69,10 +56,25 @@ public class WorldGold : MonoBehaviour
             return;
         }
 
-        if (dist <= magnetRadius)
+        if (!launched && dist <= magnetRadius)
         {
             Vector3 dir = (player.position - transform.position).normalized;
             transform.position += dir * magnetSpeed * Time.deltaTime;
         }
+    }
+
+    void FindPlayer()
+    {
+        if (player != null)
+            return;
+
+        var go = GameObject.FindGameObjectWithTag("Player");
+        if (go == null)
+            return;
+        player = go.transform;
+        inventory =
+            go.GetComponent<Inventory>()
+            ?? go.GetComponentInChildren<Inventory>()
+            ?? go.GetComponentInParent<Inventory>();
     }
 }

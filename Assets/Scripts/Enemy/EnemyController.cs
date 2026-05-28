@@ -59,6 +59,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private float hp;
     private bool isDead;
+    public bool IsDead => isDead;
     private float attackTimer;
     private EnemyHealthBar healthBar;
     public float attackDamageDelay = 0.2f;
@@ -329,7 +330,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         isDead = true;
         healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
-        if (meleeHitbox != null)
+        var hitbox = meleeHitbox != null ? meleeHitbox.GetComponent<MeleeHitbox>() : null;
+        if (hitbox != null)
+            hitbox.ForceDeactivate();
+        else if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;

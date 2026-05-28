@@ -7,12 +7,14 @@ public class MeleeHitbox : MonoBehaviour
     public float knockbackForce = 10f;
 
     private Collider2D col;
+    private EnemyController owner;
 
     void Awake()
     {
         col = GetComponent<Collider2D>();
         col.isTrigger = true;
         col.enabled = false;
+        owner = GetComponentInParent<EnemyController>();
     }
 
     public void Activate(float duration)
@@ -21,11 +23,21 @@ public class MeleeHitbox : MonoBehaviour
         Invoke(nameof(Deactivate), duration);
     }
 
+    public void ForceDeactivate()
+    {
+        CancelInvoke(nameof(Deactivate));
+        col.enabled = false;
+    }
+
     void Deactivate() => col.enabled = false;
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (!col.enabled)
+            return;
         if (!other.CompareTag("Player"))
+            return;
+        if (owner != null && owner.IsDead)
             return;
         other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
 
