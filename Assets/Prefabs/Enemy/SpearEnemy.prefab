@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6294836684713710006
 Transform:
@@ -86,12 +86,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1459693717, guid: 1653e4ec7973b9f449a510077311818b, type: 3}
+  m_Sprite: {fileID: -575934076, guid: 412038208df76cb40aaeff2940344739, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.56, y: 2.56}
+  m_Size: {x: 1.16, y: 1.4}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -179,17 +179,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.6518813}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.56, y: 2.56}
-    newSize: {x: 2.56, y: 2.56}
+    oldSize: {x: 1.16, y: 1.4}
+    newSize: {x: 1.16, y: 1.4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.15, y: 2.56}
+  m_Size: {x: 1.15, y: 1.3037626}
   m_EdgeRadius: 0
 --- !u!114 &3427827913436165532
 MonoBehaviour:
@@ -219,7 +219,16 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  hpBarOffset: {x: 0, y: -0.6, z: 0}
+  knockbackForce: 6
+  knockbackDuration: 0.15
   meleeHitbox: {fileID: 1002739566803246385}
+  goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
+  goldDropMin: 3
+  goldDropMax: 8
+  potionDropPrefab: {fileID: 2534901888073699160, guid: ecf8c7ea1ed9a2c40a42f347c8d5c7c3, type: 3}
+  potionDropChance: 0.2
+  potionHealAmount: 20
   edgeCheckDepth: 0.4
   platformLayer:
     serializedVersion: 2
@@ -241,7 +250,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2822667273781949566
 Transform:
@@ -252,7 +261,7 @@ Transform:
   m_GameObject: {fileID: 5281891531134171487}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1, y: 0, z: 0}
+  m_LocalPosition: {x: 0.82, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -265,7 +274,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5281891531134171487}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -292,7 +301,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.36185095, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -302,7 +311,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 0.6}
+  m_Size: {x: 0.47629815, y: 0.6}
   m_EdgeRadius: 0
 --- !u!114 &7983547642425598409
 MonoBehaviour:
@@ -317,3 +326,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeHitbox
   damage: 12
+  knockbackForce: 10

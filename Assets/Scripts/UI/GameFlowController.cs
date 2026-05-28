@@ -15,6 +15,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject playerPrefab;
 
+    [SerializeField]
+    private GameObject uiCanvasPrefab;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -26,7 +29,16 @@ public class GameFlowController : MonoBehaviour
     private GameObject villageInstance;
     private GameObject playerInstance;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        Instance = this;
+        if (uiCanvasPrefab != null)
+            Instantiate(uiCanvasPrefab);
+
+        // RunStats 가 씬에 없으면 자동 생성
+        if (RunStats.Instance == null)
+            new GameObject("RunStats").AddComponent<RunStats>();
+    }
 
     void Start() => GoToTitle();
 
@@ -99,6 +111,12 @@ public class GameFlowController : MonoBehaviour
     {
         roomManager.ResetDungeon();
         FindFirstObjectByType<GameClearUI>()?.ResetUI();
+        FindFirstObjectByType<GameOverUI>()?.ResetUI();
+
+        // 사망 후 귀환 시 플레이어 전체 상태 복구 (HP + 물리 + 애니메이터)
+        if (playerInstance != null)
+            playerInstance.GetComponent<PlayerController>()?.Revive();
+
         GoToVillage();
     }
 
@@ -109,6 +127,12 @@ public class GameFlowController : MonoBehaviour
             Destroy(villageInstance);
             villageInstance = null;
         }
+
+        // ResetDungeon()에서 player 레퍼런스가 null 됐을 수 있으므로 재설정
+        if (playerInstance != null)
+            roomManager.SetPlayer(playerInstance.transform);
+
+        RunStats.Instance?.StartRun();
         roomManager.StartGame();
     }
 }

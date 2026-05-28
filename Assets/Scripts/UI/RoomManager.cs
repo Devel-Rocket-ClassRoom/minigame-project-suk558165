@@ -32,6 +32,10 @@ public class RoomManager : MonoBehaviour
     [SerializeField]
     private GameObject bossRoomPrefab;
 
+    [Header("Chest")]
+    [SerializeField]
+    private GameObject chestPrefab;
+
     [Header("References")]
     [SerializeField]
     private Transform player;
@@ -189,8 +193,22 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
+        SpawnChest();
+
         if (currentPortal != null)
             currentPortal.SetActive(true);
+    }
+
+    void SpawnChest()
+    {
+        if (chestPrefab == null || currentRoom == null)
+            return;
+
+        var spawnPoint = currentRoom.GetComponentInChildren<ChestSpawnPoint>();
+        if (spawnPoint == null)
+            return;
+
+        Instantiate(chestPrefab, spawnPoint.transform.position, Quaternion.identity);
     }
 
     public void GoToNextRoom()
@@ -207,8 +225,6 @@ public class RoomManager : MonoBehaviour
 
     void OnGameClear()
     {
-        Debug.Log("Game Clear!");
-
         if (gameClearUI == null)
             gameClearUI = FindAnyObjectByType<GameClearUI>();
 

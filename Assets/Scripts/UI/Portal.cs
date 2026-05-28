@@ -1,7 +1,16 @@
 using UnityEngine;
 
+public enum PortalType
+{
+    DungeonEntrance,
+    NextRoom,
+}
+
 public class Portal : MonoBehaviour
 {
+    [SerializeField]
+    private PortalType portalType = PortalType.NextRoom;
+
     [SerializeField]
     private GameObject visualEffect;
 
@@ -11,7 +20,7 @@ public class Portal : MonoBehaviour
 
     void Awake()
     {
-        SetActive(false);
+        SetActive(portalType == PortalType.DungeonEntrance);
     }
 
     public void SetActive(bool active)
@@ -45,12 +54,14 @@ public class Portal : MonoBehaviour
         if (!_active || _triggered || !_playerInRange)
             return;
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            _triggered = true;
-            var room = FindAnyObjectByType<RoomManager>();
-            if (room != null)
-                room.GoToNextRoom();
-        }
+        if (!Input.GetKeyDown(KeyCode.UpArrow))
+            return;
+
+        _triggered = true;
+
+        if (portalType == PortalType.DungeonEntrance)
+            GameFlowController.Instance?.EnterDungeon();
+        else
+            FindAnyObjectByType<RoomManager>()?.GoToNextRoom();
     }
 }

@@ -28,12 +28,25 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Header("HP Bar")]
+    public Vector3 hpBarOffset = new Vector3(0f, -0.6f, 0f);
+
     [Header("Knockback")]
     public float knockbackForce = 6f;
     public float knockbackDuration = 0.15f;
 
     [Header("Melee")]
     public Collider2D meleeHitbox;
+
+    [Header("Drops")]
+    public GameObject goldDropPrefab;
+    public int goldDropMin = 3;
+    public int goldDropMax = 8;
+    public GameObject potionDropPrefab;
+
+    [Range(0f, 1f)]
+    public float potionDropChance = 0.2f;
+    public float potionHealAmount = 20f;
 
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
@@ -47,6 +60,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float hp;
     private bool isDead;
     private float attackTimer;
+    private EnemyHealthBar healthBar;
     public float attackDamageDelay = 0.2f;
 
     private Transform player;
@@ -66,6 +80,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         col = GetComponent<Collider2D>();
         hp = maxHp;
         patrolOrigin = transform.position;
+        healthBar = gameObject.AddComponent<EnemyHealthBar>();
+        healthBar.Init(hpBarOffset);
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
@@ -99,6 +115,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateMelee(float dist)
     {
+        if (player == null)
+        {
+            Patrol();
+            return;
+        }
         bool sameLevel = Mathf.Abs(player.position.y - transform.position.y) <= chaseYThreshold;
         if (dist <= detectionRange && sameLevel)
         {
@@ -126,6 +147,11 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void UpdateRanged(float dist)
     {
+        if (player == null)
+        {
+            Patrol();
+            return;
+        }
         if (dist <= detectionRange)
         {
             if (dist < safeDistance)
@@ -266,6 +292,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
+        healthBar?.SetHealth(hp, maxHp);
 
         if (hp <= 0f)
         {
@@ -297,6 +324,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
@@ -304,10 +332,37 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
+        RunStats.Instance?.AddKill();
+        SpawnDrops();
         animator.ResetTrigger(HashIsHit);
         animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);
         StartCoroutine(DeathRoutine());
+    }
+
+    void SpawnDrops()
+    {
+        Vector3 pos = transform.position;
+
+        if (goldDropPrefab != null)
+        {
+            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
+            var worldGold = gold.GetComponent<WorldGold>();
+            if (worldGold != null)
+                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
+        }
+
+        if (potionDropPrefab != null && Random.value < potionDropChance)
+        {
+            var potion = Instantiate(
+                potionDropPrefab,
+                pos + Vector3.up * 0.4f,
+                Quaternion.identity
+            );
+            var worldPotion = potion.GetComponent<WorldPotion>();
+            if (worldPotion != null)
+                worldPotion.healAmount = potionHealAmount;
+        }
     }
 
     IEnumerator DeathRoutine()

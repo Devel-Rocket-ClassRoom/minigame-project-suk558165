@@ -179,7 +179,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.17806002}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -189,7 +189,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.15, y: 2.56}
+  m_Size: {x: 1.15, y: 2.212019}
   m_EdgeRadius: 0
 --- !u!114 &653864372982173630
 MonoBehaviour:
@@ -219,7 +219,16 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  hpBarOffset: {x: 0, y: -0.6, z: 0}
+  knockbackForce: 6
+  knockbackDuration: 0.15
   meleeHitbox: {fileID: 3317682275281999150}
+  goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
+  goldDropMin: 3
+  goldDropMax: 8
+  potionDropPrefab: {fileID: 2534901888073699160, guid: ecf8c7ea1ed9a2c40a42f347c8d5c7c3, type: 3}
+  potionDropChance: 0.2
+  potionHealAmount: 20
   edgeCheckDepth: 0.4
   platformLayer:
     serializedVersion: 2
@@ -317,3 +326,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeHitbox
   damage: 8
+  knockbackForce: 10

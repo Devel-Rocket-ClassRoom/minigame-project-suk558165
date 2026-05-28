@@ -4,6 +4,7 @@ using UnityEngine;
 public class MeleeHitbox : MonoBehaviour
 {
     public float damage = 10f;
+    public float knockbackForce = 10f;
 
     private Collider2D col;
 
@@ -27,6 +28,13 @@ public class MeleeHitbox : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
         other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
+
+        var playerCtrl = other.GetComponentInParent<PlayerController>();
+        if (playerCtrl != null)
+        {
+            Vector2 dir = (other.transform.root.position - transform.position).normalized;
+            playerCtrl.Knockback(new Vector2(dir.x, 0.4f).normalized * knockbackForce);
+        }
     }
 
     void OnDrawGizmos()

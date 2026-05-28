@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -10,21 +11,10 @@ public class PlayerCombat : MonoBehaviour
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 12f;
-    public float rangedDamage = 15f;
-    public float rangedCooldown = 0.8f;
 
-    [Header("Attack Settings")]
+    [Header("Sword Animator")]
     [SerializeField]
-    private string swordAttackStateName = "SwordAttack";
-
-    [SerializeField]
-    private string bowAttackStateName = "BowAttack";
-
-    [SerializeField]
-    private string swordOverrideClipName = "Player_SwordAttack";
-
-    [SerializeField]
-    private string idleOverrideClipName = "Player_Idle";
+    private Animator swordAnimator;
 
     [Header("Type-based Clips")]
     [SerializeField]
@@ -41,10 +31,15 @@ public class PlayerCombat : MonoBehaviour
 
     public bool IsAttacking { get; private set; }
 
+    private const string SwordAttackState = "SwordAttack";
+    private const string BowAttackState = "BowAttack";
+    private const string SwordOverrideClip = "Player_SwordAttack";
+    private const string IdleOverrideClip = "Player_Idle";
+
     private Animator animator;
     private AnimatorOverrideController overrideController;
     private PlayerMovement movement;
-    private float rangedAttackTimer;
+    private float attackTimer;
 
     void Awake()
     {
@@ -72,7 +67,7 @@ public class PlayerCombat : MonoBehaviour
 
     public void HandleInput()
     {
-        rangedAttackTimer -= Time.deltaTime;
+        attackTimer -= Time.deltaTime;
         IsAttacking = false;
 
         if (InventoryUI.IsOpen)
@@ -81,30 +76,30 @@ public class PlayerCombat : MonoBehaviour
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;
         if (!Input.GetKeyDown(KeyCode.X) || currentWeapon == null)
             return;
+        if (attackTimer > 0f)
+            return;
         if (!movement.IsGrounded && movement.AirAttackUsed)
             return;
 
         Vector2 attackDir = GetAttackDirection();
+        attackTimer = currentWeapon.attackCooldown;
 
         if (currentWeapon.weaponType == WeaponType.Melee && weapon != null)
         {
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
-            animator.Play(swordAttackStateName, 0, 0f);
+            animator.Play(SwordAttackState, 0, 0f);
+            swordAnimator?.SetTrigger("Attack");
+            StartCoroutine(MeleeHitAfterDelay(0.15f));
         }
-        else if (
-            currentWeapon.weaponType == WeaponType.Ranged
-            && rangedAttackTimer <= 0f
-            && projectilePrefab != null
-        )
+        else if (currentWeapon.weaponType == WeaponType.Ranged && projectilePrefab != null)
         {
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
-            rangedAttackTimer = rangedCooldown;
-            animator.Play(bowAttackStateName, 0, 0f);
-            ShootInDirection(attackDir);
+            animator.Play(BowAttackState, 0, 0f);
+            ShootInDirection(attackDir, currentWeapon.damage);
         }
     }
 
@@ -125,7 +120,6 @@ public class PlayerCombat : MonoBehaviour
         if (h != 0f || v != 0f)
             return new Vector2(h, v).normalized;
 
-        // 방향키 없으면 바라보는 방향
         bool facingLeft =
             movement.Visuals != null
                 ? movement.Visuals.localScale.x < 0f
@@ -133,13 +127,19 @@ public class PlayerCombat : MonoBehaviour
         return facingLeft ? Vector2.left : Vector2.right;
     }
 
-    void ShootInDirection(Vector2 dir)
+    void ShootInDirection(Vector2 dir, float damage)
     {
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
-            projComp.Init(dir, projectileSpeed, rangedDamage, gameObject);
+            projComp.Init(dir, projectileSpeed, damage, gameObject);
+    }
+
+    IEnumerator MeleeHitAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        weapon?.OnHitFrame();
     }
 
     void ApplyWeapon(WeaponData data)
@@ -150,11 +150,11 @@ public class PlayerCombat : MonoBehaviour
             data.weaponType == WeaponType.Ranged ? rangedIdleClip : meleeIdleClip;
 
         if (attackClip != null)
-            overrideController[swordOverrideClipName] = attackClip;
+            overrideController[SwordOverrideClip] = attackClip;
 
         if (idleClip != null)
         {
-            overrideController[idleOverrideClipName] = idleClip;
+            overrideController[IdleOverrideClip] = idleClip;
             var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (stateInfo.IsName("Idle"))
                 animator.Play("Idle", 0, stateInfo.normalizedTime);
