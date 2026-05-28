@@ -39,6 +39,7 @@ public class Inventory : MonoBehaviour
         if (backpack.Count >= MaxBackpack)
             return false;
         backpack.Add(item);
+        RunStats.Instance?.AddItem();
         OnInventoryChanged?.Invoke();
         return true;
     }
@@ -122,6 +123,7 @@ public class Inventory : MonoBehaviour
     public void AddGold(int amount)
     {
         gold += amount;
+        RunStats.Instance?.AddGold(amount);
         OnInventoryChanged?.Invoke();
     }
 

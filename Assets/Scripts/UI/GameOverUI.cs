@@ -41,13 +41,14 @@ public class GameOverUI : MonoBehaviour
             {
                 triggered = true;
                 RunStats.Instance?.StopTimer();
+                Time.timeScale = 0f;
                 StartCoroutine(ShowRoutine());
             }
             return;
         }
 
         if (canReturn && Input.GetKeyDown(returnKey))
-            ReturnToTitle();
+            ReturnToVillage();
     }
 
     IEnumerator ShowRoutine()
@@ -57,7 +58,7 @@ public class GameOverUI : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             if (canvasGroup != null)
                 canvasGroup.alpha = Mathf.Clamp01(elapsed / fadeInDuration);
             yield return null;
@@ -98,9 +99,10 @@ public class GameOverUI : MonoBehaviour
             label.text = value;
     }
 
-    public void ReturnToTitle()
+    public void ReturnToVillage()
     {
-        GameFlowController.Instance?.GoToTitle();
+        Time.timeScale = 1f;
+        GameFlowController.Instance?.ReturnToVillage();
     }
 
     void Hide()
@@ -114,6 +116,7 @@ public class GameOverUI : MonoBehaviour
 
     public void ResetUI()
     {
+        Time.timeScale = 1f;
         triggered = false;
         canReturn = false;
         playerHealth = null;

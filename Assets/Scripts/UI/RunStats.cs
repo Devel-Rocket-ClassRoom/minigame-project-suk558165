@@ -22,6 +22,7 @@ public class RunStats : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject); // 씬 전환 시에도 유지
     }
 
     void Update()

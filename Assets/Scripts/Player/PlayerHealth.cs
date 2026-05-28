@@ -27,4 +27,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (IsDead)
             RunStats.Instance?.AddDeath();
     }
+
+    /// <summary>마을 귀환 시 HP를 최대치로 복구합니다.</summary>
+    public void Revive()
+    {
+        hp = EffectiveMaxHp;
+    }
 }
