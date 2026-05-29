@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 public enum WeaponType
 {
@@ -9,12 +10,14 @@ public enum WeaponType
 [CreateAssetMenu(menuName = "Game/WeaponData", fileName = "NewWeapon")]
 public class WeaponData : ScriptableObject
 {
-    public string weaponName;
+    [Tooltip("세이브/로드에 사용되는 고유 식별자. 절대 변경 금지.")]
+    public string id;
+
+    public LocalizedString weaponName;
     public Sprite sprite;
     public WeaponType weaponType;
 
-    [TextArea]
-    public string description;
+    public LocalizedString description;
     public int price;
 
     [Header("Stats")]

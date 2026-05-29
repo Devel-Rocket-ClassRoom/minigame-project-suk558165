@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float detectionRange = 6f;
     public float attackRange = 1.2f;
     public float attackCooldown = 1.2f;
+    public float spawnDelay = 2.5f;
     public LayerMask groundLayer;
 
     [Header("Patrol")]
@@ -61,6 +62,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private bool isDead;
     public bool IsDead => isDead;
     private float attackTimer;
+    private float spawnDelayTimer;
     private EnemyHealthBar healthBar;
     public float attackDamageDelay = 0.2f;
 
@@ -96,6 +98,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             player = playerGO.transform;
             Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
         }
+        spawnDelayTimer = spawnDelay;
     }
 
     void Update()
@@ -104,6 +107,13 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         attackTimer -= Time.deltaTime;
+
+        if (spawnDelayTimer > 0f)
+        {
+            spawnDelayTimer -= Time.deltaTime;
+            Patrol();
+            return;
+        }
 
         float dist =
             player != null ? Vector2.Distance(transform.position, player.position) : float.MaxValue;
