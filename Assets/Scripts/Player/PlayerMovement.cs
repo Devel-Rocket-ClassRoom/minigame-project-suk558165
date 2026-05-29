@@ -83,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
     private float dashDirection;
     private Vector2 knockbackVelocity;
     private float knockbackTimer;
+    private bool isDropping;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -104,6 +105,8 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
+
+        isDropping = false;
     }
 
     public void HandleInput()
@@ -238,7 +241,9 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, rb.linearVelocity.y);
+            // 아랫점프 중이면 FixedUpdate에서 속도를 강제 적용 (코루틴에서 설정한 속도가 물리 보정에 덮어써지는 문제 방지)
+            float yVel = isDropping ? Mathf.Min(rb.linearVelocity.y, -10f) : rb.linearVelocity.y;
+            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, yVel);
 
             if (rb.linearVelocity.y < 0f)
                 rb.linearVelocity +=
@@ -246,6 +251,14 @@ public class PlayerMovement : MonoBehaviour
                     * Physics2D.gravity.y
                     * (fallGravityMultiplier - 1f)
                     * Time.fixedDeltaTime;
+        }
+
+        // 상승 중이거나 아랫점프 중이면 플랫폼 레이어 무시, 그 외엔 복원
+        int platLayer = LayerMaskToIndex(platformLayer);
+        if (platLayer >= 0)
+        {
+            bool ignorePlatform = isDropping || rb.linearVelocity.y > 0.5f;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, platLayer, ignorePlatform);
         }
 
         Vector2 checkPos = groundCheck.position;
@@ -261,17 +274,29 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator DropDown()
     {
-        var playerCol = GetComponent<Collider2D>();
-        if (playerCol == null)
+        if (isDropping)
             yield break;
 
-        LayerMask prev = playerCol.excludeLayers;
-        playerCol.excludeLayers = new LayerMask { value = prev.value | platformLayer.value };
+        int platLayer = LayerMaskToIndex(platformLayer);
+        if (platLayer < 0)
+            yield break;
 
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
+        isDropping = true;
+        // FixedUpdate를 기다리지 않고 즉시 IgnoreLayerCollision 적용 + 위치 이동으로
+        // Box2D의 기존 Contact를 다음 물리 스텝 전에 확실히 무효화
+        Physics2D.IgnoreLayerCollision(gameObject.layer, platLayer, true);
+        rb.position += Vector2.down * 0.15f;
 
-        yield return new WaitForSeconds(dropDownDuration);
+        yield return new WaitForSeconds(0.4f);
 
-        playerCol.excludeLayers = prev;
+        isDropping = false;
+    }
+
+    static int LayerMaskToIndex(LayerMask mask)
+    {
+        for (int i = 0; i < 32; i++)
+            if ((mask.value & (1 << i)) != 0)
+                return i;
+        return -1;
     }
 }

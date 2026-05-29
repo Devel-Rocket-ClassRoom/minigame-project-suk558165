@@ -314,6 +314,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
         }
 
+        DisableHitbox();
+
         animator.SetTrigger(HashIsHit);
 
         if (player != null)

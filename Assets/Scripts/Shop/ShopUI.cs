@@ -30,6 +30,7 @@ public class ShopUI : MonoBehaviour
 
     void Awake()
     {
+        openCount = 0;
         closeButton?.onClick.AddListener(Close);
     }
 

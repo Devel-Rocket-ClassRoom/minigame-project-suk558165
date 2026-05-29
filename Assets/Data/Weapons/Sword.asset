@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7320bb17f2992243ba93838d76530d0, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  id: 
+  id: sowrd
   weaponName:
     m_TableReference:
       m_TableCollectionName: 
@@ -33,10 +33,10 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  spriteScale: 2
   price: 0
   damage: 20
   attackCooldown: 0.5
+  spriteScale: 1.5
   swingAngle: 120
   swingDuration: 0.25
   projectileSpeed: 12
