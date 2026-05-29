@@ -22,7 +22,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 3521028af68594448ad6ada69b98464b, type: 3}
   description:
     m_TableReference:
       m_TableCollectionName: Items
