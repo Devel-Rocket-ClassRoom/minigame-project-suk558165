@@ -21,7 +21,9 @@ public class ShopUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI noticeText;
 
-    public static bool IsOpen { get; private set; }
+    // 씬에 있는 어떤 상점이든 하나라도 열려있으면 true (Shop.Update에서 중복 열기 방지용)
+    public static bool IsOpen => openCount > 0;
+    private static int openCount = 0;
 
     private Inventory inventory;
     private Coroutine noticeCoroutine;
@@ -33,7 +35,8 @@ public class ShopUI : MonoBehaviour
 
     void Start()
     {
-        frame?.SetActive(false);
+        if (!IsOpen)
+            frame?.SetActive(false);
     }
 
     void Update()
@@ -79,15 +82,19 @@ public class ShopUI : MonoBehaviour
             goldText.text = $"골드: {inventory.Gold}";
 
         frame.SetActive(true);
-        IsOpen = true;
+        openCount++;
         Time.timeScale = 0f;
     }
 
     public void Close()
     {
-        frame?.SetActive(false);
-        IsOpen = false;
-        Time.timeScale = 1f;
+        if (frame != null && frame.activeSelf)
+        {
+            frame.SetActive(false);
+            openCount = Mathf.Max(0, openCount - 1);
+            if (openCount == 0)
+                Time.timeScale = 1f;
+        }
     }
 
     public bool TryBuy(ScriptableObject item, int price)

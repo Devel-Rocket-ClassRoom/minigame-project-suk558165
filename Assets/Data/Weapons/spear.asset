@@ -33,6 +33,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  spriteScale: 2
   price: 160
   damage: 22
   attackCooldown: 0.7

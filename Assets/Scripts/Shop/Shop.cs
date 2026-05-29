@@ -68,19 +68,15 @@ public class Shop : MonoBehaviour
 
     void EnsureShopUI()
     {
-        if (shopUI != null && shopUI.gameObject.scene.IsValid())
+        if (shopUI == null)
             return;
 
-        ShopUI prefabRef = shopUI != null && !shopUI.gameObject.scene.IsValid() ? shopUI : null;
-        shopUI = FindFirstObjectByType<ShopUI>(FindObjectsInactive.Include);
-        if (shopUI != null)
-            return;
-
-        if (prefabRef == null)
-            return;
-
-        var canvas = FindFirstObjectByType<Canvas>();
-        shopUI = Instantiate(prefabRef, canvas != null ? canvas.transform : null);
+        // shopUI가 프리팹(씬 밖)이면 인스턴스화
+        if (!shopUI.gameObject.scene.IsValid())
+        {
+            var canvas = FindFirstObjectByType<Canvas>();
+            shopUI = Instantiate(shopUI, canvas != null ? canvas.transform : null);
+        }
     }
 
     void Open()

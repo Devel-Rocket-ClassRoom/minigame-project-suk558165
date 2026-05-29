@@ -132,22 +132,15 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetButtonDown("Jump"))
             return;
 
-        bool pressingDown = Input.GetKey(KeyCode.DownArrow);
-        Vector2 pCheckPos = groundCheck.position;
-        float pHalfW = groundCheckSize.x * 0.5f;
-        bool onPlatform =
-            platformLayer.value != 0
-            && (
-                Physics2D.OverlapCircle(pCheckPos, 0.15f, platformLayer)
-                || Physics2D.OverlapCircle(pCheckPos + Vector2.left * pHalfW, 0.12f, platformLayer)
-                || Physics2D.OverlapCircle(pCheckPos + Vector2.right * pHalfW, 0.12f, platformLayer)
-            );
+        bool pressingDown = Input.GetAxisRaw("Vertical") < 0f;
 
-        if (pressingDown && onPlatform)
+        if (pressingDown && IsGrounded)
         {
             StartCoroutine(DropDown());
+            return;
         }
-        else if (jumpCharges > 0)
+
+        if (jumpCharges > 0)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
@@ -269,41 +262,16 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator DropDown()
     {
         var playerCol = GetComponent<Collider2D>();
-        Vector2 dCheckPos = groundCheck.position;
-        float dHalfW = groundCheckSize.x * 0.5f;
-        var hitSet = new System.Collections.Generic.HashSet<Collider2D>();
-        foreach (var c in Physics2D.OverlapCircleAll(dCheckPos, 0.15f, platformLayer))
-            hitSet.Add(c);
-        foreach (
-            var c in Physics2D.OverlapCircleAll(
-                dCheckPos + Vector2.left * dHalfW,
-                0.12f,
-                platformLayer
-            )
-        )
-            hitSet.Add(c);
-        foreach (
-            var c in Physics2D.OverlapCircleAll(
-                dCheckPos + Vector2.right * dHalfW,
-                0.12f,
-                platformLayer
-            )
-        )
-            hitSet.Add(c);
-        var hits = new Collider2D[hitSet.Count];
-        hitSet.CopyTo(hits);
-        if (hits.Length == 0)
+        if (playerCol == null)
             yield break;
 
-        foreach (var c in hits)
-            Physics2D.IgnoreCollision(playerCol, c, true);
+        LayerMask prev = playerCol.excludeLayers;
+        playerCol.excludeLayers = new LayerMask { value = prev.value | platformLayer.value };
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        foreach (var c in hits)
-            if (c != null)
-                Physics2D.IgnoreCollision(playerCol, c, false);
+        playerCol.excludeLayers = prev;
     }
 }
