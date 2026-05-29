@@ -18,6 +18,13 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject uiCanvasPrefab;
 
+    [SerializeField]
+    private GameObject pauseMenuPrefab;
+
+    [Header("데이터")]
+    [SerializeField]
+    private ItemDatabase itemDatabase;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -28,6 +35,7 @@ public class GameFlowController : MonoBehaviour
     private GameObject titleInstance;
     private GameObject villageInstance;
     private GameObject playerInstance;
+    private GameObject pauseMenuInstance;
 
     void Awake()
     {
@@ -35,12 +43,67 @@ public class GameFlowController : MonoBehaviour
         if (uiCanvasPrefab != null)
             Instantiate(uiCanvasPrefab);
 
+        // SaveManager 가 씬에 없으면 자동 생성
+        if (SaveManager.Instance == null)
+            new GameObject("SaveManager").AddComponent<SaveManager>();
+
+        // ItemDatabase 초기화
+        if (itemDatabase != null)
+            itemDatabase.Init();
+
         // RunStats 가 씬에 없으면 자동 생성
         if (RunStats.Instance == null)
             new GameObject("RunStats").AddComponent<RunStats>();
     }
 
     void Start() => GoToTitle();
+
+    void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.Escape))
+            return;
+
+        // 인벤토리가 열려있으면 ESC 무시
+        if (InventoryUI.IsOpen)
+            return;
+
+        // GameOver / GameClear 가 이미 화면을 점유 중이면 무시
+        if (Time.timeScale == 0f && !PauseMenu.IsPaused)
+            return;
+
+        if (PauseMenu.IsPaused)
+        {
+            ClosePauseMenu();
+        }
+        else
+        {
+            OpenPauseMenu();
+        }
+    }
+
+    void OpenPauseMenu()
+    {
+        if (pauseMenuInstance == null)
+        {
+            if (pauseMenuPrefab == null)
+                return;
+            pauseMenuInstance = Instantiate(pauseMenuPrefab);
+        }
+        else
+        {
+            pauseMenuInstance.SetActive(true);
+        }
+
+        PauseMenu.Instance.Open();
+    }
+
+    public void ClosePauseMenu()
+    {
+        if (PauseMenu.Instance != null)
+            PauseMenu.Instance.Close();
+        if (pauseMenuInstance != null)
+            pauseMenuInstance.SetActive(false);
+    }
 
     public void GoToTitle()
     {
@@ -65,19 +128,84 @@ public class GameFlowController : MonoBehaviour
 
     public void StartNewGame()
     {
+        // 세이브 초기화
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.DeleteSave();
+
+        DestroyTitle();
+        SpawnPlayer();
+        GoToVillage();
+    }
+
+    public void ContinueGame()
+    {
+        if (!HasSaveData())
+            return;
+
+        DestroyTitle();
+        SpawnPlayer();
+        LoadPlayerData();
+        GoToVillage();
+    }
+
+    public bool HasSaveData()
+    {
+        return SaveManager.Instance != null
+            && System.IO.File.Exists(
+                System.IO.Path.Combine(
+                    UnityEngine.Application.persistentDataPath,
+                    "save.dat"
+                )
+            );
+    }
+
+    void DestroyTitle()
+    {
         if (titleInstance != null)
         {
             Destroy(titleInstance);
             titleInstance = null;
         }
+    }
 
+    void SpawnPlayer()
+    {
         playerInstance = Instantiate(playerPrefab);
 
         if (cinemachineCamera != null)
             cinemachineCamera.Follow = playerInstance.transform;
 
         roomManager.SetPlayer(playerInstance.transform);
-        GoToVillage();
+    }
+
+    void LoadPlayerData()
+    {
+        if (SaveManager.Instance == null)
+            return;
+
+        var data = SaveManager.Instance.Data;
+        var inventory = playerInstance.GetComponentInChildren<Inventory>();
+
+        if (inventory == null)
+            return;
+
+        // 골드 복원
+        inventory.LoadGold();
+
+        // 장착 무기 복원
+        if (itemDatabase != null && data.equippedWeapons.Count > 0)
+        {
+            var weaponInv = inventory.WeaponInventory;
+            if (weaponInv != null)
+            {
+                weaponInv.weapons.Clear();
+                foreach (var weaponName in data.equippedWeapons)
+                {
+                    var weapon = itemDatabase.FindWeapon(weaponName);
+                    weaponInv.weapons.Add(weapon); // null이면 빈 슬롯
+                }
+            }
+        }
     }
 
     void GoToVillage()

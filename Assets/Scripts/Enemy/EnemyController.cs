@@ -38,6 +38,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Melee")]
     public Collider2D meleeHitbox;
 
+    [Header("Drops")]
+    public GameObject goldDropPrefab;
+    public int goldDropMin = 3;
+    public int goldDropMax = 8;
+    public GameObject potionDropPrefab;
+
+    [Range(0f, 1f)]
+    public float potionDropChance = 0.2f;
+    public float potionHealAmount = 20f;
+
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
     public LayerMask platformLayer;
@@ -49,6 +59,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private float hp;
     private bool isDead;
+    public bool IsDead => isDead;
     private float attackTimer;
     private EnemyHealthBar healthBar;
     public float attackDamageDelay = 0.2f;
@@ -286,6 +297,9 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (hp <= 0f)
         {
+            // 즉시 히트박스 비활성화하여 죽는 순간 데미지 방지
+            if (meleeHitbox != null)
+                meleeHitbox.enabled = false;
             Die();
             return;
         }
@@ -316,17 +330,53 @@ public class EnemyController : MonoBehaviour, IDamageable
         isDead = true;
         healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
-        if (meleeHitbox != null)
+        var hitbox = meleeHitbox != null ? meleeHitbox.GetComponent<MeleeHitbox>() : null;
+        if (hitbox != null)
+            hitbox.ForceDeactivate();
+        else if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
         RunStats.Instance?.AddKill();
+        SpawnDrops();
         animator.ResetTrigger(HashIsHit);
         animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);
         StartCoroutine(DeathRoutine());
+    }
+
+    void SpawnDrops()
+    {
+        float floorY = transform.position.y;
+        Vector3 pos = transform.position + Vector3.up * 0.3f;
+
+        if (goldDropPrefab != null)
+        {
+            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
+            var worldGold = gold.GetComponent<WorldGold>();
+            if (worldGold != null)
+            {
+                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
+                float angle = Random.Range(50f, 130f) * Mathf.Deg2Rad;
+                float force = Random.Range(3f, 5f);
+                worldGold.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
+            }
+        }
+
+        if (potionDropPrefab != null && Random.value < potionDropChance)
+        {
+            var potion = Instantiate(potionDropPrefab, pos, Quaternion.identity);
+            var worldPotion = potion.GetComponent<WorldPotion>();
+            if (worldPotion != null)
+            {
+                worldPotion.healAmount = potionHealAmount;
+                float angle = Random.Range(70f, 110f) * Mathf.Deg2Rad;
+                float force = Random.Range(3f, 5f);
+                worldPotion.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
+            }
+        }
     }
 
     IEnumerator DeathRoutine()

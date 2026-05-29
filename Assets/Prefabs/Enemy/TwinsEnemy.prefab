@@ -92,6 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeHitbox
   damage: 12
+  knockbackForce: 10
 --- !u!1 &6174295281681821268
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,6 +316,12 @@ MonoBehaviour:
   knockbackForce: 6
   knockbackDuration: 0.15
   meleeHitbox: {fileID: 8663207341760413900}
+  goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
+  goldDropMin: 3
+  goldDropMax: 8
+  potionDropPrefab: {fileID: 2534901888073699160, guid: ecf8c7ea1ed9a2c40a42f347c8d5c7c3, type: 3}
+  potionDropChance: 0.2
+  potionHealAmount: 20
   edgeCheckDepth: 0.4
   platformLayer:
     serializedVersion: 2

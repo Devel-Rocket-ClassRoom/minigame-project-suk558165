@@ -28,6 +28,13 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             RunStats.Instance?.AddDeath();
     }
 
+    public void Heal(float amount)
+    {
+        if (IsDead)
+            return;
+        hp = Mathf.Min(hp + amount, EffectiveMaxHp);
+    }
+
     /// <summary>마을 귀환 시 HP를 최대치로 복구합니다.</summary>
     public void Revive()
     {
