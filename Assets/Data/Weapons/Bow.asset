@@ -12,13 +12,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7320bb17f2992243ba93838d76530d0, type: 3}
   m_Name: Bow
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Bow
+  id: bow
+  weaponName:
+    m_TableReference:
+      m_TableCollectionName: Items
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: weapon_bow_name
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   sprite: {fileID: 0}
   weaponType: 1
+  description:
+    m_TableReference:
+      m_TableCollectionName: Items
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: weapon_bow_desc
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  price: 150
   damage: 15
   attackCooldown: 0.8
   swingAngle: 0
   swingDuration: 0
   projectileSpeed: 12
-  attackClip: {fileID: 7400000, guid: 7063265198bda2444b9b7d5068965a88, type: 2}
-  idleClip: {fileID: 7400000, guid: a26597d1dfbc2f84ea31800bcd76e3da, type: 2}
+  references:
+    version: 2
+    RefIds: []

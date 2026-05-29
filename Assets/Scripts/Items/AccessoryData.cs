@@ -12,8 +12,32 @@ public class AccessoryData : ScriptableObject
     public LocalizedString description;
     public int price;
 
-    [Header("Stat Bonuses")]
+    [Header("기본 스탯")]
     public float maxHpBonus;
     public float damageBonus;
     public float speedBonus;
+    public float jumpBonus;
+
+    [Header("전투")]
+    public float criticalChance;
+    public float criticalDamage;
+    public float attackSpeedBonus;
+    public float damageReduction;
+
+    [Header("리스크/리워드")]
+    public float damageReceivedMult;
+    public float damageDealtMult;
+
+    [Header("대쉬")]
+    public int dashCountBonus;
+    public float dashRangeBonus;
+
+    [Header("기타")]
+    public float evasionRate;
+    public float goldDropBonus;
+
+    [Header("투사체 (활 장착 시)")]
+    public int arrowCount;
+    public float arrowDamageMult;
+    public int penetrationCount;
 }

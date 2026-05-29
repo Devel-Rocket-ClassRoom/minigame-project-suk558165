@@ -35,6 +35,45 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator animator;
+    private Inventory inventory;
+
+    private float baseWalkSpeed;
+    private float baseJumpForce;
+    private int baseDashCharges;
+    private float baseDashDuration;
+
+    float EffectiveWalkSpeed
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseWalkSpeed * (1f + b.speed);
+        }
+    }
+    float EffectiveJumpForce
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseJumpForce * (1f + b.jump);
+        }
+    }
+    int EffectiveDashCharges
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseDashCharges + b.dashCount;
+        }
+    }
+    float EffectiveDashDuration
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseDashDuration * (1f + b.dashRange);
+        }
+    }
 
     private int jumpCharges;
     private bool wasGrounded;
@@ -55,6 +94,12 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         Sr = GetComponent<SpriteRenderer>();
         Visuals = transform.Find("Visuals");
+        inventory = GetComponent<Inventory>();
+
+        baseWalkSpeed = walkSpeed;
+        baseJumpForce = jumpForce;
+        baseDashCharges = maxDashCharges;
+        baseDashDuration = dashDuration;
 
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
@@ -104,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (jumpCharges > 0)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
         }
     }
@@ -115,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
         {
             dashCooldownTimer -= Time.deltaTime;
             if (dashCooldownTimer <= 0f)
-                dashCharges = maxDashCharges;
+                dashCharges = EffectiveDashCharges;
         }
 
         var dashKey = InputManager.Instance?.Dash ?? KeyCode.Z;
@@ -126,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
             dashDirection = facingLeft ? -1f : 1f;
 
             IsDashing = true;
-            dashTimer = dashDuration;
+            dashTimer = EffectiveDashDuration;
             dashCharges--;
             if (dashCharges == 0)
                 dashCooldownTimer = dashCooldown;
@@ -193,11 +238,14 @@ public class PlayerMovement : MonoBehaviour
 
         if (IsDashing)
         {
-            rb.linearVelocity = new Vector2(dashDirection * walkSpeed * dashSpeedMultiplier, 0f);
+            rb.linearVelocity = new Vector2(
+                dashDirection * EffectiveWalkSpeed * dashSpeedMultiplier,
+                0f
+            );
         }
         else
         {
-            rb.linearVelocity = new Vector2(MoveInput * walkSpeed, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, rb.linearVelocity.y);
 
             if (rb.linearVelocity.y < 0f)
                 rb.linearVelocity +=

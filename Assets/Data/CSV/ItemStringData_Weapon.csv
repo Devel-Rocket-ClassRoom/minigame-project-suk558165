@@ -1,0 +1,19 @@
+﻿id,Key,한국어,English
+knife,weapon_knife_name,칼,Knife
+knife,weapon_knife_desc,빠르고 가벼운 근접 무기.,A fast and light melee weapon.
+bow,weapon_bow_name,활,Bow
+bow,weapon_bow_desc,원거리 화살을 발사하는 활.,A bow that fires arrows from a distance.
+crossbow,weapon_crossbow_name,석궁,Crossbow
+crossbow,weapon_crossbow_desc,강력하지만 재장전이 느린 원거리 무기.,A powerful ranged weapon with a slow reload.
+spear,weapon_spear_name,창,Spear
+spear,weapon_spear_desc,긴 사거리의 찌르기 근접 무기.,A thrusting melee weapon with long reach.
+staff,weapon_staff_name,마법봉,Magic Staff
+staff,weapon_staff_desc,마법 에너지를 발사하는 봉.,A staff that fires magical energy.
+scythe,weapon_scythe_name,낫,Scythe
+scythe,weapon_scythe_desc,넓은 범위를 베는 근접 무기.,A melee weapon that slashes in a wide arc.
+gauntlet,weapon_gauntlet_name,장갑,Gauntlet
+gauntlet,weapon_gauntlet_desc,주먹으로 빠르게 공격하는 무기.,A weapon that strikes fast with bare fists.
+hammer,weapon_hammer_name,망치,Hammer
+hammer,weapon_hammer_desc,느리지만 강력한 타격을 주는 무기.,A slow but devastatingly powerful weapon.
+hoe,weapon_hoe_name,호미,Hoe
+hoe,weapon_hoe_desc,농사 도구이지만 꽤 쓸만하다.,A farming tool that works surprisingly well.

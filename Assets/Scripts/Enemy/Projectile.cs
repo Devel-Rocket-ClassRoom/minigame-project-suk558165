@@ -10,6 +10,8 @@ public class Projectile : MonoBehaviour
     private float knockbackForce;
     private GameObject shooter;
     private bool ready;
+    private int pierceRemaining;
+    private System.Collections.Generic.HashSet<int> hitIds = new();
 
     void Awake()
     {
@@ -24,12 +26,14 @@ public class Projectile : MonoBehaviour
         float speed,
         float damage,
         GameObject shooter = null,
-        float knockbackForce = 8f
+        float knockbackForce = 8f,
+        int pierce = 0
     )
     {
         this.damage = damage;
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
+        this.pierceRemaining = pierce;
         GetComponent<Rigidbody2D>().linearVelocity = direction.normalized * speed;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
@@ -64,6 +68,9 @@ public class Projectile : MonoBehaviour
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
+            if (!hitIds.Add(other.GetInstanceID()))
+                return;
+
             damageable.TakeDamage(damage);
 
             if (other.CompareTag("Player"))
@@ -76,7 +83,10 @@ public class Projectile : MonoBehaviour
                 }
             }
 
-            Destroy(gameObject);
+            if (pierceRemaining <= 0)
+                Destroy(gameObject);
+            else
+                pierceRemaining--;
         }
     }
 }

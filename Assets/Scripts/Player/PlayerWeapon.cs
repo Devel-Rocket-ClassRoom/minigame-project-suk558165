@@ -11,12 +11,14 @@ public class PlayerWeapon : MonoBehaviour
     private SpriteRenderer weaponSr;
     private Transform playerRoot;
     private Transform visuals;
+    private Inventory inventory;
 
     void Awake()
     {
         weaponSr = GetComponent<SpriteRenderer>();
         playerRoot = transform.root;
         visuals = playerRoot.Find("Visuals");
+        inventory = playerRoot.GetComponent<Inventory>();
 
         if (enemyLayer == 0)
             enemyLayer = LayerMask.GetMask("Enemy");
@@ -34,14 +36,19 @@ public class PlayerWeapon : MonoBehaviour
         Vector2 center =
             attackPoint != null ? (Vector2)attackPoint.position : (Vector2)playerRoot.position;
 
+        var bonus = inventory?.GetTotalStatBonus() ?? default;
+        float effectiveDamage = (damage + bonus.damage) * (1f + bonus.damageDealtMult);
+        if (bonus.criticalChance > 0f && Random.value < bonus.criticalChance)
+            effectiveDamage *= 1f + bonus.criticalDamage;
+
         var hits = Physics2D.OverlapCircleAll(center, hitRadius, enemyLayer);
         foreach (var hit in hits)
         {
             var enemy = hit.GetComponent<EnemyController>();
             if (enemy == null)
                 continue;
-            enemy.TakeDamage(damage);
-            RunStats.Instance?.AddDamageDealt(damage);
+            enemy.TakeDamage(effectiveDamage);
+            RunStats.Instance?.AddDamageDealt(effectiveDamage);
         }
     }
 

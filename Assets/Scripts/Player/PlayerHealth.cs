@@ -22,8 +22,17 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         if (IsDead)
             return;
-        hp -= amount;
-        RunStats.Instance?.AddDamageTaken(amount);
+
+        var bonus = inventory?.GetTotalStatBonus() ?? default;
+
+        if (bonus.evasionRate > 0f && UnityEngine.Random.value < bonus.evasionRate)
+            return;
+
+        float finalDamage =
+            amount * (1f + bonus.damageReceivedMult) * (1f - Mathf.Clamp01(bonus.damageReduction));
+
+        hp -= finalDamage;
+        RunStats.Instance?.AddDamageTaken(finalDamage);
         if (IsDead)
             RunStats.Instance?.AddDeath();
     }
