@@ -85,6 +85,21 @@ public class RoomManager : MonoBehaviour
         StartCoroutine(LoadRoomWithFade(1, true));
     }
 
+    public void ResumeGame(int roomNumber)
+    {
+        var data = SaveManager.Instance?.Data;
+        if (data != null && data.savedRoomOrder.Count > 0)
+        {
+            normalRoomOrder = new List<int>(data.savedRoomOrder);
+            normalRoomCursor = data.savedRoomCursor;
+        }
+        else
+        {
+            ShuffleNormalRooms();
+        }
+        StartCoroutine(LoadRoomWithFade(roomNumber, true));
+    }
+
     void ShuffleNormalRooms()
     {
         normalRoomOrder = new List<int>();
@@ -98,6 +113,16 @@ public class RoomManager : MonoBehaviour
         }
 
         normalRoomCursor = 0;
+        SaveRoomLayout();
+    }
+
+    void SaveRoomLayout()
+    {
+        var data = SaveManager.Instance?.Data;
+        if (data == null)
+            return;
+        data.savedRoomOrder = new List<int>(normalRoomOrder);
+        data.savedRoomCursor = normalRoomCursor;
     }
 
     int PickNormalRoomIndex()
@@ -105,6 +130,8 @@ public class RoomManager : MonoBehaviour
         if (normalRoomCursor >= normalRoomOrder.Count)
             ShuffleNormalRooms();
 
+        // 증가 전에 저장 — 컨티뉴 시 이 방을 다시 로드할 때 동일한 인덱스를 집어오기 위해
+        SaveRoomLayout();
         return normalRoomOrder[normalRoomCursor++];
     }
 
@@ -152,7 +179,11 @@ public class RoomManager : MonoBehaviour
 
         if (confiner != null)
         {
-            var bounds = currentRoom.GetComponentInChildren<PolygonCollider2D>();
+            var boundsObj = currentRoom.transform.Find("CameraBounds");
+            var bounds =
+                boundsObj != null
+                    ? boundsObj.GetComponent<PolygonCollider2D>()
+                    : currentRoom.GetComponentInChildren<PolygonCollider2D>();
             if (bounds != null)
             {
                 confiner.BoundingShape2D = bounds;
@@ -172,6 +203,13 @@ public class RoomManager : MonoBehaviour
         }
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
+
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.Data.lastLocation = "Dungeon";
+            SaveManager.Instance.Data.lastRoomNumber = roomNumber;
+            SaveManager.Instance.Save();
+        }
 
         if (CurrentRoomType == RoomType.Shop)
         {

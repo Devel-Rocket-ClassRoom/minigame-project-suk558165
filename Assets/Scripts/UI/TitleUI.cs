@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TitleUI : MonoBehaviour
@@ -9,9 +10,23 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private Button continueButton;
 
+    [SerializeField]
+    private GameObject optionsPanel;
+
     private GameObject hpBar;
     private GameObject controls;
     private GameObject goldDisplay;
+
+    void Start()
+    {
+        // optionsPanel이 프리팹 에셋으로 연결된 경우 씬 인스턴스로 교체
+        if (optionsPanel != null && !optionsPanel.scene.IsValid())
+        {
+            var instance = Instantiate(optionsPanel, transform.root);
+            instance.name = "TitleOptionsPanel";
+            optionsPanel = instance;
+        }
+    }
 
     void OnEnable()
     {
@@ -44,7 +59,19 @@ public class TitleUI : MonoBehaviour
 
     public void OnContinue() => GameFlowController.Instance.ContinueGame();
 
-    public void OnOptions() => Debug.Log("Options: 미구현");
+    public void OnOptions()
+    {
+        EventSystem.current?.SetSelectedGameObject(null);
+
+        if (optionsPanel == null)
+            return;
+
+        var ui = optionsPanel.GetComponent<TitleOptionsUI>();
+        if (ui != null)
+            ui.Show();
+        else
+            optionsPanel.SetActive(true);
+    }
 
     public void OnQuit()
     {

@@ -16,6 +16,9 @@ public class SaveManager : MonoBehaviour
     private static readonly byte[] Key = Encoding.UTF8.GetBytes("MiniGame_SaveKey_2024!__32Bytes!");
     private static readonly byte[] IV = Encoding.UTF8.GetBytes("MG_InitVec_16B!!");
 
+    // 구버전 호환: IV가 15바이트였던 시절의 세이브 복호화용
+    private static readonly byte[] LegacyIV = Encoding.UTF8.GetBytes("MG_InitVec_16B!");
+
     private string FilePath => Path.Combine(Application.persistentDataPath, "save.dat");
 
     void Awake()
@@ -47,18 +50,28 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
-        try
+        byte[] encrypted = File.ReadAllBytes(FilePath);
+
+        // 현재 IV로 복호화 시도
+        if (TryDecrypt(encrypted, IV, out string json))
         {
-            byte[] encrypted = File.ReadAllBytes(FilePath);
-            string json = Decrypt(encrypted);
             Data = JsonUtility.FromJson<SaveData>(json);
             Migrate();
+            return;
         }
-        catch (Exception e)
+
+        // 구버전(15바이트 IV) 세이브 호환 복호화
+        if (TryDecrypt(encrypted, LegacyIV, out json))
         {
-            Debug.LogWarning($"[SaveManager] 세이브 로드 실패, 새 데이터 생성: {e.Message}");
-            Data = new SaveData();
+            Debug.Log("[SaveManager] 구버전 세이브 감지 → 새 형식으로 재저장");
+            Data = JsonUtility.FromJson<SaveData>(json);
+            Save(); // 새 IV로 덮어쓰기
+            Migrate();
+            return;
         }
+
+        Debug.LogWarning("[SaveManager] 세이브 복호화 실패, 새 데이터 생성");
+        Data = new SaveData();
     }
 
     // ── 세이브 초기화 ──
@@ -88,6 +101,20 @@ public class SaveManager : MonoBehaviour
     }
 
     // ── AES-256 암호화 ──
+    bool TryDecrypt(byte[] cipherBytes, byte[] iv, out string result)
+    {
+        try
+        {
+            result = DecryptWith(cipherBytes, iv);
+            return true;
+        }
+        catch
+        {
+            result = null;
+            return false;
+        }
+    }
+
     byte[] Encrypt(string plainText)
     {
         using var aes = Aes.Create();
@@ -105,11 +132,11 @@ public class SaveManager : MonoBehaviour
         return ms.ToArray();
     }
 
-    string Decrypt(byte[] cipherBytes)
+    string DecryptWith(byte[] cipherBytes, byte[] iv)
     {
         using var aes = Aes.Create();
         aes.Key = Key;
-        aes.IV = IV;
+        aes.IV = iv;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
 

@@ -17,7 +17,6 @@ public class TreasureChest : MonoBehaviour
     public float launchDuration = 0.5f;
 
     [Header("Interaction")]
-    public KeyCode interactKey = KeyCode.A;
     public float interactRange = 1.5f;
 
     [Header("UI")]
@@ -60,6 +59,7 @@ public class TreasureChest : MonoBehaviour
         if (hintObject != null)
             hintObject.SetActive(inRange);
 
+        var interactKey = InputManager.Instance?.Interact ?? KeyCode.A;
         if (inRange && Input.GetKeyDown(interactKey))
             Open();
     }

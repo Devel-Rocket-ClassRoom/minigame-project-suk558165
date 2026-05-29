@@ -23,6 +23,26 @@ public class SaveData
     public float volumeMaster = 1f;
     public float volumeBGM = 1f;
     public float volumeSFX = 1f;
+
+    // 마지막 위치
+    public string lastLocation = "Village"; // "Village" or "Dungeon"
+    public int lastRoomNumber = 1;
+
+    // 던전 방 배치
+    public List<int> savedRoomOrder = new List<int>();
+    public int savedRoomCursor = 0;
+
+    // 키 바인딩
+    public KeyBindingSaveData keyBindings = new KeyBindingSaveData();
+}
+
+[Serializable]
+public class KeyBindingSaveData
+{
+    public string dashKey = "Z";
+    public string attackKey = "X";
+    public string inventoryKey = "Tab";
+    public string interactKey = "A";
 }
 
 [Serializable]
