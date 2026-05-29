@@ -4,6 +4,8 @@ public class WorldPotion : MonoBehaviour
 {
     public float healAmount = 20f;
     public float pickupRadius = 1.2f;
+    public float magnetRadius = 4f;
+    public float magnetSpeed = 6f;
 
     private Transform player;
     private PlayerHealth health;
@@ -30,7 +32,11 @@ public class WorldPotion : MonoBehaviour
 
             if (velocity.y < 0f && transform.position.y <= groundY)
             {
-                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                transform.position = new Vector3(
+                    transform.position.x,
+                    groundY,
+                    transform.position.z
+                );
                 launched = false;
             }
 
@@ -52,10 +58,21 @@ public class WorldPotion : MonoBehaviour
         if (health == null || health.IsDead)
             return;
 
-        if (Vector2.Distance(transform.position, player.position) <= pickupRadius)
+        float dist = Vector2.Distance(transform.position, player.position);
+
+        if (dist <= pickupRadius)
         {
             health.Heal(healAmount);
             Destroy(gameObject);
+            return;
+        }
+
+        // HP가 최대치 미만일 때만 자석 흡인
+        bool needsHeal = health.CurrentHp < health.EffectiveMaxHp;
+        if (needsHeal && dist <= magnetRadius)
+        {
+            Vector3 dir = (player.position - transform.position).normalized;
+            transform.position += dir * magnetSpeed * Time.deltaTime;
         }
     }
 }

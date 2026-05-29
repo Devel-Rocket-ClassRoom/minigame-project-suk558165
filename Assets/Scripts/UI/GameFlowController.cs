@@ -54,6 +54,10 @@ public class GameFlowController : MonoBehaviour
         // RunStats 가 씬에 없으면 자동 생성
         if (RunStats.Instance == null)
             new GameObject("RunStats").AddComponent<RunStats>();
+
+        // InputManager 가 씬에 없으면 자동 생성
+        if (InputManager.Instance == null)
+            new GameObject("InputManager").AddComponent<InputManager>();
     }
 
     void Start() => GoToTitle();
@@ -145,17 +149,26 @@ public class GameFlowController : MonoBehaviour
         DestroyTitle();
         SpawnPlayer();
         LoadPlayerData();
-        GoToVillage();
+
+        var data = SaveManager.Instance.Data;
+        if (data.lastLocation == "Dungeon" && data.lastRoomNumber > 0)
+        {
+            if (playerInstance != null)
+                roomManager.SetPlayer(playerInstance.transform);
+            RunStats.Instance?.StartRun();
+            roomManager.ResumeGame(data.lastRoomNumber);
+        }
+        else
+        {
+            GoToVillage();
+        }
     }
 
     public bool HasSaveData()
     {
         return SaveManager.Instance != null
             && System.IO.File.Exists(
-                System.IO.Path.Combine(
-                    UnityEngine.Application.persistentDataPath,
-                    "save.dat"
-                )
+                System.IO.Path.Combine(UnityEngine.Application.persistentDataPath, "save.dat")
             );
     }
 
@@ -210,6 +223,12 @@ public class GameFlowController : MonoBehaviour
 
     void GoToVillage()
     {
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.Data.lastLocation = "Village";
+            SaveManager.Instance.Save();
+        }
+
         villageInstance = Instantiate(villagePrefab);
 
         var spawn = villageInstance.GetComponentInChildren<PlayerSpawnPoint>();

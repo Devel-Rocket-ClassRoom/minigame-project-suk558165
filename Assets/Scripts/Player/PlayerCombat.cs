@@ -74,7 +74,8 @@ public class PlayerCombat : MonoBehaviour
             return;
 
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;
-        if (!Input.GetKeyDown(KeyCode.X) || currentWeapon == null)
+        var attackKey = InputManager.Instance?.Attack ?? KeyCode.X;
+        if (!Input.GetKeyDown(attackKey) || currentWeapon == null)
             return;
         if (attackTimer > 0f)
             return;

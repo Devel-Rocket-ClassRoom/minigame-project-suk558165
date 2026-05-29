@@ -17,18 +17,18 @@ public class ItemDatabase : ScriptableObject
         Instance = this;
     }
 
-    public WeaponData FindWeapon(string weaponName)
+    public WeaponData FindWeapon(string id)
     {
         foreach (var w in weapons)
-            if (w != null && w.weaponName == weaponName)
+            if (w != null && w.id == id)
                 return w;
         return null;
     }
 
-    public AccessoryData FindAccessory(string accessoryName)
+    public AccessoryData FindAccessory(string id)
     {
         foreach (var a in accessories)
-            if (a != null && a.accessoryName == accessoryName)
+            if (a != null && a.id == id)
                 return a;
         return null;
     }

@@ -118,7 +118,8 @@ public class PlayerMovement : MonoBehaviour
                 dashCharges = maxDashCharges;
         }
 
-        if (Input.GetKeyDown(KeyCode.Z) && !IsDashing && dashCharges > 0)
+        var dashKey = InputManager.Instance?.Dash ?? KeyCode.Z;
+        if (Input.GetKeyDown(dashKey) && !IsDashing && dashCharges > 0)
         {
             bool facingLeft =
                 Visuals != null ? Visuals.localScale.x < 0f : (Sr != null && Sr.flipX);

@@ -116,7 +116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d15c809a9c3c7b4fb66b3a25f62babe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleUI
-  titlePanel: {fileID: 0}
+  titlePanel: {fileID: 48144096924919366}
+  continueButton: {fileID: 4778895324094875390}
+  optionsPanel: {fileID: 1104939646057373939, guid: 0d363e96ee02735429dc52386812370b, type: 3}
 --- !u!1 &869053360730921769
 GameObject:
   m_ObjectHideFlags: 0
@@ -131,7 +133,7 @@ GameObject:
   - component: {fileID: 4778895324094875390}
   - component: {fileID: 2855409340302452138}
   m_Layer: 0
-  m_Name: Btn_NewGame (1)
+  m_Name: Btn_Continue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -279,7 +281,7 @@ GameObject:
   - component: {fileID: 8990205793717015970}
   - component: {fileID: 4084593713390511325}
   m_Layer: 0
-  m_Name: Btn_NewGame (3)
+  m_Name: Btn_Quit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -568,7 +570,7 @@ GameObject:
   - component: {fileID: 4418528554277839254}
   - component: {fileID: 5351378970383645016}
   m_Layer: 0
-  m_Name: Btn_NewGame (2)
+  m_Name: Btn_Option
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -681,7 +683,7 @@ MonoBehaviour:
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

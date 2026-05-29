@@ -91,7 +91,7 @@ public class Inventory : MonoBehaviour
         var names = SaveManager.Instance.Data.equippedWeapons;
         names.Clear();
         foreach (var w in weaponInventory.weapons)
-            names.Add(w != null ? w.weaponName : "");
+            names.Add(w != null ? w.id : "");
         SaveManager.Instance.Save();
     }
 

@@ -21,9 +21,23 @@ public class AudioManager : MonoBehaviour
         LoadVolumes();
     }
 
+    void Start()
+    {
+        Debug.Log(
+            $"[AudioManager] bgmSource={bgmSource}  clip={bgmSource?.clip?.name}  "
+                + $"bgmVolume={bgmSource?.volume}  listenerVolume={AudioListener.volume}  "
+                + $"isPlaying={bgmSource?.isPlaying}"
+        );
+
+        if (bgmSource != null && bgmSource.clip != null && !bgmSource.isPlaying)
+            bgmSource.Play();
+    }
+
     void LoadVolumes()
     {
-        float master, bgm, sfx;
+        float master,
+            bgm,
+            sfx;
 
         if (SaveManager.Instance != null)
         {
