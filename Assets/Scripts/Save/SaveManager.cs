@@ -14,7 +14,7 @@ public class SaveManager : MonoBehaviour
     // ── 암호화 키 (32바이트 = AES-256) ──
     // 실제 배포 시 난독화 또는 키 관리 방식 변경 권장
     private static readonly byte[] Key = Encoding.UTF8.GetBytes("MiniGame_SaveKey_2024!__32Bytes!");
-    private static readonly byte[] IV = Encoding.UTF8.GetBytes("MG_InitVec_16B!");
+    private static readonly byte[] IV = Encoding.UTF8.GetBytes("MG_InitVec_16B!!");
 
     private string FilePath => Path.Combine(Application.persistentDataPath, "save.dat");
 
