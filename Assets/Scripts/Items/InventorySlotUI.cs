@@ -106,7 +106,7 @@ public class InventorySlotUI
     {
         if (DragSource == this)
         {
-            icon.raycastTarget = false;
+            icon.raycastTarget = true;
             DragSource = null;
             OnDragEnded?.Invoke();
         }

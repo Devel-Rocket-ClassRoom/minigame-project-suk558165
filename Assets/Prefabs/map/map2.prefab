@@ -2650,7 +2650,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 25
-      m_TileSpriteIndex: 25
+      m_TileSpriteIndex: 27
       m_TileMatrixIndex: 0
       m_TileColorIndex: 1
       m_TileObjectToInstantiateIndex: 65535
@@ -3067,12 +3067,12 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: -2420399472567947404, guid: 4d1ed94e983bc634eb8fa911dbc99e64, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
   - m_RefCount: 30
     m_Data: {fileID: -1122647542, guid: d18080ed182200a45bfc54e958ad02db, type: 3}
   m_TileMatrixArray:
@@ -3598,7 +3598,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1269281539327155038}
-  - {fileID: 6723779034557149319}
   m_Father: {fileID: 6502038475362423959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1839735485 &4357022079746691461
@@ -7714,7 +7713,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3295866982616013946}
+  m_Father: {fileID: 6502038475362423959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1839735485 &8808824384608198249
 Tilemap:
@@ -8852,6 +8851,7 @@ Transform:
   - {fileID: 7784762825689821542}
   - {fileID: 3049706472106902638}
   - {fileID: 2826885249307243954}
+  - {fileID: 6723779034557149319}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!156049354 &5634408398780374318

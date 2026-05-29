@@ -29,6 +29,9 @@ public class PlayerWeapon : MonoBehaviour
         damage = data.damage;
         if (weaponSr != null)
             weaponSr.sprite = data.sprite;
+
+        float s = data.spriteScale > 0f ? data.spriteScale : 1f;
+        transform.localScale = new Vector3(s, s, 1f);
     }
 
     public void OnHitFrame()

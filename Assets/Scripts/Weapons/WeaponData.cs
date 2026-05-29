@@ -24,6 +24,9 @@ public class WeaponData : ScriptableObject
     public float damage = 20f;
     public float attackCooldown = 0.5f;
 
+    [Header("Visuals")]
+    public float spriteScale = 1f;
+
     [Header("Swing (Melee)")]
     public float swingAngle = 120f;
     public float swingDuration = 0.5f;
