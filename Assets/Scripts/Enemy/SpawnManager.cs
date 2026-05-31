@@ -14,18 +14,38 @@ public class SpawnManager : MonoBehaviour
         public EnemyController activeEnemy;
     }
 
-    public List<SpawnEntry> entries = new List<SpawnEntry>();
-    [SerializeField] private bool respawnEnabled = false;
-    [SerializeField] private float respawnDelay = 3f;
+    [System.Serializable]
+    public class Wave
+    {
+        public List<SpawnEntry> entries = new List<SpawnEntry>();
+        [Tooltip("이 웨이브 스폰 전 대기 시간")]
+        public float delayBeforeSpawn = 1f;
+    }
+
+    [SerializeField] private List<Wave> waves = new List<Wave>();
 
     public System.Action onAllEnemiesDead;
 
+    private int currentWaveIndex;
     private int aliveCount;
 
     void Start()
     {
+        currentWaveIndex = 0;
         aliveCount = 0;
-        foreach (var entry in entries)
+
+        if (waves.Count == 0)
+            return;
+
+        StartCoroutine(SpawnWave(waves[0]));
+    }
+
+    IEnumerator SpawnWave(Wave wave)
+    {
+        if (wave.delayBeforeSpawn > 0f)
+            yield return new WaitForSeconds(wave.delayBeforeSpawn);
+
+        foreach (var entry in wave.entries)
         {
             SpawnEnemy(entry);
             aliveCount++;
@@ -41,28 +61,26 @@ public class SpawnManager : MonoBehaviour
         entry.activeEnemy = go.GetComponent<EnemyController>();
         if (entry.activeEnemy != null)
         {
-            entry.activeEnemy.onDeath += () => OnEnemyDied(entry);
+            entry.activeEnemy.onDeath += () => OnEnemyDied();
         }
     }
 
-    void OnEnemyDied(SpawnEntry entry)
+    void OnEnemyDied()
     {
         aliveCount--;
 
-        if (respawnEnabled)
-        {
-            StartCoroutine(Respawn(entry));
+        if (aliveCount > 0)
             return;
+
+        currentWaveIndex++;
+
+        if (currentWaveIndex < waves.Count)
+        {
+            StartCoroutine(SpawnWave(waves[currentWaveIndex]));
         }
-
-        if (aliveCount <= 0)
+        else
+        {
             onAllEnemiesDead?.Invoke();
-    }
-
-    IEnumerator Respawn(SpawnEntry entry)
-    {
-        yield return new WaitForSeconds(respawnDelay);
-        aliveCount++;
-        SpawnEnemy(entry);
+        }
     }
 }

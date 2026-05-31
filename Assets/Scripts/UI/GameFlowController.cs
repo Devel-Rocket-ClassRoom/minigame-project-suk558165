@@ -252,8 +252,12 @@ public class GameFlowController : MonoBehaviour
         }
 
         var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
+        float savedDamping = 0f;
         if (confiner != null)
         {
+            savedDamping = confiner.Damping;
+            confiner.Damping = 0f;
+
             var bounds = villageInstance
                 .transform.Find("CameraBounds")
                 ?.GetComponent<PolygonCollider2D>();
@@ -263,6 +267,19 @@ public class GameFlowController : MonoBehaviour
                 confiner.InvalidateBoundingShapeCache();
             }
         }
+
+        if (cinemachineCamera != null && playerInstance != null)
+        {
+            var targetPos = new Vector3(
+                playerInstance.transform.position.x,
+                playerInstance.transform.position.y,
+                cinemachineCamera.transform.position.z
+            );
+            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
+        }
+
+        if (confiner != null)
+            confiner.Damping = savedDamping;
     }
 
     public void ReturnToVillage()

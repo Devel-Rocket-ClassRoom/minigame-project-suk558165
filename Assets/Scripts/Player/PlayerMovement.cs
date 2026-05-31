@@ -85,9 +85,10 @@ public class PlayerMovement : MonoBehaviour
     private float knockbackTimer;
     private bool isDropping;
 
+    private DashGhostEffect dashGhost;
+
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
-    private static readonly int HashDash = Animator.StringToHash("Dash");
 
     void Awake()
     {
@@ -96,6 +97,8 @@ public class PlayerMovement : MonoBehaviour
         Sr = GetComponent<SpriteRenderer>();
         Visuals = transform.Find("Visuals");
         inventory = GetComponent<Inventory>();
+
+        dashGhost = GetComponent<DashGhostEffect>();
 
         baseWalkSpeed = walkSpeed;
         baseJumpForce = jumpForce;
@@ -176,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
                 jumpCharges = 0;
 
             rb.gravityScale = 0f;
-            animator.SetTrigger(HashDash);
+            dashGhost?.StartGhost();
         }
 
         if (IsDashing)
@@ -186,6 +189,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 IsDashing = false;
                 rb.gravityScale = gravityScale;
+                dashGhost?.StopGhost();
             }
         }
     }
