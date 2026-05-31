@@ -9,6 +9,9 @@ public class TitleOptionsUI : MonoBehaviour
     public Slider bgmSlider;
     public Slider sfxSlider;
 
+    [Header("언어")]
+    public TMP_Dropdown languageDropdown;
+
     [Header("키 바인딩 텍스트")]
     public TextMeshProUGUI dashKeyText;
     public TextMeshProUGUI attackKeyText;
@@ -40,6 +43,7 @@ public class TitleOptionsUI : MonoBehaviour
         if (sfxSlider != null)
             sfxSlider.onValueChanged.AddListener(OnSFXChanged);
 
+        InitLanguageDropdown();
         RefreshVolume();
         RefreshKeyLabels();
     }
@@ -52,6 +56,8 @@ public class TitleOptionsUI : MonoBehaviour
             bgmSlider.onValueChanged.RemoveListener(OnBGMChanged);
         if (sfxSlider != null)
             sfxSlider.onValueChanged.RemoveListener(OnSFXChanged);
+        if (languageDropdown != null)
+            languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged);
     }
 
     void Update()
@@ -124,6 +130,25 @@ public class TitleOptionsUI : MonoBehaviour
         if (SaveManager.Instance != null)
             SaveManager.Instance.Data.volumeSFX = v;
         SaveManager.Instance?.Save();
+    }
+
+    // ── 언어 ──────────────────────────────────────────────
+
+    void InitLanguageDropdown()
+    {
+        if (languageDropdown == null)
+            return;
+
+        languageDropdown.ClearOptions();
+        languageDropdown.AddOptions(new System.Collections.Generic.List<string> { "English", "한국어" });
+        languageDropdown.SetValueWithoutNotify(
+            LanguageManager.Instance != null ? LanguageManager.Instance.CurrentIndex : 0);
+        languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+    }
+
+    void OnLanguageChanged(int index)
+    {
+        LanguageManager.Instance?.SetLanguage(index);
     }
 
     // ── 키 바인딩 ─────────────────────────────────────────

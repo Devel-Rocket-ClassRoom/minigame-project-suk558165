@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,9 @@ public class OptionsMenu : MonoBehaviour
     public Slider masterVolumeSlider;
     public Slider bgmVolumeSlider;
     public Slider sfxVolumeSlider;
+
+    [Header("Language")]
+    public TMP_Dropdown languageDropdown;
 
     const string KeyMaster = "Vol_Master";
     const string KeyBGM = "Vol_BGM";
@@ -36,6 +40,8 @@ public class OptionsMenu : MonoBehaviour
             bgmVolumeSlider.value = bgm;
         if (sfxVolumeSlider != null)
             sfxVolumeSlider.value = sfx;
+
+        InitLanguageDropdown();
     }
 
     // ── 슬라이더 OnValueChanged 콜백 ──────────────────────
@@ -68,6 +74,25 @@ public class OptionsMenu : MonoBehaviour
     {
         PlayerPrefs.SetFloat(key, value); // 호환용 유지
         SaveManager.Instance?.Save();
+    }
+
+    // ── 언어 ──────────────────────────────────────────────
+
+    void InitLanguageDropdown()
+    {
+        if (languageDropdown == null)
+            return;
+
+        languageDropdown.ClearOptions();
+        languageDropdown.AddOptions(new System.Collections.Generic.List<string> { "English", "한국어" });
+        languageDropdown.SetValueWithoutNotify(
+            LanguageManager.Instance != null ? LanguageManager.Instance.CurrentIndex : 0);
+        languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+    }
+
+    void OnLanguageChanged(int index)
+    {
+        LanguageManager.Instance?.SetLanguage(index);
     }
 
     // ── 뒤로가기 ──────────────────────────────────────────

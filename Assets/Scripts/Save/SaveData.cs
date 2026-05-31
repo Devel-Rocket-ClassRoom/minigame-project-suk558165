@@ -32,6 +32,9 @@ public class SaveData
     public List<int> savedRoomOrder = new List<int>();
     public int savedRoomCursor = 0;
 
+    // 언어 설정 ("ko" or "en", 빈 문자열이면 시스템 기본)
+    public string languageCode = "";
+
     // 키 바인딩
     public KeyBindingSaveData keyBindings = new KeyBindingSaveData();
 }
