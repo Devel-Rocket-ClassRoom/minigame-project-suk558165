@@ -23,7 +23,16 @@ public class ShopUI : MonoBehaviour
 
     // 씬에 있는 어떤 상점이든 하나라도 열려있으면 true (Shop.Update에서 중복 열기 방지용)
     public static bool IsOpen => openCount > 0;
+    public static bool JustClosed => Time.frameCount == closedFrame;
     private static int openCount = 0;
+    private static int closedFrame = -1;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics()
+    {
+        openCount = 0;
+        closedFrame = -1;
+    }
 
     private Inventory inventory;
     private Coroutine noticeCoroutine;
@@ -93,6 +102,7 @@ public class ShopUI : MonoBehaviour
         {
             frame.SetActive(false);
             openCount = Mathf.Max(0, openCount - 1);
+            closedFrame = Time.frameCount;
             if (openCount == 0)
                 Time.timeScale = 1f;
         }

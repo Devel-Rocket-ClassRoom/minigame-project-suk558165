@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class WeaponInventory : MonoBehaviour
 {
+    public const int MaxSlots = 2;
+
     public List<WeaponData> weapons = new List<WeaponData>();
     public int currentIndex = 0;
 

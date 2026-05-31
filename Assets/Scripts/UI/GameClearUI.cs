@@ -33,6 +33,7 @@ public class GameClearUI : MonoBehaviour
         triggered = true;
         RunStats.Instance?.StopTimer();
         Time.timeScale = 0f;
+        gameObject.SetActive(true);
         StartCoroutine(ShowRoutine());
     }
 

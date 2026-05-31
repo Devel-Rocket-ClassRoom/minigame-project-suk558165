@@ -18,6 +18,7 @@ public class Projectile : MonoBehaviour
         var rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         GetComponent<CircleCollider2D>().isTrigger = true;
     }
 
@@ -34,7 +35,12 @@ public class Projectile : MonoBehaviour
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
         this.pierceRemaining = pierce;
-        GetComponent<Rigidbody2D>().linearVelocity = direction.normalized * speed;
+        var rb = GetComponent<Rigidbody2D>();
+        rb.linearVelocity = direction.normalized * speed;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rb.constraints = RigidbodyConstraints2D.None;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
     }

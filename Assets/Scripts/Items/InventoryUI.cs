@@ -31,6 +31,9 @@ public class InventoryUI : MonoBehaviour
     private CanvasGroup canvasGroup;
     public static bool IsOpen { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => IsOpen = false;
+
     void Start()
     {
         frame = transform.Find("Frame")?.gameObject;
@@ -103,7 +106,7 @@ public class InventoryUI : MonoBehaviour
     void Update()
     {
         var inventoryKey = InputManager.Instance?.Inventory ?? KeyCode.Tab;
-        if (Input.GetKeyDown(inventoryKey) && !PauseMenu.IsPaused)
+        if (Input.GetKeyDown(inventoryKey) && !PauseMenu.IsPaused && !ShopUI.IsOpen)
             Toggle();
 
         if (IsOpen && dragGhost != null && dragGhost.gameObject.activeSelf)

@@ -36,7 +36,7 @@ public class Shop : MonoBehaviour
 
     void Update()
     {
-        if (!playerInRange || ShopUI.IsOpen)
+        if (!playerInRange || ShopUI.IsOpen || ShopUI.JustClosed)
             return;
 
         var key = InputManager.Instance?.Interact ?? KeyCode.A;
@@ -76,6 +76,15 @@ public class Shop : MonoBehaviour
         {
             var canvas = FindFirstObjectByType<Canvas>();
             shopUI = Instantiate(shopUI, canvas != null ? canvas.transform : null);
+
+            // SpriteRenderer(NPC 등)보다 앞에 그리기 위해 sortingOrder 설정
+            var shopCanvas = shopUI.GetComponent<Canvas>();
+            if (shopCanvas == null)
+                shopCanvas = shopUI.gameObject.AddComponent<Canvas>();
+            shopCanvas.overrideSorting = true;
+            shopCanvas.sortingOrder = 100;
+            if (shopUI.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
+                shopUI.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
         }
     }
 

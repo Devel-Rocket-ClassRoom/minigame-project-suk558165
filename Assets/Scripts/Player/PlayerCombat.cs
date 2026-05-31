@@ -109,21 +109,6 @@ public class PlayerCombat : MonoBehaviour
 
     Vector2 GetAttackDirection()
     {
-        float h = 0f,
-            v = 0f;
-        if (Input.GetKey(KeyCode.RightArrow))
-            h = 1f;
-        else if (Input.GetKey(KeyCode.LeftArrow))
-            h = -1f;
-
-        if (Input.GetKey(KeyCode.UpArrow))
-            v = 1f;
-        else if (Input.GetKey(KeyCode.DownArrow))
-            v = -1f;
-
-        if (h != 0f || v != 0f)
-            return new Vector2(h, v).normalized;
-
         bool facingLeft =
             movement.Visuals != null
                 ? movement.Visuals.localScale.x < 0f

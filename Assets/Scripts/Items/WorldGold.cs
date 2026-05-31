@@ -10,16 +10,12 @@ public class WorldGold : MonoBehaviour
     private Transform player;
     private Inventory inventory;
 
-    // ── 방출 물리 ──
     private Vector2 velocity;
     private float gravity = 20f;
     private float groundY;
     private bool launched;
+    private bool grounded;
 
-    /// <summary>
-    /// 부채꼴로 방출할 때 호출.
-    /// 스폰 위치의 Y를 바닥으로 기억하고, 낙하 시 바닥에서 멈춤.
-    /// </summary>
     public void Launch(Vector2 force, float floorY)
     {
         velocity = force;
@@ -27,11 +23,16 @@ public class WorldGold : MonoBehaviour
         launched = true;
     }
 
+    void Start()
+    {
+        if (!launched)
+            SnapToGround();
+    }
+
     void Update()
     {
         FindPlayer();
 
-        // 방출 물리 처리
         if (launched)
         {
             velocity.y -= gravity * Time.deltaTime;
@@ -41,8 +42,23 @@ public class WorldGold : MonoBehaviour
             {
                 transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
                 launched = false;
+                grounded = true;
+            }
+
+            if (!grounded && velocity.y < 0f)
+            {
+                float realGround = FindGroundY();
+                if (transform.position.y <= realGround)
+                {
+                    transform.position = new Vector3(transform.position.x, realGround, transform.position.z);
+                    launched = false;
+                    grounded = true;
+                }
             }
         }
+
+        if (!grounded && !launched)
+            SnapToGround();
 
         if (player == null || inventory == null)
             return;
@@ -61,6 +77,23 @@ public class WorldGold : MonoBehaviour
             Vector3 dir = (player.position - transform.position).normalized;
             transform.position += dir * magnetSpeed * Time.deltaTime;
         }
+    }
+
+    void SnapToGround()
+    {
+        float y = FindGroundY();
+        if (y < transform.position.y)
+            transform.position = new Vector3(transform.position.x, y, transform.position.z);
+        grounded = true;
+    }
+
+    float FindGroundY()
+    {
+        var hit = Physics2D.Raycast(transform.position, Vector2.down, 20f,
+            LayerMask.GetMask("Ground", "Platform"));
+        if (hit.collider != null)
+            return hit.point.y;
+        return groundY;
     }
 
     void FindPlayer()

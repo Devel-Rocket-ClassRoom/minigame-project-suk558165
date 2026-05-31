@@ -78,6 +78,9 @@ public class Inventory : MonoBehaviour
         if (weaponInventory == null)
             return weapon;
 
+        if (slotIndex >= WeaponInventory.MaxSlots)
+            return weapon;
+
         while (weaponInventory.weapons.Count <= slotIndex)
             weaponInventory.weapons.Add(null);
 

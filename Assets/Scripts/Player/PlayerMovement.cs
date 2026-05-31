@@ -264,7 +264,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
-        LayerMask combinedLayer = groundLayer | platformLayer;
+        LayerMask combinedLayer = isDropping ? groundLayer : (groundLayer | platformLayer);
         bool hit =
             Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
@@ -277,17 +277,18 @@ public class PlayerMovement : MonoBehaviour
         if (isDropping)
             yield break;
 
-        int platLayer = LayerMaskToIndex(platformLayer);
-        if (platLayer < 0)
-            yield break;
-
         isDropping = true;
-        // FixedUpdate를 기다리지 않고 즉시 IgnoreLayerCollision 적용 + 위치 이동으로
-        // Box2D의 기존 Contact를 다음 물리 스텝 전에 확실히 무효화
-        Physics2D.IgnoreLayerCollision(gameObject.layer, platLayer, true);
-        rb.position += Vector2.down * 0.15f;
 
-        yield return new WaitForSeconds(0.4f);
+        var col = GetComponent<Collider2D>();
+        col.enabled = false;
+        rb.position += Vector2.down * 0.5f;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -8f);
+
+        yield return new WaitForSeconds(0.15f);
+
+        col.enabled = true;
+
+        yield return new WaitForSeconds(0.25f);
 
         isDropping = false;
     }

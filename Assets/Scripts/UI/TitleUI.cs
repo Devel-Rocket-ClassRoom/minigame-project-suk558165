@@ -13,6 +13,9 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject optionsPanel;
 
+    [SerializeField]
+    private GameObject newGameConfirmPanel;
+
     private GameObject hpBar;
     private GameObject controls;
     private GameObject goldDisplay;
@@ -26,6 +29,9 @@ public class TitleUI : MonoBehaviour
             instance.name = "TitleOptionsPanel";
             optionsPanel = instance;
         }
+
+        if (newGameConfirmPanel != null)
+            newGameConfirmPanel.SetActive(false);
     }
 
     void OnEnable()
@@ -55,7 +61,30 @@ public class TitleUI : MonoBehaviour
             goldDisplay.SetActive(visible);
     }
 
-    public void OnNewGame() => GameFlowController.Instance.StartNewGame();
+    public void OnNewGame()
+    {
+        if (GameFlowController.Instance.HasSaveData() && newGameConfirmPanel != null)
+        {
+            newGameConfirmPanel.SetActive(true);
+            return;
+        }
+
+        GameFlowController.Instance.StartNewGame();
+    }
+
+    public void OnNewGameConfirm()
+    {
+        if (newGameConfirmPanel != null)
+            newGameConfirmPanel.SetActive(false);
+
+        GameFlowController.Instance.StartNewGame();
+    }
+
+    public void OnNewGameCancel()
+    {
+        if (newGameConfirmPanel != null)
+            newGameConfirmPanel.SetActive(false);
+    }
 
     public void OnContinue() => GameFlowController.Instance.ContinueGame();
 

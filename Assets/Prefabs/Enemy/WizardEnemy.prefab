@@ -209,12 +209,14 @@ MonoBehaviour:
   detectionRange: 7
   attackRange: 1.5
   attackCooldown: 1.5
+  spawnDelay: 2.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 576
   patrolDistance: 4
   chaseYThreshold: 1.2
   isRanged: 1
+  aimAtPlayer: 1
   projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   firePoint: {fileID: 0}
   projectileSpeed: 8

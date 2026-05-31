@@ -4,6 +4,9 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [Header("Audio Sources")]
     public AudioSource bgmSource;
     public AudioSource sfxSource;

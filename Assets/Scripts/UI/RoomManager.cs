@@ -159,6 +159,11 @@ public class RoomManager : MonoBehaviour
 
     void LoadRoom(int roomNumber)
     {
+        foreach (var g in FindObjectsByType<WorldGold>(FindObjectsSortMode.None))
+            Destroy(g.gameObject);
+        foreach (var p in FindObjectsByType<WorldPotion>(FindObjectsSortMode.None))
+            Destroy(p.gameObject);
+
         if (currentRoom != null)
             Destroy(currentRoom);
 

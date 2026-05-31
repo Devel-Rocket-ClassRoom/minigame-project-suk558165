@@ -43,6 +43,15 @@ public class InventorySlotUI
     public static event Action<InventorySlotUI> OnDragStarted;
     public static event Action OnDragEnded;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics()
+    {
+        DragSource = null;
+        OnSlotDropped = null;
+        OnDragStarted = null;
+        OnDragEnded = null;
+    }
+
     public void Setup(Image bg, Image ic, Image hl)
     {
         background = bg;
