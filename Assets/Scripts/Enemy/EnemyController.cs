@@ -24,6 +24,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Ranged")]
     public bool isRanged = false;
+    public bool aimAtPlayer = false;
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 8f;
@@ -197,7 +198,12 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
 
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
-        Vector2 dir = ((Vector2)player.position - (Vector2)origin).normalized;
+
+        Vector2 dir;
+        if (aimAtPlayer)
+            dir = ((Vector2)player.position - (Vector2)origin).normalized;
+        else
+            dir = sr.flipX ? Vector2.left : Vector2.right;
 
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
@@ -314,6 +320,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             return;
         }
 
+        DisableHitbox();
+
         animator.SetTrigger(HashIsHit);
 
         if (player != null)
@@ -349,6 +357,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         rb.bodyType = RigidbodyType2D.Kinematic;
         GetComponent<Collider2D>().enabled = false;
         onDeath?.Invoke();
+        onDeath = null;
         RunStats.Instance?.AddKill();
         SpawnDrops();
         animator.ResetTrigger(HashIsHit);

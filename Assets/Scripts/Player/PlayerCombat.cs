@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -11,10 +10,6 @@ public class PlayerCombat : MonoBehaviour
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 12f;
-
-    [Header("Sword Animator")]
-    [SerializeField]
-    private Animator swordAnimator;
 
     [Header("Type-based Clips")]
     [SerializeField]
@@ -39,12 +34,14 @@ public class PlayerCombat : MonoBehaviour
     private Animator animator;
     private AnimatorOverrideController overrideController;
     private PlayerMovement movement;
+    private Inventory inventory;
     private float attackTimer;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
         movement = GetComponent<PlayerMovement>();
+        inventory = GetComponent<Inventory>();
 
         overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         animator.runtimeAnimatorController = overrideController;
@@ -70,7 +67,7 @@ public class PlayerCombat : MonoBehaviour
         attackTimer -= Time.deltaTime;
         IsAttacking = false;
 
-        if (InventoryUI.IsOpen || PauseMenu.IsPaused)
+        if (InventoryUI.IsOpen || ShopUI.IsOpen || PauseMenu.IsPaused)
             return;
 
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;
@@ -83,7 +80,8 @@ public class PlayerCombat : MonoBehaviour
             return;
 
         Vector2 attackDir = GetAttackDirection();
-        attackTimer = currentWeapon.attackCooldown;
+        var bonus = inventory?.GetTotalStatBonus() ?? default;
+        attackTimer = currentWeapon.attackCooldown / Mathf.Max(0.01f, 1f + bonus.attackSpeed);
 
         if (currentWeapon.weaponType == WeaponType.Melee && weapon != null)
         {
@@ -91,8 +89,6 @@ public class PlayerCombat : MonoBehaviour
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             animator.Play(SwordAttackState, 0, 0f);
-            swordAnimator?.SetTrigger("Attack");
-            StartCoroutine(MeleeHitAfterDelay(0.15f));
         }
         else if (currentWeapon.weaponType == WeaponType.Ranged && projectilePrefab != null)
         {
@@ -100,27 +96,12 @@ public class PlayerCombat : MonoBehaviour
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             animator.Play(BowAttackState, 0, 0f);
-            ShootInDirection(attackDir, currentWeapon.damage);
+            ShootInDirection(attackDir, currentWeapon.damage, bonus);
         }
     }
 
     Vector2 GetAttackDirection()
     {
-        float h = 0f,
-            v = 0f;
-        if (Input.GetKey(KeyCode.RightArrow))
-            h = 1f;
-        else if (Input.GetKey(KeyCode.LeftArrow))
-            h = -1f;
-
-        if (Input.GetKey(KeyCode.UpArrow))
-            v = 1f;
-        else if (Input.GetKey(KeyCode.DownArrow))
-            v = -1f;
-
-        if (h != 0f || v != 0f)
-            return new Vector2(h, v).normalized;
-
         bool facingLeft =
             movement.Visuals != null
                 ? movement.Visuals.localScale.x < 0f
@@ -128,18 +109,46 @@ public class PlayerCombat : MonoBehaviour
         return facingLeft ? Vector2.left : Vector2.right;
     }
 
-    void ShootInDirection(Vector2 dir, float damage)
+    void ShootInDirection(Vector2 dir, float baseDamage, StatBonus bonus)
+    {
+        float effectiveDamage = (baseDamage + bonus.damage) * (1f + bonus.damageDealtMult);
+        if (bonus.criticalChance > 0f && Random.value < bonus.criticalChance)
+            effectiveDamage *= 1f + bonus.criticalDamage;
+
+        int totalArrows = bonus.arrowCount >= 2 ? bonus.arrowCount : 1;
+        float perArrowDmg =
+            totalArrows > 1 && bonus.arrowDamageMult > 0f
+                ? effectiveDamage * bonus.arrowDamageMult
+                : effectiveDamage;
+
+        float spreadAngle = 15f;
+        for (int i = 0; i < totalArrows; i++)
+        {
+            float offset = totalArrows > 1 ? (i - (totalArrows - 1) * 0.5f) * spreadAngle : 0f;
+            SpawnProjectile(RotateVector(dir, offset), perArrowDmg, bonus.penetration);
+        }
+    }
+
+    void SpawnProjectile(Vector2 dir, float damage, int pierce)
     {
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject);
+            projComp.Init(dir, projectileSpeed, damage, gameObject, pierce: pierce);
     }
 
-    IEnumerator MeleeHitAfterDelay(float delay)
+    static Vector2 RotateVector(Vector2 v, float degrees)
     {
-        yield return new WaitForSeconds(delay);
+        float rad = degrees * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(rad),
+            sin = Mathf.Sin(rad);
+        return new Vector2(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
+    }
+
+    // Animation Event에서 호출 — Player_SwordAttack 클립의 히트 프레임에 이벤트 추가
+    public void OnMeleeHit()
+    {
         weapon?.OnHitFrame();
     }
 

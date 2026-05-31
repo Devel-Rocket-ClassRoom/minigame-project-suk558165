@@ -1,0 +1,10 @@
+﻿id,weaponType,damage,attackCooldown,swingAngle,swingDuration,projectileSpeed,price
+knife,Melee,18,0.3,90,0.3,0,80
+bow,Ranged,15,0.8,0,0,12,150
+crossbow,Ranged,28,1.4,0,0,20,200
+spear,Melee,22,0.7,60,0.5,0,160
+staff,Ranged,20,1.0,0,0,9,220
+scythe,Melee,16,0.5,160,0.45,0,140
+gauntlet,Melee,10,0.2,70,0.2,0,120
+hammer,Melee,38,1.6,100,0.9,0,210
+hoe,Melee,12,0.4,110,0.4,0,90

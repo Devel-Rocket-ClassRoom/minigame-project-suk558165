@@ -7,6 +7,9 @@ using UnityEngine;
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
     public const int CurrentVersion = 1;
 
     public SaveData Data { get; private set; }

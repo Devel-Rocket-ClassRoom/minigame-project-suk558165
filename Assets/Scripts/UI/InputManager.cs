@@ -4,6 +4,9 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     public KeyCode Dash { get; private set; } = KeyCode.Z;
     public KeyCode Attack { get; private set; } = KeyCode.X;
     public KeyCode Inventory { get; private set; } = KeyCode.Tab;

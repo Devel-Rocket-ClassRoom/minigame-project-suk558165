@@ -10,17 +10,23 @@ public class WorldPotion : MonoBehaviour
     private Transform player;
     private PlayerHealth health;
 
-    // ── 방출 물리 ──
     private Vector2 velocity;
     private float gravity = 20f;
     private float groundY;
     private bool launched;
+    private bool grounded;
 
     public void Launch(Vector2 force, float floorY)
     {
         velocity = force;
         groundY = floorY;
         launched = true;
+    }
+
+    void Start()
+    {
+        if (!launched)
+            SnapToGround();
     }
 
     void Update()
@@ -32,16 +38,27 @@ public class WorldPotion : MonoBehaviour
 
             if (velocity.y < 0f && transform.position.y <= groundY)
             {
-                transform.position = new Vector3(
-                    transform.position.x,
-                    groundY,
-                    transform.position.z
-                );
+                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
                 launched = false;
+                grounded = true;
+            }
+
+            if (!grounded && velocity.y < 0f)
+            {
+                float realGround = FindGroundY();
+                if (transform.position.y <= realGround)
+                {
+                    transform.position = new Vector3(transform.position.x, realGround, transform.position.z);
+                    launched = false;
+                    grounded = true;
+                }
             }
 
             return;
         }
+
+        if (!grounded)
+            SnapToGround();
 
         if (player == null)
         {
@@ -67,12 +84,28 @@ public class WorldPotion : MonoBehaviour
             return;
         }
 
-        // HP가 최대치 미만일 때만 자석 흡인
         bool needsHeal = health.CurrentHp < health.EffectiveMaxHp;
         if (needsHeal && dist <= magnetRadius)
         {
             Vector3 dir = (player.position - transform.position).normalized;
             transform.position += dir * magnetSpeed * Time.deltaTime;
         }
+    }
+
+    void SnapToGround()
+    {
+        float y = FindGroundY();
+        if (y < transform.position.y)
+            transform.position = new Vector3(transform.position.x, y, transform.position.z);
+        grounded = true;
+    }
+
+    float FindGroundY()
+    {
+        var hit = Physics2D.Raycast(transform.position, Vector2.down, 20f,
+            LayerMask.GetMask("Ground", "Platform"));
+        if (hit.collider != null)
+            return hit.point.y;
+        return groundY;
     }
 }

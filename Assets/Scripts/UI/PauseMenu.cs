@@ -5,6 +5,13 @@ public class PauseMenu : MonoBehaviour
     public static PauseMenu Instance { get; private set; }
     public static bool IsPaused { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics()
+    {
+        Instance = null;
+        IsPaused = false;
+    }
+
     [Header("Panels")]
     public CanvasGroup pausePanel;
     public CanvasGroup optionsPanel;

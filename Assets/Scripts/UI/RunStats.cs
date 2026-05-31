@@ -4,6 +4,9 @@ public class RunStats : MonoBehaviour
 {
     public static RunStats Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     public float PlayTime { get; private set; }
     public int Deaths { get; private set; }
     public int Kills { get; private set; }

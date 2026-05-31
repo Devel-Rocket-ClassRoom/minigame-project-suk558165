@@ -7,6 +7,25 @@ public struct StatBonus
     public float maxHp;
     public float damage;
     public float speed;
+    public float jump;
+
+    public float criticalChance;
+    public float criticalDamage;
+    public float attackSpeed;
+    public float damageReduction;
+
+    public float damageReceivedMult;
+    public float damageDealtMult;
+
+    public int dashCount;
+    public float dashRange;
+
+    public float evasionRate;
+    public float goldDrop;
+
+    public int arrowCount;
+    public float arrowDamageMult;
+    public int penetration;
 }
 
 public class Inventory : MonoBehaviour
@@ -57,6 +76,9 @@ public class Inventory : MonoBehaviour
     public WeaponData EquipWeapon(int slotIndex, WeaponData weapon)
     {
         if (weaponInventory == null)
+            return weapon;
+
+        if (slotIndex >= WeaponInventory.MaxSlots)
             return weapon;
 
         while (weaponInventory.weapons.Count <= slotIndex)
@@ -176,6 +198,20 @@ public class Inventory : MonoBehaviour
             bonus.maxHp += acc.maxHpBonus;
             bonus.damage += acc.damageBonus;
             bonus.speed += acc.speedBonus;
+            bonus.jump += acc.jumpBonus;
+            bonus.criticalChance += acc.criticalChance;
+            bonus.criticalDamage += acc.criticalDamage;
+            bonus.attackSpeed += acc.attackSpeedBonus;
+            bonus.damageReduction += acc.damageReduction;
+            bonus.damageReceivedMult += acc.damageReceivedMult;
+            bonus.damageDealtMult += acc.damageDealtMult;
+            bonus.dashCount += acc.dashCountBonus;
+            bonus.dashRange += acc.dashRangeBonus;
+            bonus.evasionRate += acc.evasionRate;
+            bonus.goldDrop += acc.goldDropBonus;
+            bonus.arrowCount += acc.arrowCount;
+            bonus.arrowDamageMult += acc.arrowDamageMult;
+            bonus.penetration += acc.penetrationCount;
         }
         return bonus;
     }

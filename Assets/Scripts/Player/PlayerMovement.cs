@@ -35,6 +35,45 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator animator;
+    private Inventory inventory;
+
+    private float baseWalkSpeed;
+    private float baseJumpForce;
+    private int baseDashCharges;
+    private float baseDashDuration;
+
+    float EffectiveWalkSpeed
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseWalkSpeed * (1f + b.speed);
+        }
+    }
+    float EffectiveJumpForce
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseJumpForce * (1f + b.jump);
+        }
+    }
+    int EffectiveDashCharges
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseDashCharges + b.dashCount;
+        }
+    }
+    float EffectiveDashDuration
+    {
+        get
+        {
+            var b = inventory?.GetTotalStatBonus() ?? default;
+            return baseDashDuration * (1f + b.dashRange);
+        }
+    }
 
     private int jumpCharges;
     private bool wasGrounded;
@@ -44,10 +83,12 @@ public class PlayerMovement : MonoBehaviour
     private float dashDirection;
     private Vector2 knockbackVelocity;
     private float knockbackTimer;
+    private bool isDropping;
+
+    private DashGhostEffect dashGhost;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
-    private static readonly int HashDash = Animator.StringToHash("Dash");
 
     void Awake()
     {
@@ -55,15 +96,25 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         Sr = GetComponent<SpriteRenderer>();
         Visuals = transform.Find("Visuals");
+        inventory = GetComponent<Inventory>();
+
+        dashGhost = GetComponent<DashGhostEffect>();
+
+        baseWalkSpeed = walkSpeed;
+        baseJumpForce = jumpForce;
+        baseDashCharges = maxDashCharges;
+        baseDashDuration = dashDuration;
 
         rb.gravityScale = gravityScale;
         dashCharges = maxDashCharges;
         jumpCharges = maxJumpCharges;
+
+        isDropping = false;
     }
 
     public void HandleInput()
     {
-        if (InventoryUI.IsOpen || PauseMenu.IsPaused)
+        if (InventoryUI.IsOpen || ShopUI.IsOpen || PauseMenu.IsPaused)
         {
             MoveInput = 0f;
             return;
@@ -87,24 +138,17 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetButtonDown("Jump"))
             return;
 
-        bool pressingDown = Input.GetKey(KeyCode.DownArrow);
-        Vector2 pCheckPos = groundCheck.position;
-        float pHalfW = groundCheckSize.x * 0.5f;
-        bool onPlatform =
-            platformLayer.value != 0
-            && (
-                Physics2D.OverlapCircle(pCheckPos, 0.15f, platformLayer)
-                || Physics2D.OverlapCircle(pCheckPos + Vector2.left * pHalfW, 0.12f, platformLayer)
-                || Physics2D.OverlapCircle(pCheckPos + Vector2.right * pHalfW, 0.12f, platformLayer)
-            );
+        bool pressingDown = Input.GetAxisRaw("Vertical") < 0f;
 
-        if (pressingDown && onPlatform)
+        if (pressingDown && IsGrounded)
         {
             StartCoroutine(DropDown());
+            return;
         }
-        else if (jumpCharges > 0)
+
+        if (jumpCharges > 0)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
         }
     }
@@ -115,7 +159,7 @@ public class PlayerMovement : MonoBehaviour
         {
             dashCooldownTimer -= Time.deltaTime;
             if (dashCooldownTimer <= 0f)
-                dashCharges = maxDashCharges;
+                dashCharges = EffectiveDashCharges;
         }
 
         var dashKey = InputManager.Instance?.Dash ?? KeyCode.Z;
@@ -126,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
             dashDirection = facingLeft ? -1f : 1f;
 
             IsDashing = true;
-            dashTimer = dashDuration;
+            dashTimer = EffectiveDashDuration;
             dashCharges--;
             if (dashCharges == 0)
                 dashCooldownTimer = dashCooldown;
@@ -135,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
                 jumpCharges = 0;
 
             rb.gravityScale = 0f;
-            animator.SetTrigger(HashDash);
+            dashGhost?.StartGhost();
         }
 
         if (IsDashing)
@@ -145,6 +189,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 IsDashing = false;
                 rb.gravityScale = gravityScale;
+                dashGhost?.StopGhost();
             }
         }
     }
@@ -193,11 +238,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (IsDashing)
         {
-            rb.linearVelocity = new Vector2(dashDirection * walkSpeed * dashSpeedMultiplier, 0f);
+            rb.linearVelocity = new Vector2(
+                dashDirection * EffectiveWalkSpeed * dashSpeedMultiplier,
+                0f
+            );
         }
         else
         {
-            rb.linearVelocity = new Vector2(MoveInput * walkSpeed, rb.linearVelocity.y);
+            // 아랫점프 중이면 FixedUpdate에서 속도를 강제 적용 (코루틴에서 설정한 속도가 물리 보정에 덮어써지는 문제 방지)
+            float yVel = isDropping ? Mathf.Min(rb.linearVelocity.y, -10f) : rb.linearVelocity.y;
+            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, yVel);
 
             if (rb.linearVelocity.y < 0f)
                 rb.linearVelocity +=
@@ -207,10 +257,18 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
+        // 상승 중이거나 아랫점프 중이면 플랫폼 레이어 무시, 그 외엔 복원
+        int platLayer = LayerMaskToIndex(platformLayer);
+        if (platLayer >= 0)
+        {
+            bool ignorePlatform = isDropping || rb.linearVelocity.y > 0.5f;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, platLayer, ignorePlatform);
+        }
+
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
-        LayerMask combinedLayer = groundLayer | platformLayer;
+        LayerMask combinedLayer = isDropping ? groundLayer : (groundLayer | platformLayer);
         bool hit =
             Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
@@ -220,42 +278,30 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator DropDown()
     {
-        var playerCol = GetComponent<Collider2D>();
-        Vector2 dCheckPos = groundCheck.position;
-        float dHalfW = groundCheckSize.x * 0.5f;
-        var hitSet = new System.Collections.Generic.HashSet<Collider2D>();
-        foreach (var c in Physics2D.OverlapCircleAll(dCheckPos, 0.15f, platformLayer))
-            hitSet.Add(c);
-        foreach (
-            var c in Physics2D.OverlapCircleAll(
-                dCheckPos + Vector2.left * dHalfW,
-                0.12f,
-                platformLayer
-            )
-        )
-            hitSet.Add(c);
-        foreach (
-            var c in Physics2D.OverlapCircleAll(
-                dCheckPos + Vector2.right * dHalfW,
-                0.12f,
-                platformLayer
-            )
-        )
-            hitSet.Add(c);
-        var hits = new Collider2D[hitSet.Count];
-        hitSet.CopyTo(hits);
-        if (hits.Length == 0)
+        if (isDropping)
             yield break;
 
-        foreach (var c in hits)
-            Physics2D.IgnoreCollision(playerCol, c, true);
+        isDropping = true;
 
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
+        var col = GetComponent<Collider2D>();
+        col.enabled = false;
+        rb.position += Vector2.down * 0.5f;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -8f);
 
-        yield return new WaitForSeconds(dropDownDuration);
+        yield return new WaitForSeconds(0.15f);
 
-        foreach (var c in hits)
-            if (c != null)
-                Physics2D.IgnoreCollision(playerCol, c, false);
+        col.enabled = true;
+
+        yield return new WaitForSeconds(0.25f);
+
+        isDropping = false;
+    }
+
+    static int LayerMaskToIndex(LayerMask mask)
+    {
+        for (int i = 0; i < 32; i++)
+            if ((mask.value & (1 << i)) != 0)
+                return i;
+        return -1;
     }
 }

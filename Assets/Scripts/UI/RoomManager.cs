@@ -159,6 +159,11 @@ public class RoomManager : MonoBehaviour
 
     void LoadRoom(int roomNumber)
     {
+        foreach (var g in FindObjectsByType<WorldGold>(FindObjectsSortMode.None))
+            Destroy(g.gameObject);
+        foreach (var p in FindObjectsByType<WorldPotion>(FindObjectsSortMode.None))
+            Destroy(p.gameObject);
+
         if (currentRoom != null)
             Destroy(currentRoom);
 
@@ -275,9 +280,19 @@ public class RoomManager : MonoBehaviour
         if (!isFirst && ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeOut();
 
+        float savedDamping = 0f;
+        if (confiner != null)
+        {
+            savedDamping = confiner.Damping;
+            confiner.Damping = 0f;
+        }
+
         LoadRoom(roomNumber);
 
         yield return null;
+
+        if (confiner != null)
+            confiner.Damping = savedDamping;
 
         if (ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeIn();

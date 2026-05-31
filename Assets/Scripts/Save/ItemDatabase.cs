@@ -6,6 +6,9 @@ public class ItemDatabase : ScriptableObject
 {
     public static ItemDatabase Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [Header("등록된 무기 목록")]
     public List<WeaponData> weapons = new List<WeaponData>();
 

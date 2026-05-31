@@ -302,7 +302,6 @@ GameObject:
   - component: {fileID: 7075832695521661017}
   - component: {fileID: 1501719899310542362}
   - component: {fileID: 3317452654947226166}
-  - component: {fileID: 1962641010466378023}
   - component: {fileID: 2011847362051234567}
   m_Layer: 0
   m_Name: UICanvas
@@ -414,23 +413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScreenFader
   fadeImage: {fileID: 6643907266554487044}
   fadeDuration: 0.8
---- !u!114 &1962641010466378023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4668893597031252979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67813d38bcbf93241bb7391f8fa6fa13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
-  weaponSlots: []
-  accessorySlots: []
-  backpackSlots: []
-  goldText: {fileID: 0}
-  dragGhost: {fileID: 0}
+
 --- !u!114 &2011847362051234567
 MonoBehaviour:
   m_ObjectHideFlags: 0

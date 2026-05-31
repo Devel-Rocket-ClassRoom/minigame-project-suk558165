@@ -33,8 +33,25 @@ public class TitleOptionsUI : MonoBehaviour
 
     void OnEnable()
     {
+        if (masterSlider != null)
+            masterSlider.onValueChanged.AddListener(OnMasterChanged);
+        if (bgmSlider != null)
+            bgmSlider.onValueChanged.AddListener(OnBGMChanged);
+        if (sfxSlider != null)
+            sfxSlider.onValueChanged.AddListener(OnSFXChanged);
+
         RefreshVolume();
         RefreshKeyLabels();
+    }
+
+    void OnDisable()
+    {
+        if (masterSlider != null)
+            masterSlider.onValueChanged.RemoveListener(OnMasterChanged);
+        if (bgmSlider != null)
+            bgmSlider.onValueChanged.RemoveListener(OnBGMChanged);
+        if (sfxSlider != null)
+            sfxSlider.onValueChanged.RemoveListener(OnSFXChanged);
     }
 
     void Update()

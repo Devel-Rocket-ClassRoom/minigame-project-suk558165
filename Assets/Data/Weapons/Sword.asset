@@ -12,13 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7320bb17f2992243ba93838d76530d0, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Sword
-  sprite: {fileID: 21300000, guid: 136d6e120f1eaeb46b638c4ca1719f15, type: 3}
+  id: sowrd
+  weaponName:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  sprite: {fileID: 21300000, guid: e258338ea3577154ca49858d66478354, type: 3}
   weaponType: 0
+  description:
+    m_TableReference:
+      m_TableCollectionName: 
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  price: 0
   damage: 20
   attackCooldown: 0.5
+  spriteScale: 1.5
   swingAngle: 120
   swingDuration: 0.25
   projectileSpeed: 12
-  attackClip: {fileID: 7400000, guid: f62aa5797bd692747be04424a25a113c, type: 2}
-  idleClip: {fileID: 7400000, guid: e2bcb5480c28f9a45b7db7755d6ad7e4, type: 2}
+  references:
+    version: 2
+    RefIds: []

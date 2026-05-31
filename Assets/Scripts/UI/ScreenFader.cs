@@ -6,6 +6,9 @@ public class ScreenFader : MonoBehaviour
 {
     public static ScreenFader Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [SerializeField] private Image fadeImage;
     [SerializeField] private float fadeDuration = 0.5f;
 

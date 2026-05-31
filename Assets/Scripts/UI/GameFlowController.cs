@@ -5,6 +5,9 @@ public class GameFlowController : MonoBehaviour
 {
     public static GameFlowController Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [Header("프리팹")]
     [SerializeField]
     private GameObject titlePrefab;
@@ -65,6 +68,14 @@ public class GameFlowController : MonoBehaviour
     void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Escape))
+            return;
+
+        // 타이틀 화면에서는 일시정지 불가
+        if (titleInstance != null)
+            return;
+
+        // 플레이어가 없으면 (게임 중이 아니면) 무시
+        if (playerInstance == null)
             return;
 
         // 인벤토리가 열려있으면 ESC 무시
@@ -241,8 +252,12 @@ public class GameFlowController : MonoBehaviour
         }
 
         var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
+        float savedDamping = 0f;
         if (confiner != null)
         {
+            savedDamping = confiner.Damping;
+            confiner.Damping = 0f;
+
             var bounds = villageInstance
                 .transform.Find("CameraBounds")
                 ?.GetComponent<PolygonCollider2D>();
@@ -252,6 +267,19 @@ public class GameFlowController : MonoBehaviour
                 confiner.InvalidateBoundingShapeCache();
             }
         }
+
+        if (cinemachineCamera != null && playerInstance != null)
+        {
+            var targetPos = new Vector3(
+                playerInstance.transform.position.x,
+                playerInstance.transform.position.y,
+                cinemachineCamera.transform.position.z
+            );
+            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
+        }
+
+        if (confiner != null)
+            confiner.Damping = savedDamping;
     }
 
     public void ReturnToVillage()

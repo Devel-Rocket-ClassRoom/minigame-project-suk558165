@@ -1,0 +1,31 @@
+id	Key	한국어	English
+dash_boost	acc_dash_boost_name	질주의 부적	Sprint Charm
+dash_boost	acc_dash_boost_desc	이동속도가 크게 증가한다.	Greatly increases movement speed.
+move_speed	acc_move_speed_name	바람의 신발	Wind Boots
+move_speed	acc_move_speed_desc	이동속도가 증가한다.	Increases movement speed.
+critical	acc_critical_name	예리한 눈	Sharp Eye
+critical	acc_critical_desc	크리티컬 확률과 데미지가 증가한다.	Increases critical chance and damage.
+attack_speed	acc_attack_speed_name	빠른 손목	Quick Wrist
+attack_speed	acc_attack_speed_desc	공격 속도가 증가한다.	Increases attack speed.
+max_hp	acc_max_hp_name	강인한 갑옷	Sturdy Heart
+max_hp	acc_max_hp_desc	최대 체력이 증가한다.	Increases maximum HP.
+gold_drop	acc_gold_drop_name	황금 성배	Golden Hand
+gold_drop	acc_gold_drop_desc	적 처치 시 골드 드랍량이 증가한다.	Enemies drop more gold on defeat.
+damage_reduce	acc_damage_reduce_name	철갑 방패	Iron Shield
+damage_reduce	acc_damage_reduce_desc	받는 피해가 감소한다.	Reduces incoming damage.
+risk_reward	acc_risk_reward_name	광전사의 각오	Berserker's Resolve
+risk_reward	acc_risk_reward_desc	받는 피해가 증가하지만 주는 피해도 크게 증가한다.	"Take more damage, but deal much more in return."
+jump_power	acc_jump_power_name	스프링 부츠	Spring Boots
+jump_power	acc_jump_power_desc	점프력이 강화된다.	Enhances jump power.
+dash_count	acc_dash_count_name	순간이동 부적	Blink Charm
+dash_count	acc_dash_count_desc	대쉬 횟수가 1회 추가된다.	Grants one additional dash charge.
+evasion	acc_evasion_name	그림자 망토	Shadow Cloak
+evasion	acc_evasion_desc	공격을 회피할 확률이 생긴다.	Grants a chance to evade attacks.
+triple_arrow	acc_triple_arrow_name	화살촉	Triple Arrowhead
+triple_arrow	acc_triple_arrow_desc	화살이 3갈래로 나뉘지만 각 화살의 데미지가 감소한다.	"Arrows split into 3, but each deals less damage."
+dash_range	acc_dash_range_name	질풍 발걸음	Gale Step
+dash_range	acc_dash_range_desc	대쉬 이동 거리가 증가한다.	Increases dash travel distance.
+penetration	acc_penetration_name	관통의 화살촉	Piercing Arrowhead
+penetration	acc_penetration_desc	화살이 적을 관통하여 뒤의 적도 공격한다.	"Arrows pierce through enemies, hitting those behind."
+sell_item	acc_sell_item_name	은괴	Merchant's Gem
+sell_item	acc_sell_item_desc	아무런 효과가 없지만 비싸게 팔 수 있다.	"Has no effect, but can be sold for a high price."

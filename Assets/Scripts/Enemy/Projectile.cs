@@ -10,12 +10,15 @@ public class Projectile : MonoBehaviour
     private float knockbackForce;
     private GameObject shooter;
     private bool ready;
+    private int pierceRemaining;
+    private System.Collections.Generic.HashSet<int> hitIds = new();
 
     void Awake()
     {
         var rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         GetComponent<CircleCollider2D>().isTrigger = true;
     }
 
@@ -24,13 +27,20 @@ public class Projectile : MonoBehaviour
         float speed,
         float damage,
         GameObject shooter = null,
-        float knockbackForce = 8f
+        float knockbackForce = 8f,
+        int pierce = 0
     )
     {
         this.damage = damage;
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
-        GetComponent<Rigidbody2D>().linearVelocity = direction.normalized * speed;
+        this.pierceRemaining = pierce;
+        var rb = GetComponent<Rigidbody2D>();
+        rb.linearVelocity = direction.normalized * speed;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rb.constraints = RigidbodyConstraints2D.None;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
     }
@@ -64,6 +74,9 @@ public class Projectile : MonoBehaviour
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
+            if (!hitIds.Add(other.GetInstanceID()))
+                return;
+
             damageable.TakeDamage(damage);
 
             if (other.CompareTag("Player"))
@@ -76,7 +89,10 @@ public class Projectile : MonoBehaviour
                 }
             }
 
-            Destroy(gameObject);
+            if (pierceRemaining <= 0)
+                Destroy(gameObject);
+            else
+                pierceRemaining--;
         }
     }
 }

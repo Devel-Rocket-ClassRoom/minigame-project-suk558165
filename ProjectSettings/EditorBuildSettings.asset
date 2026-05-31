@@ -14,5 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TotalTest/MainTest.unity
     guid: d3fea8d53c592dc46be9e4f99f9da499
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: e66482d5224754f41b918802aa612155, type: 2}
+    com.unity.localization.settings: {fileID: 11400000, guid: 98e7f22a694b20046a1dcf948b3a4717, type: 2}
   m_UseUCBPForAssetBundles: 0
