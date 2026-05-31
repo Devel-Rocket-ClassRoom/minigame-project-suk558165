@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -11,10 +10,6 @@ public class PlayerCombat : MonoBehaviour
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 12f;
-
-    [Header("Sword Animator")]
-    [SerializeField]
-    private Animator swordAnimator;
 
     [Header("Type-based Clips")]
     [SerializeField]
@@ -94,8 +89,6 @@ public class PlayerCombat : MonoBehaviour
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             animator.Play(SwordAttackState, 0, 0f);
-            swordAnimator?.SetTrigger("Attack");
-            StartCoroutine(MeleeHitAfterDelay(0.15f));
         }
         else if (currentWeapon.weaponType == WeaponType.Ranged && projectilePrefab != null)
         {
@@ -153,9 +146,9 @@ public class PlayerCombat : MonoBehaviour
         return new Vector2(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
     }
 
-    IEnumerator MeleeHitAfterDelay(float delay)
+    // Animation Event에서 호출 — Player_SwordAttack 클립의 히트 프레임에 이벤트 추가
+    public void OnMeleeHit()
     {
-        yield return new WaitForSeconds(delay);
         weapon?.OnHitFrame();
     }
 
