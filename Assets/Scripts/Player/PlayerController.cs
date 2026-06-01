@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     public bool previewDeath;
 
+    public bool InputLocked { get; set; }
+
     private PlayerHealth health;
     private Rigidbody2D rb;
     private Animator animator;
@@ -39,6 +41,13 @@ public class PlayerController : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Kinematic;
             }
+            return;
+        }
+
+        if (InputLocked)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            movement.UpdateAnimatorAndFlip(false);
             return;
         }
 

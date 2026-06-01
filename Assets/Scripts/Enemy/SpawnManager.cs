@@ -56,7 +56,11 @@ public class SpawnManager : MonoBehaviour
         if (waves.Count == 0)
             return;
 
-        StartCoroutine(SpawnWave(waves[0]));
+        var bossIntro = GetComponentInChildren<BossIntro>();
+        if (bossIntro != null)
+            bossIntro.Play(() => StartCoroutine(SpawnWave(waves[0])));
+        else
+            StartCoroutine(SpawnWave(waves[0]));
     }
 
     IEnumerator SpawnWave(Wave wave)
