@@ -108,9 +108,17 @@ public class SpawnManager : MonoBehaviour
 
         var go = Instantiate(prefab, position, Quaternion.identity);
         aliveCount++;
+
         var enemy = go.GetComponent<EnemyController>();
         if (enemy != null)
+        {
             enemy.onDeath += OnEnemyDied;
+            yield break;
+        }
+
+        var boss = go.GetComponent<BossController>();
+        if (boss != null)
+            boss.onDeath += OnEnemyDied;
     }
 
     void OnEnemyDied()
