@@ -151,6 +151,14 @@ public class ShopSlotUI : MonoBehaviour
             nameText.text = value;
     }
 
+    public void MarkSoldOut()
+    {
+        soldOutOverlay?.SetActive(true);
+        if (buyButton != null)
+            buyButton.interactable = false;
+        item = null;
+    }
+
     void OnBuyClick()
     {
         if (item == null || shopUI == null)
@@ -158,9 +166,6 @@ public class ShopSlotUI : MonoBehaviour
         if (!shopUI.TryBuy(item, price))
             return;
 
-        soldOutOverlay?.SetActive(true);
-        if (buyButton != null)
-            buyButton.interactable = false;
-        item = null;
+        MarkSoldOut();
     }
 }

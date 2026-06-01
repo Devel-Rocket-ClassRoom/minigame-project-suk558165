@@ -11,6 +11,7 @@ public class Projectile : MonoBehaviour
     private GameObject shooter;
     private bool ready;
     private int pierceRemaining;
+    private float spinSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
 
     void Awake()
@@ -28,21 +29,29 @@ public class Projectile : MonoBehaviour
         float damage,
         GameObject shooter = null,
         float knockbackForce = 8f,
-        int pierce = 0
+        int pierce = 0,
+        float spinSpeed = 0f
     )
     {
         this.damage = damage;
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
         this.pierceRemaining = pierce;
+        this.spinSpeed = spinSpeed;
         var rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rb.constraints = RigidbodyConstraints2D.None;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        transform.rotation = Quaternion.Euler(0, 0, angle - 45f);
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
+    }
+
+    void Update()
+    {
+        if (spinSpeed != 0f)
+            transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime);
     }
 
     void Activate() => ready = true;
@@ -50,6 +59,9 @@ public class Projectile : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!ready)
+            return;
+
+        if (other.isTrigger)
             return;
 
         if (shooter != null && other.transform.IsChildOf(shooter.transform))

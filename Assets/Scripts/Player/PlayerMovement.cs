@@ -20,6 +20,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("Knockback")]
     public float knockbackDuration = 0.15f;
 
+    [Header("Audio")]
+    public AudioClip jumpSound;
+    public AudioClip dashSound;
+
     [Header("Dash")]
     public float dashSpeedMultiplier = 3f;
     public float dashDuration = 0.3f;
@@ -86,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isDropping;
 
     private DashGhostEffect dashGhost;
+    private Collider2D mainCollider;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -99,6 +104,7 @@ public class PlayerMovement : MonoBehaviour
         inventory = GetComponent<Inventory>();
 
         dashGhost = GetComponent<DashGhostEffect>();
+        mainCollider = GetComponent<Collider2D>();
 
         baseWalkSpeed = walkSpeed;
         baseJumpForce = jumpForce;
@@ -120,7 +126,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        MoveInput = Input.GetAxisRaw("Horizontal");
+        float left = Input.GetKey(KeyCode.LeftArrow) ? -1f : 0f;
+        float right = Input.GetKey(KeyCode.RightArrow) ? 1f : 0f;
+        MoveInput = left + right;
 
         if (IsGrounded && !wasGrounded)
         {
@@ -138,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetButtonDown("Jump"))
             return;
 
-        bool pressingDown = Input.GetAxisRaw("Vertical") < 0f;
+        bool pressingDown = Input.GetKey(KeyCode.DownArrow);
 
         if (pressingDown && IsGrounded)
         {
@@ -150,6 +158,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
+            AudioManager.Instance?.PlaySFX(jumpSound);
         }
     }
 
@@ -174,6 +183,7 @@ public class PlayerMovement : MonoBehaviour
             dashCharges--;
             if (dashCharges == 0)
                 dashCooldownTimer = dashCooldown;
+            AudioManager.Instance?.PlaySFX(dashSound);
 
             if (!IsGrounded)
                 jumpCharges = 0;
@@ -257,18 +267,15 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
-        // 상승 중이거나 아랫점프 중이면 플랫폼 레이어 무시, 그 외엔 복원
-        int platLayer = LayerMaskToIndex(platformLayer);
-        if (platLayer >= 0)
-        {
-            bool ignorePlatform = isDropping || rb.linearVelocity.y > 0.5f;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, platLayer, ignorePlatform);
-        }
+        // 상승 중이거나 아랫점프 중이면 이 콜라이더에서만 플랫폼 충돌 제외
+        bool ignorePlatform = isDropping || rb.linearVelocity.y > 0.5f;
+        if (mainCollider != null)
+            mainCollider.excludeLayers = ignorePlatform ? platformLayer : (LayerMask)0;
 
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
-        LayerMask combinedLayer = isDropping ? groundLayer : (groundLayer | platformLayer);
+        LayerMask combinedLayer = groundLayer | platformLayer;
         bool hit =
             Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
@@ -282,17 +289,9 @@ public class PlayerMovement : MonoBehaviour
             yield break;
 
         isDropping = true;
-
-        var col = GetComponent<Collider2D>();
-        col.enabled = false;
-        rb.position += Vector2.down * 0.5f;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -8f);
 
-        yield return new WaitForSeconds(0.15f);
-
-        col.enabled = true;
-
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(dropDownDuration);
 
         isDropping = false;
     }

@@ -16,6 +16,9 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject newGameConfirmPanel;
 
+    [SerializeField]
+    private GameObject quitConfirmPanel;
+
     private GameObject hpBar;
     private GameObject controls;
     private GameObject goldDisplay;
@@ -32,6 +35,8 @@ public class TitleUI : MonoBehaviour
 
         if (newGameConfirmPanel != null)
             newGameConfirmPanel.SetActive(false);
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
     }
 
     void OnEnable()
@@ -103,6 +108,29 @@ public class TitleUI : MonoBehaviour
     }
 
     public void OnQuit()
+    {
+        if (quitConfirmPanel != null)
+        {
+            quitConfirmPanel.SetActive(true);
+            return;
+        }
+        DoQuit();
+    }
+
+    public void OnQuitConfirm()
+    {
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
+        DoQuit();
+    }
+
+    public void OnQuitCancel()
+    {
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
+    }
+
+    void DoQuit()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

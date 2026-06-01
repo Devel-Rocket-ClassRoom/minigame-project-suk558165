@@ -30,12 +30,18 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Tooltip("발사체 회전 속도 (도/초). 0이면 회전 없음")]
+    public float projectileSpinSpeed = 0f;
+
     [Header("HP Bar")]
     public Vector3 hpBarOffset = new Vector3(0f, -0.6f, 0f);
 
     [Header("Knockback")]
     public float knockbackForce = 6f;
     public float knockbackDuration = 0.15f;
+
+    [Header("Audio")]
+    public AudioClip attackSound;
 
     [Header("Melee")]
     public Collider2D meleeHitbox;
@@ -149,6 +155,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
+                AudioManager.Instance?.PlaySFX(attackSound);
             }
         }
         else
@@ -183,6 +190,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
+                AudioManager.Instance?.PlaySFX(attackSound);
                 StartCoroutine(ShootAfterDelay(attackDamageDelay));
             }
         }
@@ -208,7 +216,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject);
+            projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
     }
 
     void Patrol()
@@ -303,13 +311,20 @@ public class EnemyController : MonoBehaviour, IDamageable
             ShootProjectile();
     }
 
+    // ShieldController 등이 등록해서 데미지 차단 여부를 결정
+    public System.Func<bool> isAttackBlocked;
+
     public void TakeDamage(float amount)
     {
         if (isDead)
             return;
 
+        if (isAttackBlocked != null && isAttackBlocked())
+            return;
+
         hp -= amount;
         healthBar?.SetHealth(hp, maxHp);
+        StartCoroutine(HitFlash());
 
         if (hp <= 0f)
         {
@@ -326,6 +341,13 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (player != null)
             StartCoroutine(Knockback((transform.position - player.position).normalized));
+    }
+
+    IEnumerator HitFlash()
+    {
+        sr.color = Color.red;
+        yield return new WaitForSeconds(0.15f);
+        sr.color = Color.white;
     }
 
     IEnumerator Knockback(Vector2 dir)
@@ -348,6 +370,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         isDead = true;
         healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
+        sr.color = Color.white;
         var hitbox = meleeHitbox != null ? meleeHitbox.GetComponent<MeleeHitbox>() : null;
         if (hitbox != null)
             hitbox.ForceDeactivate();

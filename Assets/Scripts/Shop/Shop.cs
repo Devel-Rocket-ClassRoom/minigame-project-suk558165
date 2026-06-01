@@ -19,10 +19,14 @@ public class Shop : MonoBehaviour
     private ShopUI shopUI;
 
     [SerializeField]
+    private float shopScale = 1.5f;
+
+    [SerializeField]
     private GameObject interactPrompt;
 
     private bool playerInRange = false;
     private List<ScriptableObject> activeItems = new List<ScriptableObject>();
+    private readonly HashSet<ScriptableObject> soldItems = new HashSet<ScriptableObject>();
 
     void Start()
     {
@@ -36,11 +40,20 @@ public class Shop : MonoBehaviour
 
     void Update()
     {
-        if (!playerInRange || ShopUI.IsOpen || ShopUI.JustClosed)
+        if (playerInRange && !ShopUI.IsOpen)
+            SetPrompt(true);
+
+        if (!playerInRange)
             return;
 
         var key = InputManager.Instance?.Interact ?? KeyCode.A;
-        if (Input.GetKeyDown(key))
+        if (!Input.GetKeyDown(key))
+            return;
+
+        // A키 하나로 열기/닫기 토글 — ShopUI.Update에서 중복 처리하지 않음
+        if (ShopUI.IsOpen)
+            shopUI?.Close();
+        else
             Open();
     }
 
@@ -71,13 +84,11 @@ public class Shop : MonoBehaviour
         if (shopUI == null)
             return;
 
-        // shopUI가 프리팹(씬 밖)이면 인스턴스화
         if (!shopUI.gameObject.scene.IsValid())
         {
             var canvas = FindFirstObjectByType<Canvas>();
             shopUI = Instantiate(shopUI, canvas != null ? canvas.transform : null);
 
-            // SpriteRenderer(NPC 등)보다 앞에 그리기 위해 sortingOrder 설정
             var shopCanvas = shopUI.GetComponent<Canvas>();
             if (shopCanvas == null)
                 shopCanvas = shopUI.gameObject.AddComponent<Canvas>();
@@ -85,6 +96,9 @@ public class Shop : MonoBehaviour
             shopCanvas.sortingOrder = 100;
             if (shopUI.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
                 shopUI.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+
+            shopUI.transform.localScale = Vector3.one * shopScale;
+            shopUI.OnItemSold = item => soldItems.Add(item);
         }
     }
 
@@ -96,13 +110,11 @@ public class Shop : MonoBehaviour
 
         if (restockOnReopen)
         {
-            if (randomizeOnStart)
-                activeItems = BuildRandomItems();
-            else
-                activeItems = new List<ScriptableObject>(items);
+            soldItems.Clear();
+            activeItems = randomizeOnStart ? BuildRandomItems() : new List<ScriptableObject>(items);
         }
 
-        shopUI.Open(activeItems);
+        shopUI.Open(activeItems, soldItems);
     }
 
     List<ScriptableObject> BuildRandomItems()

@@ -6748,18 +6748,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-    spawnPoint: {fileID: 7448437511515547396}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 7186360369159578586}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 1657790208562064160}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves:
+  - entries:
+    - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
+      spawnPoint: {fileID: 7448437511515547396}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
+      spawnPoint: {fileID: 7186360369159578586}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3147369898384476076, guid: e9ea09ffccc72eb45827e820ae0e4f75, type: 3}
+      spawnPoint: {fileID: 1657790208562064160}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3147369898384476076, guid: e9ea09ffccc72eb45827e820ae0e4f75, type: 3}
+      spawnPoint: {fileID: 7448437511515547396}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1
+  - entries:
+    - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
+      spawnPoint: {fileID: 7448437511515547396}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
+      spawnPoint: {fileID: 7186360369159578586}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 1657790208562064160}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 7448437511515547396}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 7186360369159578586}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 2
 --- !u!1 &1313735572848881627
 GameObject:
   m_ObjectHideFlags: 0

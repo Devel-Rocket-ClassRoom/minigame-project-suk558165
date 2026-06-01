@@ -917,7 +917,6 @@ MonoBehaviour:
   itemsGainedText: {fileID: 0}
   returnHintText: {fileID: 0}
   returnKey: 120
-  autoReturnDelay: 10
 --- !u!1 &3979637298888141695
 GameObject:
   m_ObjectHideFlags: 0

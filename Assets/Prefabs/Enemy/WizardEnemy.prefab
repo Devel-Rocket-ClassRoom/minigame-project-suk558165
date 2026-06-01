@@ -218,12 +218,14 @@ MonoBehaviour:
   isRanged: 1
   aimAtPlayer: 1
   projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 8311547963635048009}
   projectileSpeed: 8
   safeDistance: 3
+  projectileSpinSpeed: 0
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
+  attackSound: {fileID: 0}
   meleeHitbox: {fileID: 2741993019580225325}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3

@@ -9,11 +9,20 @@ public class TitleOptionsUI : MonoBehaviour
     public Slider bgmSlider;
     public Slider sfxSlider;
 
-    [Header("키 바인딩 텍스트")]
+    [Header("키 바인딩 레이블 (액션 설명 텍스트에 연결)")]
     public TextMeshProUGUI dashKeyText;
     public TextMeshProUGUI attackKeyText;
     public TextMeshProUGUI inventoryKeyText;
     public TextMeshProUGUI interactKeyText;
+
+    [Header("중복 경고")]
+    [SerializeField]
+    private TextMeshProUGUI duplicateWarningText;
+
+    private TextMeshProUGUI dashKeyDisplay;
+    private TextMeshProUGUI attackKeyDisplay;
+    private TextMeshProUGUI inventoryKeyDisplay;
+    private TextMeshProUGUI interactKeyDisplay;
 
     private string rebindingAction;
     private bool isRebinding;
@@ -25,6 +34,25 @@ public class TitleOptionsUI : MonoBehaviour
         KeyCode.Mouse1,
         KeyCode.Mouse2,
     };
+
+    void Awake()
+    {
+        // 액션 설명 레이블을 정적 텍스트로 복원
+        if (dashKeyText != null)
+            dashKeyText.text = "대시";
+        if (attackKeyText != null)
+            attackKeyText.text = "공격";
+        if (inventoryKeyText != null)
+            inventoryKeyText.text = "인벤토리";
+        if (interactKeyText != null)
+            interactKeyText.text = "상호작용";
+
+        // 어두운 KeyText 박스 안에 키 값 표시용 TMP 동적 생성
+        dashKeyDisplay = CreateKeyDisplay(dashKeyText);
+        attackKeyDisplay = CreateKeyDisplay(attackKeyText);
+        inventoryKeyDisplay = CreateKeyDisplay(inventoryKeyText);
+        interactKeyDisplay = CreateKeyDisplay(interactKeyText);
+    }
 
     void Start()
     {
@@ -72,6 +100,13 @@ public class TitleOptionsUI : MonoBehaviour
             if (!Input.GetKeyDown(kc))
                 continue;
 
+            if (IsDuplicateKey(kc))
+            {
+                ShowWarning("중복된 키입니다");
+                return;
+            }
+
+            HideWarning();
             InputManager.Instance?.SetKey(rebindingAction, kc);
             isRebinding = false;
             rebindingAction = null;
@@ -133,38 +168,99 @@ public class TitleOptionsUI : MonoBehaviour
         var im = InputManager.Instance;
         if (im == null)
             return;
-        if (dashKeyText != null)
-            dashKeyText.text = im.Dash.ToString();
-        if (attackKeyText != null)
-            attackKeyText.text = im.Attack.ToString();
-        if (inventoryKeyText != null)
-            inventoryKeyText.text = im.Inventory.ToString();
-        if (interactKeyText != null)
-            interactKeyText.text = im.Interact.ToString();
+        if (dashKeyDisplay != null)
+            dashKeyDisplay.text = im.Dash.ToString();
+        if (attackKeyDisplay != null)
+            attackKeyDisplay.text = im.Attack.ToString();
+        if (inventoryKeyDisplay != null)
+            inventoryKeyDisplay.text = im.Inventory.ToString();
+        if (interactKeyDisplay != null)
+            interactKeyDisplay.text = im.Interact.ToString();
     }
 
-    void StartRebind(string action, TextMeshProUGUI label)
+    TextMeshProUGUI CreateKeyDisplay(TextMeshProUGUI actionLabel)
     {
+        if (actionLabel == null)
+            return null;
+
+        var row = actionLabel.transform.parent;
+        if (row == null)
+            return null;
+
+        var keyBox = row.Find("KeyText");
+        if (keyBox == null)
+            return null;
+
+        var go = new GameObject("KeyValue");
+        go.transform.SetParent(keyBox, false);
+
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.font = actionLabel.font;
+        tmp.fontSize = actionLabel.fontSize;
+        tmp.fontMaterial = actionLabel.fontMaterial;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.raycastTarget = false;
+
+        return tmp;
+    }
+
+    bool IsDuplicateKey(KeyCode kc)
+    {
+        var im = InputManager.Instance;
+        if (im == null)
+            return false;
+
+        return (rebindingAction != "Dash" && im.Dash == kc)
+            || (rebindingAction != "Attack" && im.Attack == kc)
+            || (rebindingAction != "Inventory" && im.Inventory == kc)
+            || (rebindingAction != "Interact" && im.Interact == kc);
+    }
+
+    void ShowWarning(string message)
+    {
+        if (duplicateWarningText == null)
+            return;
+        duplicateWarningText.text = message;
+        duplicateWarningText.gameObject.SetActive(true);
+    }
+
+    void HideWarning()
+    {
+        if (duplicateWarningText != null)
+            duplicateWarningText.gameObject.SetActive(false);
+    }
+
+    void StartRebind(string action, TextMeshProUGUI display)
+    {
+        HideWarning();
         isRebinding = true;
         rebindingAction = action;
-        if (label != null)
-            label.text = "키를 입력하세요...";
+        if (display != null)
+            display.text = "...";
     }
 
     void CancelRebind()
     {
+        HideWarning();
         isRebinding = false;
         rebindingAction = null;
         RefreshKeyLabels();
     }
 
-    public void OnDashRebind() => StartRebind("Dash", dashKeyText);
+    public void OnDashRebind() => StartRebind("Dash", dashKeyDisplay);
 
-    public void OnAttackRebind() => StartRebind("Attack", attackKeyText);
+    public void OnAttackRebind() => StartRebind("Attack", attackKeyDisplay);
 
-    public void OnInventoryRebind() => StartRebind("Inventory", inventoryKeyText);
+    public void OnInventoryRebind() => StartRebind("Inventory", inventoryKeyDisplay);
 
-    public void OnInteractRebind() => StartRebind("Interact", interactKeyText);
+    public void OnInteractRebind() => StartRebind("Interact", interactKeyDisplay);
 
     // ── 닫기 ──────────────────────────────────────────────
 
@@ -172,5 +268,7 @@ public class TitleOptionsUI : MonoBehaviour
     {
         CancelRebind();
         gameObject.SetActive(false);
+        if (PauseMenu.IsPaused)
+            PauseMenu.Instance?.OnOptionsBackButton();
     }
 }

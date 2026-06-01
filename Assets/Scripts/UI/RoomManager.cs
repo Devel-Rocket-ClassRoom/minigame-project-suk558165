@@ -55,11 +55,14 @@ public class RoomManager : MonoBehaviour
     private Portal currentPortal;
     private CinemachineCamera cinemachineCamera;
 
+    private CameraFollow cameraFollow;
+
     void Start()
     {
         cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
         if (confiner == null && cinemachineCamera != null)
             confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
+        cameraFollow = FindAnyObjectByType<CameraFollow>();
     }
 
     public void SetPlayer(Transform playerTransform)
@@ -182,18 +185,23 @@ public class RoomManager : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
         }
 
-        if (confiner != null)
+        var boundsObj = currentRoom.transform.Find("CameraBounds");
+        var cameraBounds =
+            boundsObj != null
+                ? boundsObj.GetComponent<PolygonCollider2D>()
+                : currentRoom.GetComponentInChildren<PolygonCollider2D>();
+
+        if (cameraBounds != null)
         {
-            var boundsObj = currentRoom.transform.Find("CameraBounds");
-            var bounds =
-                boundsObj != null
-                    ? boundsObj.GetComponent<PolygonCollider2D>()
-                    : currentRoom.GetComponentInChildren<PolygonCollider2D>();
-            if (bounds != null)
+            if (confiner != null)
             {
-                confiner.BoundingShape2D = bounds;
+                confiner.BoundingShape2D = cameraBounds;
                 confiner.InvalidateBoundingShapeCache();
             }
+
+            if (cameraFollow == null)
+                cameraFollow = FindAnyObjectByType<CameraFollow>();
+            cameraFollow?.SetBoundsFromPolygon(cameraBounds);
         }
 
         // 카메라를 플레이어 위치로 즉시 스냅 (부드러운 추적 시작 전 초기 위치 보정)
@@ -236,6 +244,8 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
+        SaveManager.Instance?.Save();
+
         SpawnChest();
 
         if (currentPortal != null)
@@ -268,11 +278,45 @@ public class RoomManager : MonoBehaviour
 
     void OnGameClear()
     {
+        ResetPlayerInventory();
+
         if (gameClearUI == null)
             gameClearUI = FindAnyObjectByType<GameClearUI>();
 
         if (gameClearUI != null)
             gameClearUI.Show();
+    }
+
+    void ResetPlayerInventory()
+    {
+        if (player == null)
+            return;
+
+        var inventory = player.GetComponentInChildren<Inventory>();
+        if (inventory != null)
+        {
+            // 장착 장비 초기화
+            for (int i = inventory.Accessories.Count - 1; i >= 0; i--)
+                inventory.RemoveAccessory(i);
+
+            // 백팩 초기화
+            for (int i = inventory.Backpack.Count - 1; i >= 0; i--)
+                inventory.RemoveFromBackpack(i);
+
+            // 장착 무기 초기화
+            var weaponInv = inventory.WeaponInventory;
+            if (weaponInv != null)
+                weaponInv.weapons.Clear();
+        }
+
+        // 세이브 데이터에서도 무기 초기화 후 저장
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.Data.equippedWeapons.Clear();
+            SaveManager.Instance.Data.lastLocation = "Village";
+            SaveManager.Instance.Data.lastRoomNumber = 1;
+            SaveManager.Instance.Save();
+        }
     }
 
     IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
@@ -289,6 +333,13 @@ public class RoomManager : MonoBehaviour
 
         LoadRoom(roomNumber);
 
+        // 페이드 아웃 상태에서 카메라를 즉시 스냅하여 페이드 인 시 튀는 현상 방지
+        if (cameraFollow == null)
+            cameraFollow = FindAnyObjectByType<CameraFollow>();
+        cameraFollow?.SnapToTarget();
+
+        // Cinemachine 및 CameraFollow가 새 위치를 반영할 시간 확보
+        yield return null;
         yield return null;
 
         if (confiner != null)

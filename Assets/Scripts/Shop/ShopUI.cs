@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -21,11 +22,14 @@ public class ShopUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI noticeText;
 
-    // 씬에 있는 어떤 상점이든 하나라도 열려있으면 true (Shop.Update에서 중복 열기 방지용)
+    // 씬에 있는 어떤 상점이든 하나라도 열려있으면 true
     public static bool IsOpen => openCount > 0;
     public static bool JustClosed => Time.frameCount == closedFrame;
     private static int openCount = 0;
     private static int closedFrame = -1;
+
+    public Action<ScriptableObject> OnItemSold;
+    public Action OnClosed;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics()
@@ -39,7 +43,8 @@ public class ShopUI : MonoBehaviour
 
     void Awake()
     {
-        openCount = 0;
+        // openCount는 ResetStatics()에서만 초기화 — 여기서 리셋하면
+        // 씬에 ShopUI가 여러 개일 때 이미 열린 상점 상태가 날아감
         closeButton?.onClick.AddListener(Close);
     }
 
@@ -58,10 +63,6 @@ public class ShopUI : MonoBehaviour
             goldText.text = $"골드: {inventory.Gold}";
 
         RefreshButtonStates();
-
-        var interactKey = InputManager.Instance?.Interact ?? KeyCode.A;
-        if (Input.GetKeyDown(interactKey))
-            Close();
     }
 
     void RefreshButtonStates()
@@ -72,7 +73,7 @@ public class ShopUI : MonoBehaviour
             slot?.RefreshAffordable(inventory.Gold);
     }
 
-    public void Open(List<ScriptableObject> items)
+    public void Open(List<ScriptableObject> items, HashSet<ScriptableObject> soldItems = null)
     {
         inventory = FindFirstObjectByType<Inventory>();
         if (frame == null)
@@ -83,7 +84,12 @@ public class ShopUI : MonoBehaviour
             if (slots[i] == null)
                 continue;
             if (i < items.Count && items[i] != null)
+            {
                 slots[i].Setup(items[i], this);
+                // 이미 구매한 아이템이면 품절 상태 복원
+                if (soldItems != null && soldItems.Contains(items[i]))
+                    slots[i].MarkSoldOut();
+            }
             else
                 slots[i].Clear();
         }
@@ -105,6 +111,7 @@ public class ShopUI : MonoBehaviour
             closedFrame = Time.frameCount;
             if (openCount == 0)
                 Time.timeScale = 1f;
+            OnClosed?.Invoke();
         }
     }
 
@@ -127,6 +134,7 @@ public class ShopUI : MonoBehaviour
         if (goldText != null)
             goldText.text = $"골드: {inventory.Gold}";
 
+        OnItemSold?.Invoke(item);
         return true;
     }
 
