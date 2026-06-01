@@ -12,10 +12,6 @@ public class SaveData
     // 기본 장착 무기 (이름으로 저장)
     public List<string> equippedWeapons = new List<string>();
 
-    // 해금 목록 (ScriptableObject 이름으로 저장)
-    public List<string> unlockedWeapons = new List<string>();
-    public List<string> unlockedAccessories = new List<string>();
-
     // 베스트 런 기록
     public BestRunData bestRun = new BestRunData();
 

@@ -32,6 +32,12 @@ public class PlayerWeapon : MonoBehaviour
 
         float s = data.spriteScale > 0f ? data.spriteScale : 1f;
         transform.localScale = new Vector3(s, s, 1f);
+        transform.localPosition = new Vector3(
+            data.spriteOffset.x,
+            data.spriteOffset.y,
+            transform.localPosition.z
+        );
+        transform.localEulerAngles = new Vector3(0f, 0f, data.spriteRotation);
     }
 
     public void OnHitFrame()

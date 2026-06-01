@@ -63,7 +63,12 @@ public class GameFlowController : MonoBehaviour
             new GameObject("InputManager").AddComponent<InputManager>();
     }
 
-    void Start() => GoToTitle();
+    void Start()
+    {
+        if (cinemachineCamera == null)
+            cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
+        GoToTitle();
+    }
 
     void Update()
     {

@@ -217,13 +217,14 @@ MonoBehaviour:
   chaseYThreshold: 1.2
   isRanged: 1
   aimAtPlayer: 0
-  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  projectilePrefab: {fileID: 890269536779844890, guid: 2e5c826dcf05a1941bfd91b84d8f7fac, type: 3}
   firePoint: {fileID: 6857617571038101239}
   projectileSpeed: 8
   safeDistance: 3
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
+  attackSound: {fileID: 0}
   meleeHitbox: {fileID: 3317682275281999150}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3

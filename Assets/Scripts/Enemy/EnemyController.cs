@@ -30,6 +30,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Tooltip("발사체 회전 속도 (도/초). 0이면 회전 없음")]
+    public float projectileSpinSpeed = 0f;
+
     [Header("HP Bar")]
     public Vector3 hpBarOffset = new Vector3(0f, -0.6f, 0f);
 
@@ -213,7 +216,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject);
+            projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
     }
 
     void Patrol()
@@ -308,9 +311,15 @@ public class EnemyController : MonoBehaviour, IDamageable
             ShootProjectile();
     }
 
+    // ShieldController 등이 등록해서 데미지 차단 여부를 결정
+    public System.Func<bool> isAttackBlocked;
+
     public void TakeDamage(float amount)
     {
         if (isDead)
+            return;
+
+        if (isAttackBlocked != null && isAttackBlocked())
             return;
 
         hp -= amount;

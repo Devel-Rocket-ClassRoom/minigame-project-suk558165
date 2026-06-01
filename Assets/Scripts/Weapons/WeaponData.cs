@@ -29,6 +29,8 @@ public class WeaponData : ScriptableObject
 
     [Header("Visuals")]
     public float spriteScale = 1f;
+    public Vector2 spriteOffset = Vector2.zero;
+    public float spriteRotation = 0f;
 
     [Header("Swing (Melee)")]
     public float swingAngle = 120f;

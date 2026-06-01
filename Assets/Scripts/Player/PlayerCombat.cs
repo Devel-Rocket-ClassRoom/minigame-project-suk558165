@@ -19,10 +19,16 @@ public class PlayerCombat : MonoBehaviour
     private AnimationClip meleeIdleClip;
 
     [SerializeField]
+    private AnimationClip meleeWalkClip;
+
+    [SerializeField]
     private AnimationClip rangedAttackClip;
 
     [SerializeField]
     private AnimationClip rangedIdleClip;
+
+    [SerializeField]
+    private AnimationClip rangedWalkClip;
 
     public bool IsAttacking { get; private set; }
 
@@ -30,6 +36,7 @@ public class PlayerCombat : MonoBehaviour
     private const string BowAttackState = "BowAttack";
     private const string SwordOverrideClip = "Player_SwordAttack";
     private const string IdleOverrideClip = "Player_Idle";
+    private const string WalkOverrideClip = "Player_Walk";
 
     private Animator animator;
     private AnimatorOverrideController overrideController;
@@ -176,10 +183,11 @@ public class PlayerCombat : MonoBehaviour
 
     void ApplyWeapon(WeaponData data)
     {
-        AnimationClip attackClip =
-            data.weaponType == WeaponType.Ranged ? rangedAttackClip : meleeAttackClip;
-        AnimationClip idleClip =
-            data.weaponType == WeaponType.Ranged ? rangedIdleClip : meleeIdleClip;
+        bool isRanged = data.weaponType == WeaponType.Ranged;
+
+        AnimationClip attackClip = isRanged ? rangedAttackClip : meleeAttackClip;
+        AnimationClip idleClip = isRanged ? rangedIdleClip : meleeIdleClip;
+        AnimationClip walkClip = isRanged ? rangedWalkClip : meleeWalkClip;
 
         if (attackClip != null)
             overrideController[SwordOverrideClip] = attackClip;
@@ -190,6 +198,14 @@ public class PlayerCombat : MonoBehaviour
             var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (stateInfo.IsName("Idle"))
                 animator.Play("Idle", 0, stateInfo.normalizedTime);
+        }
+
+        if (walkClip != null)
+        {
+            overrideController[WalkOverrideClip] = walkClip;
+            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (stateInfo.IsName("Walk"))
+                animator.Play("Walk", 0, stateInfo.normalizedTime);
         }
 
         if (weapon != null)

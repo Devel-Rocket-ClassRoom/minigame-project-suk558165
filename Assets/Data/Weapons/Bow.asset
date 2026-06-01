@@ -37,7 +37,9 @@ MonoBehaviour:
   damage: 15
   attackCooldown: 0.8
   attackSound: {fileID: 8300000, guid: 88c354726166649468c956b6266dadbc, type: 3}
-  spriteScale: 2
+  spriteScale: 1.5
+  spriteOffset: {x: 0, y: 0}
+  spriteRotation: 0
   swingAngle: 0
   swingDuration: 0
   projectileSpeed: 12

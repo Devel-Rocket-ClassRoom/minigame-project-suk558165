@@ -236,6 +236,8 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
+        SaveManager.Instance?.Save();
+
         SpawnChest();
 
         if (currentPortal != null)
@@ -268,11 +270,45 @@ public class RoomManager : MonoBehaviour
 
     void OnGameClear()
     {
+        ResetPlayerInventory();
+
         if (gameClearUI == null)
             gameClearUI = FindAnyObjectByType<GameClearUI>();
 
         if (gameClearUI != null)
             gameClearUI.Show();
+    }
+
+    void ResetPlayerInventory()
+    {
+        if (player == null)
+            return;
+
+        var inventory = player.GetComponentInChildren<Inventory>();
+        if (inventory != null)
+        {
+            // 장착 장비 초기화
+            for (int i = inventory.Accessories.Count - 1; i >= 0; i--)
+                inventory.RemoveAccessory(i);
+
+            // 백팩 초기화
+            for (int i = inventory.Backpack.Count - 1; i >= 0; i--)
+                inventory.RemoveFromBackpack(i);
+
+            // 장착 무기 초기화
+            var weaponInv = inventory.WeaponInventory;
+            if (weaponInv != null)
+                weaponInv.weapons.Clear();
+        }
+
+        // 세이브 데이터에서도 무기 초기화 후 저장
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.Data.equippedWeapons.Clear();
+            SaveManager.Instance.Data.lastLocation = "Village";
+            SaveManager.Instance.Data.lastRoomNumber = 1;
+            SaveManager.Instance.Save();
+        }
     }
 
     IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)

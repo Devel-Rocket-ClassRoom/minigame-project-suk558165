@@ -6551,7 +6551,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waves: []
+  waves:
+  - entries:
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 5297680487004687453}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 5026629168030354521}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 2877499036188757312}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1
+  - entries:
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 5297680487004687453}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 5026629168030354521}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 2877499036188757312}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 2
 --- !u!1 &8351848940754165467
 GameObject:
   m_ObjectHideFlags: 0
