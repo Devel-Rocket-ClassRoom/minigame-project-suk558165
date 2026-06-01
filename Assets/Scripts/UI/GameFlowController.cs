@@ -24,6 +24,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject pauseMenuPrefab;
 
+    [SerializeField]
+    private GameObject tutorialRoomPrefab;
+
     [Header("데이터")]
     [SerializeField]
     private ItemDatabase itemDatabase;
@@ -39,6 +42,7 @@ public class GameFlowController : MonoBehaviour
     private GameObject villageInstance;
     private GameObject playerInstance;
     private GameObject pauseMenuInstance;
+    private GameObject tutorialInstance;
 
     void Awake()
     {
@@ -154,6 +158,13 @@ public class GameFlowController : MonoBehaviour
 
         DestroyTitle();
         SpawnPlayer();
+
+        if (tutorialRoomPrefab != null)
+        {
+            GoToTutorial();
+            return;
+        }
+
         GoToVillage();
     }
 
@@ -234,6 +245,62 @@ public class GameFlowController : MonoBehaviour
                     weaponInv.weapons.Add(weapon); // null이면 빈 슬롯
                 }
             }
+        }
+    }
+
+    void GoToTutorial()
+    {
+        tutorialInstance = Instantiate(tutorialRoomPrefab);
+
+        var spawn = tutorialInstance.GetComponentInChildren<PlayerSpawnPoint>();
+        if (spawn != null)
+        {
+            playerInstance.transform.position = spawn.transform.position;
+            var rb = playerInstance.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+        }
+
+        var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
+        float savedDamping = 0f;
+        if (confiner != null)
+        {
+            savedDamping = confiner.Damping;
+            confiner.Damping = 0f;
+
+            var bounds = tutorialInstance
+                .transform.Find("CameraBounds")
+                ?.GetComponent<PolygonCollider2D>();
+            if (bounds != null)
+            {
+                confiner.BoundingShape2D = bounds;
+                confiner.InvalidateBoundingShapeCache();
+            }
+        }
+
+        if (cinemachineCamera != null && playerInstance != null)
+        {
+            var targetPos = new Vector3(
+                playerInstance.transform.position.x,
+                playerInstance.transform.position.y,
+                cinemachineCamera.transform.position.z
+            );
+            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
+        }
+
+        if (confiner != null)
+            confiner.Damping = savedDamping;
+
+        var tutorial = tutorialInstance.GetComponentInChildren<TutorialManager>();
+        if (tutorial != null)
+        {
+            tutorial.onTutorialComplete += () =>
+            {
+                Destroy(tutorialInstance);
+                tutorialInstance = null;
+                GoToVillage();
+            };
+            tutorial.Begin();
         }
     }
 

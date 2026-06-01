@@ -31,6 +31,9 @@ public class SaveData
     // 언어 설정 ("ko" or "en", 빈 문자열이면 시스템 기본)
     public string languageCode = "";
 
+    // 튜토리얼
+    public bool tutorialCompleted = false;
+
     // 키 바인딩
     public KeyBindingSaveData keyBindings = new KeyBindingSaveData();
 }

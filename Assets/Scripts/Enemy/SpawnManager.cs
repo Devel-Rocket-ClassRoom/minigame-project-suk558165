@@ -29,6 +29,11 @@ public class SpawnManager : MonoBehaviour
     [Header("스폰 포인트 (좌끝, 좌중간, 중앙, 우중간, 우끝 등)")]
     [SerializeField] private Transform[] spawnPoints;
 
+    [Header("스폰 이펙트")]
+    [SerializeField] private GameObject spawnEffectPrefab;
+    [Tooltip("이펙트 재생 후 몬스터가 나타나기까지 대기 시간")]
+    [SerializeField] private float spawnEffectDelay = 0.5f;
+
     [Header("웨이브 설정")]
     [SerializeField] private List<Wave> waves = new List<Wave>();
 
@@ -85,14 +90,22 @@ public class SpawnManager : MonoBehaviour
 
         for (int i = 0; i < group.count; i++)
         {
-            SpawnEnemy(group.prefab, point.position);
+            yield return SpawnEnemyWithEffect(group.prefab, point.position);
             if (i < group.count - 1 && group.interval > 0f)
                 yield return new WaitForSeconds(group.interval);
         }
     }
 
-    void SpawnEnemy(GameObject prefab, Vector3 position)
+    IEnumerator SpawnEnemyWithEffect(GameObject prefab, Vector3 position)
     {
+        if (spawnEffectPrefab != null)
+        {
+            var fx = Instantiate(spawnEffectPrefab, position, Quaternion.identity);
+            Destroy(fx, 3f);
+            if (spawnEffectDelay > 0f)
+                yield return new WaitForSeconds(spawnEffectDelay);
+        }
+
         var go = Instantiate(prefab, position, Quaternion.identity);
         aliveCount++;
         var enemy = go.GetComponent<EnemyController>();
