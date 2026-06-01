@@ -3289,18 +3289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-    spawnPoint: {fileID: 6282001393593049467}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 7610676892220698302}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 3981820405678702471}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves: []
 --- !u!1 &5530287535269742886
 GameObject:
   m_ObjectHideFlags: 0

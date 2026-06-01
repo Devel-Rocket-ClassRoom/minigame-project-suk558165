@@ -17,6 +17,9 @@ public class ButtonScaleEffect
     [SerializeField]
     private float speed = 12f;
 
+    [SerializeField]
+    private AudioClip clickSound;
+
     private Vector3 baseScale;
     private Vector3 targetScale;
 
@@ -39,7 +42,11 @@ public class ButtonScaleEffect
 
     public void OnPointerExit(PointerEventData _) => targetScale = baseScale;
 
-    public void OnPointerDown(PointerEventData _) => targetScale = baseScale * pressScale;
+    public void OnPointerDown(PointerEventData _)
+    {
+        targetScale = baseScale * pressScale;
+        AudioManager.Instance?.PlaySFX(clickSound);
+    }
 
     public void OnPointerUp(PointerEventData _) => targetScale = baseScale * hoverScale;
 }

@@ -39,7 +39,7 @@ public class Projectile : MonoBehaviour
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         rb.constraints = RigidbodyConstraints2D.None;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);

@@ -20,6 +20,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("Knockback")]
     public float knockbackDuration = 0.15f;
 
+    [Header("Audio")]
+    public AudioClip jumpSound;
+    public AudioClip dashSound;
+
     [Header("Dash")]
     public float dashSpeedMultiplier = 3f;
     public float dashDuration = 0.3f;
@@ -120,7 +124,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        MoveInput = Input.GetAxisRaw("Horizontal");
+        float left = Input.GetKey(KeyCode.LeftArrow) ? -1f : 0f;
+        float right = Input.GetKey(KeyCode.RightArrow) ? 1f : 0f;
+        MoveInput = left + right;
 
         if (IsGrounded && !wasGrounded)
         {
@@ -150,6 +156,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
+            AudioManager.Instance?.PlaySFX(jumpSound);
         }
     }
 
@@ -174,6 +181,7 @@ public class PlayerMovement : MonoBehaviour
             dashCharges--;
             if (dashCharges == 0)
                 dashCooldownTimer = dashCooldown;
+            AudioManager.Instance?.PlaySFX(dashSound);
 
             if (!IsGrounded)
                 jumpCharges = 0;

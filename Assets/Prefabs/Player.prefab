@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 3765672486079037674}
   - component: {fileID: 757064302359953606}
   - component: {fileID: -6649310823869313722}
+  - component: {fileID: 1014718216165679732}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -98,7 +99,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.55, y: 2.55}
+  m_Size: {x: 2.580645, y: 2.580645}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -191,7 +192,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.15}
     oldSize: {x: 2.580645, y: 2.580645}
-    newSize: {x: 2.55, y: 2.55}
+    newSize: {x: 2.580645, y: 2.580645}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -268,6 +269,8 @@ MonoBehaviour:
   gravityScale: 4
   fallGravityMultiplier: 2.5
   knockbackDuration: 0.15
+  jumpSound: {fileID: 8300000, guid: 1ce42ac11cf4f3343832a33c63a511a5, type: 3}
+  dashSound: {fileID: 8300000, guid: 36147f917b9397343afb37327ea4ca66, type: 3}
   dashSpeedMultiplier: 3
   dashDuration: 0.3
   dashCooldown: 1
@@ -286,10 +289,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
   weapon: {fileID: 1274484273918966404}
   weaponInventory: {fileID: 7740948866993071214}
-  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  projectilePrefab: {fileID: 890269536779844890, guid: bd171f3684cf9f54abd5dbe3167fa2a8, type: 3}
   firePoint: {fileID: 4200001}
   projectileSpeed: 12
-  swordAnimator: {fileID: 2771323166224714755}
   meleeAttackClip: {fileID: 7400000, guid: f62aa5797bd692747be04424a25a113c, type: 2}
   meleeIdleClip: {fileID: 7400000, guid: e2bcb5480c28f9a45b7db7755d6ad7e4, type: 2}
   rangedAttackClip: {fileID: 7400000, guid: 7063265198bda2444b9b7d5068965a88, type: 2}
@@ -320,6 +322,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   weaponInventory: {fileID: 0}
+--- !u!114 &1014718216165679732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbe67fd440c8c54d8707ebba6afc4c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DashGhostEffect
+  ghostInterval: 0.05
+  ghostLifetime: 0.25
+  ghostColor: {r: 1, g: 1, b: 1, a: 0.5}
 --- !u!1 &100001
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,13 +427,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4331312101754903592}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.4179795, w: 0.90845644}
+  m_LocalRotation: {x: -0.0056492756, y: -0.0066527985, z: -0.76222706, w: 0.6472509}
   m_LocalPosition: {x: 0.56, y: 0.77, z: 0}
   m_LocalScale: {x: 0.44720733, y: 0.47111255, z: 0.12}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5577368133512836079}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -49.414}
+  m_LocalEulerAnglesHint: {x: -1, y: 0, z: -117.60215}
 --- !u!212 &5217973745853112448
 SpriteRenderer:
   serializedVersion: 2

@@ -33,10 +33,11 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  spriteScale: 2
   price: 210
   damage: 38
   attackCooldown: 1.6
+  attackSound: {fileID: 8300000, guid: 63ed9ccfdc551cc4da047f407382f3e0, type: 3}
+  spriteScale: 2
   swingAngle: 100
   swingDuration: 0.9
   projectileSpeed: 0

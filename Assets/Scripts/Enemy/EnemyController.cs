@@ -37,6 +37,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float knockbackForce = 6f;
     public float knockbackDuration = 0.15f;
 
+    [Header("Audio")]
+    public AudioClip attackSound;
+
     [Header("Melee")]
     public Collider2D meleeHitbox;
 
@@ -149,6 +152,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
+                AudioManager.Instance?.PlaySFX(attackSound);
             }
         }
         else
@@ -183,6 +187,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 attackTimer = attackCooldown;
                 animator.SetTrigger(HashAttack);
+                AudioManager.Instance?.PlaySFX(attackSound);
                 StartCoroutine(ShootAfterDelay(attackDamageDelay));
             }
         }
@@ -310,6 +315,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         hp -= amount;
         healthBar?.SetHealth(hp, maxHp);
+        StartCoroutine(HitFlash());
 
         if (hp <= 0f)
         {
@@ -326,6 +332,13 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (player != null)
             StartCoroutine(Knockback((transform.position - player.position).normalized));
+    }
+
+    IEnumerator HitFlash()
+    {
+        sr.color = Color.red;
+        yield return new WaitForSeconds(0.15f);
+        sr.color = Color.white;
     }
 
     IEnumerator Knockback(Vector2 dir)
@@ -348,6 +361,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         isDead = true;
         healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
+        sr.color = Color.white;
         var hitbox = meleeHitbox != null ? meleeHitbox.GetComponent<MeleeHitbox>() : null;
         if (hitbox != null)
             hitbox.ForceDeactivate();

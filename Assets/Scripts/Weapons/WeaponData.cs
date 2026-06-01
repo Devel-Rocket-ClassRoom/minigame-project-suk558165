@@ -24,6 +24,9 @@ public class WeaponData : ScriptableObject
     public float damage = 20f;
     public float attackCooldown = 0.5f;
 
+    [Header("Audio")]
+    public AudioClip attackSound;
+
     [Header("Visuals")]
     public float spriteScale = 1f;
 
