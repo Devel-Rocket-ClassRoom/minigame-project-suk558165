@@ -251,6 +251,8 @@ Tilemap:
   m_TileColorArray:
   - m_RefCount: 2
     m_Data: {r: 1, g: 1, b: 1, a: 1}
+  - m_RefCount: 0
+    m_Data: {r: 1.67e-43, g: 1.67e-43, b: 1.67e-43, a: 1.67e-43}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2102,6 +2104,8 @@ Tilemap:
   m_TileSpriteArray:
   - m_RefCount: 166
     m_Data: {fileID: 21300000, guid: f2f555ef6c8ee054483e35848712c087, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 166
     m_Data:
@@ -2124,6 +2128,8 @@ Tilemap:
   m_TileColorArray:
   - m_RefCount: 166
     m_Data: {r: 1, g: 1, b: 1, a: 1}
+  - m_RefCount: 0
+    m_Data: {r: 1.67e-43, g: 1.67e-43, b: 1.67e-43, a: 1.67e-43}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2250,6 +2256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d896482db782b46ab3ba0f08fa23e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Portal
+  portalType: 1
   visualEffect: {fileID: 4704217307854372961}
 --- !u!61 &468875167679837238
 BoxCollider2D:
@@ -2459,12 +2466,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-    spawnPoint: {fileID: 8681790195392641493}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves:
+  - entries:
+    - prefab: {fileID: 9100000, guid: f11f116f904c68841a699156638bc453, type: 3}
+      spawnPoint: {fileID: 8681790195392641493}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 9100000, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
+      spawnPoint: {fileID: 4029621844330895054}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1.0
+  - entries:
+    - prefab: {fileID: 9100000, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 3148079163398800335}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 9100000, guid: f11f116f904c68841a699156638bc453, type: 3}
+      spawnPoint: {fileID: 8681790195392641493}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 4.0
 --- !u!1 &5182288010703023697
 GameObject:
   m_ObjectHideFlags: 0
@@ -4215,6 +4233,8 @@ Tilemap:
   m_TileColorArray:
   - m_RefCount: 158
     m_Data: {r: 1, g: 1, b: 1, a: 1}
+  - m_RefCount: 0
+    m_Data: {r: 5e-44, g: 5e-44, b: 5e-44, a: 5e-44}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -4495,7 +4515,7 @@ Transform:
   m_GameObject: {fileID: 7275584546996790748}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12, y: -6.9, z: 0}
+  m_LocalPosition: {x: 13.03, y: -8.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

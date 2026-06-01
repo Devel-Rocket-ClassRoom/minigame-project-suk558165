@@ -14,13 +14,28 @@ public class PauseMenu : MonoBehaviour
 
     [Header("Panels")]
     public CanvasGroup pausePanel;
-    public CanvasGroup optionsPanel;
+
+    [SerializeField]
+    private GameObject quitConfirmPanel;
+
+    [Header("옵션 패널 (TitleOptionsPanel 프리팹 연결)")]
+    [SerializeField]
+    private TitleOptionsUI optionsPanelPrefab;
+
+    private TitleOptionsUI optionsPanelInstance;
 
     void Awake()
     {
         Instance = this;
         HidePanel(pausePanel);
-        HidePanel(optionsPanel);
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
+
+        if (optionsPanelPrefab != null)
+        {
+            optionsPanelInstance = Instantiate(optionsPanelPrefab, transform.root);
+            optionsPanelInstance.gameObject.SetActive(false);
+        }
     }
 
     // ── GameFlowController 에서 호출 ──────────────────────
@@ -30,7 +45,7 @@ public class PauseMenu : MonoBehaviour
         IsPaused = true;
         Time.timeScale = 0f;
         ShowPanel(pausePanel);
-        HidePanel(optionsPanel);
+        optionsPanelInstance?.gameObject.SetActive(false);
     }
 
     public void Close()
@@ -38,7 +53,7 @@ public class PauseMenu : MonoBehaviour
         IsPaused = false;
         Time.timeScale = 1f;
         HidePanel(pausePanel);
-        HidePanel(optionsPanel);
+        optionsPanelInstance?.gameObject.SetActive(false);
     }
 
     // ── 버튼 콜백 ─────────────────────────────────────────
@@ -51,19 +66,42 @@ public class PauseMenu : MonoBehaviour
     public void OnOptionsButton()
     {
         HidePanel(pausePanel);
-        ShowPanel(optionsPanel);
-    }
-
-    public void OnQuitButton()
-    {
-        GameFlowController.Instance?.ClosePauseMenu();
-        GameFlowController.Instance?.GoToTitle();
+        optionsPanelInstance?.Show();
     }
 
     public void OnOptionsBackButton()
     {
-        HidePanel(optionsPanel);
+        optionsPanelInstance?.gameObject.SetActive(false);
         ShowPanel(pausePanel);
+    }
+
+    public void OnQuitButton()
+    {
+        if (quitConfirmPanel != null)
+        {
+            quitConfirmPanel.SetActive(true);
+            return;
+        }
+        DoQuit();
+    }
+
+    public void OnQuitConfirm()
+    {
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
+        DoQuit();
+    }
+
+    public void OnQuitCancel()
+    {
+        if (quitConfirmPanel != null)
+            quitConfirmPanel.SetActive(false);
+    }
+
+    void DoQuit()
+    {
+        GameFlowController.Instance?.ClosePauseMenu();
+        GameFlowController.Instance?.GoToTitle();
     }
 
     // ── 외부에서 강제 닫기 (GameOver/Clear 등에서 호출) ────
@@ -72,7 +110,7 @@ public class PauseMenu : MonoBehaviour
     {
         IsPaused = false;
         HidePanel(pausePanel);
-        HidePanel(optionsPanel);
+        optionsPanelInstance?.gameObject.SetActive(false);
     }
 
     // ── 헬퍼 ──────────────────────────────────────────────

@@ -3,12 +3,18 @@ using UnityEngine;
 
 public class DashGhostEffect : MonoBehaviour
 {
-    [SerializeField] private float ghostInterval = 0.05f;
-    [SerializeField] private float ghostLifetime = 0.25f;
-    [SerializeField] private Color ghostColor = new Color(1f, 1f, 1f, 0.5f);
+    [SerializeField]
+    private float ghostInterval = 0.08f;
+
+    [SerializeField]
+    private float ghostLifetime = 0.15f;
+
+    [SerializeField]
+    private Color ghostColor = new Color(1f, 1f, 1f, 0.4f);
 
     private SpriteRenderer sr;
     private Transform visuals;
+    private Coroutine spawnCoroutine;
 
     void Awake()
     {
@@ -18,12 +24,18 @@ public class DashGhostEffect : MonoBehaviour
 
     public void StartGhost()
     {
-        StartCoroutine(SpawnGhosts());
+        if (spawnCoroutine != null)
+            StopCoroutine(spawnCoroutine);
+        spawnCoroutine = StartCoroutine(SpawnGhosts());
     }
 
     public void StopGhost()
     {
-        StopAllCoroutines();
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+        }
     }
 
     IEnumerator SpawnGhosts()

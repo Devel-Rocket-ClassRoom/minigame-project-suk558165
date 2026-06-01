@@ -17,6 +17,9 @@ public class GameOverUI : MonoBehaviour
     public TextMeshProUGUI damageTakenText;
     public TextMeshProUGUI itemsGainedText;
 
+    [Header("Audio")]
+    public AudioClip gameOverSound;
+
     [Header("Return")]
     public TextMeshProUGUI returnHintText;
     public KeyCode returnKey = KeyCode.X;
@@ -53,6 +56,7 @@ public class GameOverUI : MonoBehaviour
 
     IEnumerator ShowRoutine()
     {
+        AudioManager.Instance?.PlaySFX(gameOverSound);
         PopulateStats();
 
         float elapsed = 0f;

@@ -1056,18 +1056,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-    spawnPoint: {fileID: 5392702044008405833}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 8837592090030214560}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 902043880485308572}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves:
+  - entries:
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 5392702044008405833}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 8837592090030214560}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 902043880485308572}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 5392702044008405833}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1
+  - entries:
+    - prefab: {fileID: 5673119980097987662, guid: f11f116f904c68841a699156638bc453, type: 3}
+      spawnPoint: {fileID: 5392702044008405833}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 5673119980097987662, guid: f11f116f904c68841a699156638bc453, type: 3}
+      spawnPoint: {fileID: 8837592090030214560}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
+      spawnPoint: {fileID: 902043880485308572}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
+      spawnPoint: {fileID: 5392702044008405833}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 2
 --- !u!1 &3077576465851252102
 GameObject:
   m_ObjectHideFlags: 0
@@ -1289,7 +1306,7 @@ Transform:
   m_GameObject: {fileID: 3565458976932079528}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -34.6, y: -7.7, z: 0}
+  m_LocalPosition: {x: -29.8, y: -21.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3825,7 +3842,7 @@ Transform:
   m_GameObject: {fileID: 5039524975963892913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.08, y: -16.47, z: 0}
+  m_LocalPosition: {x: -17.5, y: -17.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3917,7 +3934,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 26
-      m_TileSpriteIndex: 26
+      m_TileSpriteIndex: 28
       m_TileMatrixIndex: 0
       m_TileColorIndex: 1
       m_TileObjectToInstantiateIndex: 65535
@@ -4036,12 +4053,12 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 4
     m_Data: {fileID: 1875275722508176954, guid: 4d1ed94e983bc634eb8fa911dbc99e64, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 4585938659325292825, guid: 4d1ed94e983bc634eb8fa911dbc99e64, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 5
     m_Data:
@@ -6596,7 +6613,7 @@ Transform:
   m_GameObject: {fileID: 6247325581467280296}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.31, y: -12.12, z: 0}
+  m_LocalPosition: {x: -42.6, y: -16.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

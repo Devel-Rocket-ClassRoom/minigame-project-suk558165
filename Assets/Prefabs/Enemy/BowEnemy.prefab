@@ -224,6 +224,7 @@ MonoBehaviour:
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
+  attackSound: {fileID: 8300000, guid: 88c354726166649468c956b6266dadbc, type: 3}
   meleeHitbox: {fileID: 0}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3

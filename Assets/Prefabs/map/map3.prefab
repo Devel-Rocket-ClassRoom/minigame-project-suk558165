@@ -3024,7 +3024,7 @@ Transform:
   m_GameObject: {fileID: 3701842205278987445}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.31, y: -12.12, z: 0}
+  m_LocalPosition: {x: -40.85, y: -12.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6551,18 +6551,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 3147369898384476076, guid: e9ea09ffccc72eb45827e820ae0e4f75, type: 3}
-    spawnPoint: {fileID: 5297680487004687453}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
-    spawnPoint: {fileID: 5026629168030354521}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
-    spawnPoint: {fileID: 2877499036188757312}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves:
+  - entries:
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 5297680487004687453}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 5026629168030354521}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 2877499036188757312}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1
+  - entries:
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 5297680487004687453}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
+      spawnPoint: {fileID: 5026629168030354521}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
+      spawnPoint: {fileID: 2877499036188757312}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 2
 --- !u!1 &8351848940754165467
 GameObject:
   m_ObjectHideFlags: 0
@@ -10147,7 +10158,7 @@ Transform:
   m_GameObject: {fileID: 9118439650520513079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.08, y: -16.47, z: 0}
+  m_LocalPosition: {x: -22.39, y: -15.91, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -19,10 +19,16 @@ public class PlayerCombat : MonoBehaviour
     private AnimationClip meleeIdleClip;
 
     [SerializeField]
+    private AnimationClip meleeWalkClip;
+
+    [SerializeField]
     private AnimationClip rangedAttackClip;
 
     [SerializeField]
     private AnimationClip rangedIdleClip;
+
+    [SerializeField]
+    private AnimationClip rangedWalkClip;
 
     public bool IsAttacking { get; private set; }
 
@@ -30,12 +36,19 @@ public class PlayerCombat : MonoBehaviour
     private const string BowAttackState = "BowAttack";
     private const string SwordOverrideClip = "Player_SwordAttack";
     private const string IdleOverrideClip = "Player_Idle";
+    private const string WalkOverrideClip = "Player_Walk";
 
     private Animator animator;
     private AnimatorOverrideController overrideController;
     private PlayerMovement movement;
     private Inventory inventory;
     private float attackTimer;
+
+    // 원거리 발사 이벤트용 임시 저장
+    private Vector2 pendingRangedDir;
+    private float pendingRangedDamage;
+    private StatBonus pendingRangedBonus;
+    private bool hasPendingRanged;
 
     void Awake()
     {
@@ -89,6 +102,7 @@ public class PlayerCombat : MonoBehaviour
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             animator.Play(SwordAttackState, 0, 0f);
+            AudioManager.Instance?.PlaySFX(currentWeapon.attackSound);
         }
         else if (currentWeapon.weaponType == WeaponType.Ranged && projectilePrefab != null)
         {
@@ -96,7 +110,11 @@ public class PlayerCombat : MonoBehaviour
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             animator.Play(BowAttackState, 0, 0f);
-            ShootInDirection(attackDir, currentWeapon.damage, bonus);
+            // 발사는 BowAttack 애니메이션 이벤트(OnRangedFire)에서 실행
+            pendingRangedDir = attackDir;
+            pendingRangedDamage = currentWeapon.damage;
+            pendingRangedBonus = bonus;
+            hasPendingRanged = true;
         }
     }
 
@@ -146,18 +164,30 @@ public class PlayerCombat : MonoBehaviour
         return new Vector2(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
     }
 
-    // Animation Event에서 호출 — Player_SwordAttack 클립의 히트 프레임에 이벤트 추가
+    // Animation Event — Player_SwordAttack 히트 프레임 (frame 1, time 0.083s)
     public void OnMeleeHit()
     {
         weapon?.OnHitFrame();
     }
 
+    // Animation Event — Player_BowAttack 발사 프레임 (frame 2, time 0.166s)
+    public void OnRangedFire()
+    {
+        if (!hasPendingRanged)
+            return;
+        hasPendingRanged = false;
+        var currentWeapon = weaponInventory?.Current;
+        ShootInDirection(pendingRangedDir, pendingRangedDamage, pendingRangedBonus);
+        AudioManager.Instance?.PlaySFX(currentWeapon?.attackSound);
+    }
+
     void ApplyWeapon(WeaponData data)
     {
-        AnimationClip attackClip =
-            data.weaponType == WeaponType.Ranged ? rangedAttackClip : meleeAttackClip;
-        AnimationClip idleClip =
-            data.weaponType == WeaponType.Ranged ? rangedIdleClip : meleeIdleClip;
+        bool isRanged = data.weaponType == WeaponType.Ranged;
+
+        AnimationClip attackClip = isRanged ? rangedAttackClip : meleeAttackClip;
+        AnimationClip idleClip = isRanged ? rangedIdleClip : meleeIdleClip;
+        AnimationClip walkClip = isRanged ? rangedWalkClip : meleeWalkClip;
 
         if (attackClip != null)
             overrideController[SwordOverrideClip] = attackClip;
@@ -168,6 +198,14 @@ public class PlayerCombat : MonoBehaviour
             var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (stateInfo.IsName("Idle"))
                 animator.Play("Idle", 0, stateInfo.normalizedTime);
+        }
+
+        if (walkClip != null)
+        {
+            overrideController[WalkOverrideClip] = walkClip;
+            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (stateInfo.IsName("Walk"))
+                animator.Play("Walk", 0, stateInfo.normalizedTime);
         }
 
         if (weapon != null)

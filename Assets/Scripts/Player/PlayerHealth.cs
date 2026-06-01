@@ -33,6 +33,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         hp -= finalDamage;
         RunStats.Instance?.AddDamageTaken(finalDamage);
+        ScreenHitEffect.Instance?.Flash();
         if (IsDead)
             RunStats.Instance?.AddDeath();
     }

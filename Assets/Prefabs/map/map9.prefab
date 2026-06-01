@@ -892,7 +892,7 @@ Transform:
   m_GameObject: {fileID: 2451007030697964297}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -34.6, y: -7.7, z: 0}
+  m_LocalPosition: {x: -22.4, y: -20.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6126,7 +6126,7 @@ Transform:
   m_GameObject: {fileID: 6167370900258618812}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.31, y: -12.12, z: 0}
+  m_LocalPosition: {x: -44.7, y: -22.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6272,7 +6272,7 @@ Transform:
   m_GameObject: {fileID: 6920542679680251669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.08, y: -16.47, z: 0}
+  m_LocalPosition: {x: -15.4, y: -21.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6377,18 +6377,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entries:
-  - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-    spawnPoint: {fileID: 6906121320712288638}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 7694905081043982856}
-    activeEnemy: {fileID: 0}
-  - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-    spawnPoint: {fileID: 3419093997862910428}
-    activeEnemy: {fileID: 0}
-  respawnEnabled: 0
-  respawnDelay: 3
+  waves:
+  - entries:
+    - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
+      spawnPoint: {fileID: 6906121320712288638}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
+      spawnPoint: {fileID: 7694905081043982856}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 3419093997862910428}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
+      spawnPoint: {fileID: 6906121320712288638}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 1
+  - entries:
+    - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
+      spawnPoint: {fileID: 6906121320712288638}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
+      spawnPoint: {fileID: 7694905081043982856}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
+      spawnPoint: {fileID: 3419093997862910428}
+      activeEnemy: {fileID: 0}
+    - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
+      spawnPoint: {fileID: 6906121320712288638}
+      activeEnemy: {fileID: 0}
+    delayBeforeSpawn: 2
 --- !u!1 &9078251848724814907
 GameObject:
   m_ObjectHideFlags: 0
