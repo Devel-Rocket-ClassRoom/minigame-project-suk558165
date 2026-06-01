@@ -294,8 +294,10 @@ MonoBehaviour:
   projectileSpeed: 12
   meleeAttackClip: {fileID: 7400000, guid: f62aa5797bd692747be04424a25a113c, type: 2}
   meleeIdleClip: {fileID: 7400000, guid: e2bcb5480c28f9a45b7db7755d6ad7e4, type: 2}
+  meleeWalkClip: {fileID: 7400000, guid: bd4f2e6c98210d147a9b6d876841bcd4, type: 2}
   rangedAttackClip: {fileID: 7400000, guid: 7063265198bda2444b9b7d5068965a88, type: 2}
   rangedIdleClip: {fileID: 7400000, guid: a26597d1dfbc2f84ea31800bcd76e3da, type: 2}
+  rangedWalkClip: {fileID: 7400000, guid: 4aaa472179e265d46b0ee902f0f357b2, type: 2}
 --- !u!114 &757064302359953606
 MonoBehaviour:
   m_ObjectHideFlags: 0

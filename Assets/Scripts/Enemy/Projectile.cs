@@ -61,6 +61,9 @@ public class Projectile : MonoBehaviour
         if (!ready)
             return;
 
+        if (other.isTrigger)
+            return;
+
         if (shooter != null && other.transform.IsChildOf(shooter.transform))
             return;
 
