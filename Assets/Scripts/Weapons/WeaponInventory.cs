@@ -20,7 +20,13 @@ public class WeaponInventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C))
         {
             currentIndex = (currentIndex + 1) % weapons.Count;
-            OnWeaponChanged?.Invoke(Current);
+            NotifyWeaponChanged();
         }
+    }
+
+    /// <summary>현재 활성 무기가 바뀌었음을 구독자에게 알림.</summary>
+    public void NotifyWeaponChanged()
+    {
+        OnWeaponChanged?.Invoke(Current);
     }
 }

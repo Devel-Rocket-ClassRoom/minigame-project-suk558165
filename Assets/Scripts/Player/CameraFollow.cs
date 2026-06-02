@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -54,7 +55,7 @@ public class CameraFollow : MonoBehaviour
         _cam = GetComponent<Camera>();
         ApplyCameraSettings();
 
-        // Cinemachine 등이 Z를 바꿨을 수 있으므로 강제 보정
+        // Z축 강제 보정
         var pos = transform.position;
         pos.z = cameraZ;
         transform.position = pos;
@@ -130,6 +131,51 @@ public class CameraFollow : MonoBehaviour
     {
         if (!useBounds && autoDetectBoundsFromTilemap)
             TryAutoDetectBoundsFromTilemap();
+    }
+
+    /// <summary>월드 좌표로 카메라 위치를 강제 이동. 페이드 전환 시 사용.</summary>
+    public void ForcePosition(Vector3 worldPos)
+    {
+        _velocity = Vector3.zero;
+        transform.position = new Vector3(worldPos.x, worldPos.y, cameraZ);
+    }
+
+    /// <summary>추적 대상 변경. 보스 인트로 줌인 등에서 사용.</summary>
+    public void SetFollowTarget(Transform t)
+    {
+        target = t;
+        _playerMovement = t != null ? t.GetComponent<PlayerMovement>() : null;
+    }
+
+    public float OrthographicSize
+    {
+        get => _cam != null ? _cam.orthographicSize : orthographicSize;
+        set
+        {
+            orthographicSize = value;
+            if (_cam != null)
+                _cam.orthographicSize = value;
+        }
+    }
+
+    /// <summary>OrthographicSize를 from에서 to까지 duration 동안 보간.</summary>
+    public IEnumerator LerpOrthographicSize(float from, float to, float duration)
+    {
+        if (_cam == null)
+        {
+            OrthographicSize = to;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            OrthographicSize = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        OrthographicSize = to;
     }
 
     bool TryAcquireTarget()

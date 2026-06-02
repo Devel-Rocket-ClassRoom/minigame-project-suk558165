@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
 
 public enum RoomType
@@ -41,9 +40,6 @@ public class RoomManager : MonoBehaviour
     private Transform player;
 
     [SerializeField]
-    private CinemachineConfiner2D confiner;
-
-    [SerializeField]
     private GameClearUI gameClearUI;
 
     public int CurrentRoomNumber { get; private set; }
@@ -58,7 +54,6 @@ public class RoomManager : MonoBehaviour
     private List<int> normalRoomOrder;
     private int normalRoomCursor;
     private Portal currentPortal;
-    private CinemachineCamera cinemachineCamera;
 
     private CameraFollow cameraFollow;
 
@@ -75,9 +70,6 @@ public class RoomManager : MonoBehaviour
 
     void Start()
     {
-        cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
-        if (confiner == null && cinemachineCamera != null)
-            confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
         cameraFollow = CameraFollow.Instance;
     }
 
@@ -211,20 +203,9 @@ public class RoomManager : MonoBehaviour
             cameraFollow = CameraFollow.Instance;
 
         if (cameraBounds != null)
-        {
-            if (confiner != null)
-            {
-                confiner.BoundingShape2D = cameraBounds;
-                confiner.InvalidateBoundingShapeCache();
-            }
-
             cameraFollow?.SetBoundsFromPolygon(cameraBounds);
-        }
         else
-        {
-            // 명시적 CameraBounds 없으면 Tilemap에서 자동 감지
             cameraFollow?.RefreshBounds();
-        }
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
 
@@ -336,32 +317,19 @@ public class RoomManager : MonoBehaviour
         if (!isFirst && ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeOut();
 
-        // 2. 카메라 보간을 잠시 끄고
-        float savedDamping = 0f;
-        if (confiner != null)
-        {
-            savedDamping = confiner.Damping;
-            confiner.Damping = 0f;
-        }
-
-        // 3. 새 방 로드 (플레이어 위치도 새 스폰포인트로 이동)
+        // 2. 새 방 로드 (플레이어 위치도 새 스폰포인트로 이동)
         LoadRoom(roomNumber);
 
-        // 4. 플레이어 위치를 함수로 미리 받아서
+        // 3. 플레이어 위치를 함수로 미리 받아서
         Vector3 spawnPos = GetPlayerWorldPosition();
 
-        // 5. 카메라를 그 위치로 즉시 이동
+        // 4. 카메라를 그 위치로 즉시 이동
         SnapCameraTo(spawnPos);
 
-        // 6. Cinemachine/CameraFollow가 새 위치를 반영할 시간 확보 (두 프레임)
-        yield return null;
+        // 5. CameraFollow가 새 위치를 반영할 시간 확보
         yield return null;
 
-        // 7. 카메라 보간 복구
-        if (confiner != null)
-            confiner.Damping = savedDamping;
-
-        // 8. 페이드 인 → 카메라가 새 위치에 자리 잡힌 상태에서 맵이 드러남
+        // 6. 페이드 인 → 카메라가 새 위치에 자리 잡힌 상태에서 맵이 드러남
         if (ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeIn();
     }
@@ -379,12 +347,7 @@ public class RoomManager : MonoBehaviour
     {
         if (cameraFollow == null)
             cameraFollow = CameraFollow.Instance;
+        cameraFollow?.ForcePosition(worldPos);
         cameraFollow?.SnapToTarget();
-
-        if (cinemachineCamera != null)
-        {
-            var pos = new Vector3(worldPos.x, worldPos.y, cinemachineCamera.transform.position.z);
-            cinemachineCamera.ForceCameraPosition(pos, cinemachineCamera.transform.rotation);
-        }
     }
 }

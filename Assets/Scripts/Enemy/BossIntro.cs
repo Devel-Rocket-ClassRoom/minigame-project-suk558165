@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class BossIntro : MonoBehaviour
@@ -28,10 +27,6 @@ public class BossIntro : MonoBehaviour
     [SerializeField]
     private GameObject bossNameUIPrefab;
 
-    private CinemachineCamera cinemachineCamera;
-    private Transform originalFollow;
-    private float originalLensSize;
-
     public void Play(System.Action onComplete)
     {
         StartCoroutine(IntroSequence(onComplete));
@@ -39,20 +34,22 @@ public class BossIntro : MonoBehaviour
 
     IEnumerator IntroSequence(System.Action onComplete)
     {
-        cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
-
+        var cam = CameraFollow.Instance;
         var playerController = PlayerRef.Controller;
 
         if (playerController != null)
             playerController.InputLocked = true;
 
-        if (cinemachineCamera != null)
-        {
-            originalFollow = cinemachineCamera.Follow;
-            originalLensSize = cinemachineCamera.Lens.OrthographicSize;
+        Transform originalTarget = null;
+        float originalLensSize = 0f;
 
-            cinemachineCamera.Follow = transform;
-            yield return LerpLensSize(originalLensSize, zoomOutSize, zoomDuration);
+        if (cam != null)
+        {
+            originalTarget = cam.target;
+            originalLensSize = cam.OrthographicSize;
+
+            cam.SetFollowTarget(transform);
+            yield return cam.LerpOrthographicSize(originalLensSize, zoomOutSize, zoomDuration);
         }
 
         if (bossNameUIPrefab != null)
@@ -64,28 +61,15 @@ public class BossIntro : MonoBehaviour
             yield return new WaitForSeconds(nameDisplayDuration);
         }
 
-        if (cinemachineCamera != null)
+        if (cam != null)
         {
-            cinemachineCamera.Follow = originalFollow;
-            yield return LerpLensSize(zoomOutSize, originalLensSize, zoomDuration);
+            cam.SetFollowTarget(originalTarget);
+            yield return cam.LerpOrthographicSize(zoomOutSize, originalLensSize, zoomDuration);
         }
 
         if (playerController != null)
             playerController.InputLocked = false;
 
         onComplete?.Invoke();
-    }
-
-    IEnumerator LerpLensSize(float from, float to, float duration)
-    {
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
-            cinemachineCamera.Lens.OrthographicSize = Mathf.Lerp(from, to, t);
-            yield return null;
-        }
-        cinemachineCamera.Lens.OrthographicSize = to;
     }
 }

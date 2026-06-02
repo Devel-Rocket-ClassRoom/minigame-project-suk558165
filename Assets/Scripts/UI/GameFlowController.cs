@@ -1,4 +1,3 @@
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -35,9 +34,6 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private RoomManager roomManager;
 
-    [SerializeField]
-    private CinemachineCamera cinemachineCamera;
-
     private GameObject titleInstance;
     private GameObject villageInstance;
     private GameObject playerInstance;
@@ -69,8 +65,6 @@ public class GameFlowController : MonoBehaviour
 
     void Start()
     {
-        if (cinemachineCamera == null)
-            cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
         GoToTitle();
     }
 
@@ -212,8 +206,8 @@ public class GameFlowController : MonoBehaviour
     {
         playerInstance = Instantiate(playerPrefab);
 
-        if (cinemachineCamera != null)
-            cinemachineCamera.Follow = playerInstance.transform;
+        if (CameraFollow.Instance != null)
+            CameraFollow.Instance.SetFollowTarget(playerInstance.transform);
 
         roomManager.SetPlayer(playerInstance.transform);
     }
@@ -251,45 +245,7 @@ public class GameFlowController : MonoBehaviour
     void GoToTutorial()
     {
         tutorialInstance = Instantiate(tutorialRoomPrefab);
-
-        var spawn = tutorialInstance.GetComponentInChildren<PlayerSpawnPoint>();
-        if (spawn != null)
-        {
-            playerInstance.transform.position = spawn.transform.position;
-            var rb = playerInstance.GetComponent<Rigidbody2D>();
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
-        }
-
-        var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
-        float savedDamping = 0f;
-        if (confiner != null)
-        {
-            savedDamping = confiner.Damping;
-            confiner.Damping = 0f;
-
-            var bounds = tutorialInstance
-                .transform.Find("CameraBounds")
-                ?.GetComponent<PolygonCollider2D>();
-            if (bounds != null)
-            {
-                confiner.BoundingShape2D = bounds;
-                confiner.InvalidateBoundingShapeCache();
-            }
-        }
-
-        if (cinemachineCamera != null && playerInstance != null)
-        {
-            var targetPos = new Vector3(
-                playerInstance.transform.position.x,
-                playerInstance.transform.position.y,
-                cinemachineCamera.transform.position.z
-            );
-            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
-        }
-
-        if (confiner != null)
-            confiner.Damping = savedDamping;
+        SetupSceneCamera(tutorialInstance);
 
         ScreenFader.Instance?.FadeIn();
 
@@ -306,6 +262,37 @@ public class GameFlowController : MonoBehaviour
         }
     }
 
+    /// <summary>방 인스턴스에서 스폰포인트와 카메라 바운드를 찾아 플레이어/카메라를 배치한다.</summary>
+    void SetupSceneCamera(GameObject sceneInstance)
+    {
+        var spawn = sceneInstance.GetComponentInChildren<PlayerSpawnPoint>();
+        if (spawn != null && playerInstance != null)
+        {
+            playerInstance.transform.position = spawn.transform.position;
+            var rb = playerInstance.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+        }
+
+        var cam = CameraFollow.Instance;
+        if (cam == null)
+            return;
+
+        var bounds = sceneInstance
+            .transform.Find("CameraBounds")
+            ?.GetComponent<PolygonCollider2D>();
+        if (bounds != null)
+            cam.SetBoundsFromPolygon(bounds);
+        else
+            cam.RefreshBounds();
+
+        if (playerInstance != null)
+        {
+            cam.ForcePosition(playerInstance.transform.position);
+            cam.SnapToTarget();
+        }
+    }
+
     void GoToVillage()
     {
         if (SaveManager.Instance != null)
@@ -315,45 +302,7 @@ public class GameFlowController : MonoBehaviour
         }
 
         villageInstance = Instantiate(villagePrefab);
-
-        var spawn = villageInstance.GetComponentInChildren<PlayerSpawnPoint>();
-        if (spawn != null)
-        {
-            playerInstance.transform.position = spawn.transform.position;
-            var rb = playerInstance.GetComponent<Rigidbody2D>();
-            if (rb != null)
-                rb.linearVelocity = Vector2.zero;
-        }
-
-        var confiner = cinemachineCamera?.GetComponent<CinemachineConfiner2D>();
-        float savedDamping = 0f;
-        if (confiner != null)
-        {
-            savedDamping = confiner.Damping;
-            confiner.Damping = 0f;
-
-            var bounds = villageInstance
-                .transform.Find("CameraBounds")
-                ?.GetComponent<PolygonCollider2D>();
-            if (bounds != null)
-            {
-                confiner.BoundingShape2D = bounds;
-                confiner.InvalidateBoundingShapeCache();
-            }
-        }
-
-        if (cinemachineCamera != null && playerInstance != null)
-        {
-            var targetPos = new Vector3(
-                playerInstance.transform.position.x,
-                playerInstance.transform.position.y,
-                cinemachineCamera.transform.position.z
-            );
-            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
-        }
-
-        if (confiner != null)
-            confiner.Damping = savedDamping;
+        SetupSceneCamera(villageInstance);
     }
 
     public void ReturnToVillage()
