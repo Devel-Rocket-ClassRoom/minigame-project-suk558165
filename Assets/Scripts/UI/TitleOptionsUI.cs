@@ -54,11 +54,6 @@ public class TitleOptionsUI : MonoBehaviour
         interactKeyDisplay = CreateKeyDisplay(interactKeyText);
     }
 
-    void Start()
-    {
-        gameObject.SetActive(false);
-    }
-
     void OnEnable()
     {
         if (masterSlider != null)

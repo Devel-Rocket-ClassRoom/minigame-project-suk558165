@@ -8,6 +8,7 @@ public class TutorialManager : MonoBehaviour
     {
         [Tooltip("화면에 표시할 안내 텍스트")]
         public string message;
+
         [Tooltip("이 입력이 감지되면 통과 (None이면 아무 키)")]
         public TutorialInput requiredInput;
     }
@@ -20,13 +21,18 @@ public class TutorialManager : MonoBehaviour
         Attack,
     }
 
-    [SerializeField] private Step[] steps;
-    [SerializeField] private TutorialStepUI stepUI;
+    [SerializeField]
+    private Step[] steps;
+
+    [SerializeField]
+    private TutorialStepUI stepUI;
 
     public System.Action onTutorialComplete;
 
     public void Begin()
     {
+        if (stepUI == null)
+            stepUI = FindAnyObjectByType<TutorialStepUI>();
         StartCoroutine(RunSteps());
     }
 
@@ -35,9 +41,9 @@ public class TutorialManager : MonoBehaviour
         foreach (var step in steps)
         {
             if (stepUI != null)
-                stepUI.Show(step.message);
+                stepUI.Show($"{step.message}  0 / 5");
 
-            yield return WaitForInput(step.requiredInput);
+            yield return WaitForInput(step.requiredInput, step.message);
 
             if (stepUI != null)
                 yield return stepUI.Hide();
@@ -49,13 +55,29 @@ public class TutorialManager : MonoBehaviour
             SaveManager.Instance.Save();
         }
 
+        if (stepUI != null)
+        {
+            stepUI.Show("튜토리얼이 완료되었습니다\n3초 뒤에 이동합니다");
+            yield return new WaitForSeconds(3f);
+            yield return stepUI.Hide();
+        }
+
         onTutorialComplete?.Invoke();
     }
 
-    IEnumerator WaitForInput(TutorialInput input)
+    IEnumerator WaitForInput(TutorialInput input, string baseMessage)
     {
-        while (!CheckInput(input))
+        int count = 0;
+        while (count < 5)
+        {
             yield return null;
+            if (CheckInput(input))
+            {
+                count++;
+                if (stepUI != null)
+                    stepUI.UpdateText($"{baseMessage}  {count} / 5");
+            }
+        }
     }
 
     bool CheckInput(TutorialInput input)
@@ -63,7 +85,7 @@ public class TutorialManager : MonoBehaviour
         switch (input)
         {
             case TutorialInput.MoveLeftRight:
-                return Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow);
+                return Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
             case TutorialInput.Jump:
                 return Input.GetButtonDown("Jump");
             case TutorialInput.Dash:

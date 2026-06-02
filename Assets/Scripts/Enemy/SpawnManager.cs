@@ -8,10 +8,13 @@ public class SpawnManager : MonoBehaviour
     public class SpawnGroup
     {
         public GameObject prefab;
+
         [Tooltip("이 그룹이 사용할 스폰포인트 (spawnPoints 배열의 인덱스)")]
         public int spawnPointIndex;
+
         [Tooltip("이 포인트에서 스폰할 마릿수")]
         public int count = 1;
+
         [Tooltip("여러 마리일 때 스폰 간격")]
         public float interval = 0.5f;
     }
@@ -20,22 +23,35 @@ public class SpawnManager : MonoBehaviour
     public class Wave
     {
         public List<SpawnGroup> groups = new List<SpawnGroup>();
+
         [Tooltip("이 웨이브 스폰 전 대기 시간")]
         public float delayBeforeSpawn = 1f;
-        [Tooltip("비어있으면 전멸 시 바로 다음 웨이브. 지정하면 전멸 후 이 존에 진입해야 다음 웨이브")]
+
+        [Tooltip(
+            "비어있으면 전멸 시 바로 다음 웨이브. 지정하면 전멸 후 이 존에 진입해야 다음 웨이브"
+        )]
         public Collider2D triggerZone;
     }
 
     [Header("스폰 포인트 (좌끝, 좌중간, 중앙, 우중간, 우끝 등)")]
-    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField]
+    private Transform[] spawnPoints;
 
     [Header("스폰 이펙트")]
-    [SerializeField] private GameObject spawnEffectPrefab;
+    [SerializeField]
+    private GameObject spawnEffectPrefab;
+
     [Tooltip("이펙트 재생 후 몬스터가 나타나기까지 대기 시간")]
-    [SerializeField] private float spawnEffectDelay = 0.5f;
+    [SerializeField]
+    private float spawnEffectDelay = 0.5f;
+
+    [Tooltip("이펙트 생성 Y 오프셋 (음수 = 아래)")]
+    [SerializeField]
+    private float spawnEffectYOffset = -0.5f;
 
     [Header("웨이브 설정")]
-    [SerializeField] private List<Wave> waves = new List<Wave>();
+    [SerializeField]
+    private List<Wave> waves = new List<Wave>();
 
     public System.Action onAllEnemiesDead;
 
@@ -74,10 +90,10 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(wave.delayBeforeSpawn);
 
         foreach (var group in wave.groups)
-            StartCoroutine(SpawnGroup(group));
+            StartCoroutine(SpawnGroupItems(group));
     }
 
-    IEnumerator SpawnGroup(SpawnGroup group)
+    IEnumerator SpawnGroupItems(SpawnGroup group)
     {
         if (group.prefab == null)
             yield break;
@@ -100,7 +116,8 @@ public class SpawnManager : MonoBehaviour
     {
         if (spawnEffectPrefab != null)
         {
-            var fx = Instantiate(spawnEffectPrefab, position, Quaternion.identity);
+            var fxPos = position + new Vector3(0f, spawnEffectYOffset, 0f);
+            var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
             Destroy(fx, 3f);
             if (spawnEffectDelay > 0f)
                 yield return new WaitForSeconds(spawnEffectDelay);
@@ -118,7 +135,14 @@ public class SpawnManager : MonoBehaviour
 
         var boss = go.GetComponent<BossController>();
         if (boss != null)
+        {
             boss.onDeath += OnEnemyDied;
+            yield break;
+        }
+
+        var miniBoss = go.GetComponent<MiniBossController>();
+        if (miniBoss != null)
+            miniBoss.onDeath += OnEnemyDied;
     }
 
     void OnEnemyDied()

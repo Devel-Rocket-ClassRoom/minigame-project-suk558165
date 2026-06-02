@@ -31,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     public int maxDashCharges = 2;
 
     public bool IsGrounded { get; private set; }
+    public bool IsOnPlatform { get; private set; }
     public bool IsDashing { get; private set; }
     public float MoveInput { get; private set; }
     public Transform Visuals { get; private set; }
@@ -148,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
 
         bool pressingDown = Input.GetKey(KeyCode.DownArrow);
 
-        if (pressingDown && IsGrounded)
+        if (pressingDown && IsOnPlatform)
         {
             StartCoroutine(DropDown());
             return;
@@ -267,10 +268,9 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
-        // 상승 중이거나 아랫점프 중이면 이 콜라이더에서만 플랫폼 충돌 제외
-        bool ignorePlatform = isDropping || rb.linearVelocity.y > 0.5f;
+        // 점프 상승 중엔 플랫폼 충돌 제외 (아랫점프는 DropDown에서 콜라이더를 직접 끔)
         if (mainCollider != null)
-            mainCollider.excludeLayers = ignorePlatform ? platformLayer : (LayerMask)0;
+            mainCollider.excludeLayers = rb.linearVelocity.y > 0.5f ? platformLayer : (LayerMask)0;
 
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
@@ -281,6 +281,12 @@ public class PlayerMovement : MonoBehaviour
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
+
+        // 속도 조건 없이 순수 overlap — groundLayer·platformLayer 모두 체크해 아랫점프 입력 수신에 사용
+        IsOnPlatform =
+            Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
     }
 
     IEnumerator DropDown()
@@ -288,19 +294,20 @@ public class PlayerMovement : MonoBehaviour
         if (isDropping)
             yield break;
 
+        // 발 아래 platformLayer 콜라이더 찾기
+        Collider2D platformCol = Physics2D.OverlapCircle(groundCheck.position, 0.5f, platformLayer);
+        if (platformCol == null)
+            yield break;
+
         isDropping = true;
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -8f);
+        platformCol.enabled = false;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -10f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        isDropping = false;
-    }
+        if (platformCol != null)
+            platformCol.enabled = true;
 
-    static int LayerMaskToIndex(LayerMask mask)
-    {
-        for (int i = 0; i < 32; i++)
-            if ((mask.value & (1 << i)) != 0)
-                return i;
-        return -1;
+        isDropping = false;
     }
 }

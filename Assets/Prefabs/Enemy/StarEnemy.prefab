@@ -236,7 +236,7 @@ MonoBehaviour:
   platformLayer:
     serializedVersion: 2
     m_Bits: 512
-  attackDamageDelay: 0.4
+  attackDamageDelay: 0.65
 --- !u!1 &8995280196249140786
 GameObject:
   m_ObjectHideFlags: 0

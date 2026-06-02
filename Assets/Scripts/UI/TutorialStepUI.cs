@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class TutorialStepUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI messageText;
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private float fadeDuration = 0.3f;
+    [SerializeField]
+    private TextMeshProUGUI messageText;
+
+    [SerializeField]
+    private CanvasGroup canvasGroup;
+
+    [SerializeField]
+    private float fadeDuration = 0.3f;
 
     void Awake()
     {
@@ -21,6 +26,12 @@ public class TutorialStepUI : MonoBehaviour
 
         StopAllCoroutines();
         StartCoroutine(Fade(0f, 1f));
+    }
+
+    public void UpdateText(string message)
+    {
+        if (messageText != null)
+            messageText.text = message;
     }
 
     public Coroutine Hide()

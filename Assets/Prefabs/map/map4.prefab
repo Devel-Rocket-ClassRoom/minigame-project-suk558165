@@ -8772,7 +8772,7 @@ Transform:
   m_GameObject: {fileID: 3455268731041022773}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -50, y: -12.4, z: 0}
+  m_LocalPosition: {x: -49.4, y: -7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8828,6 +8828,7 @@ Transform:
   - {fileID: 1504464229841346579}
   - {fileID: 7501911989023241751}
   - {fileID: 4050729996939257510}
+  - {fileID: 8892724624926849687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!156049354 &6916051756511399828
@@ -8842,6 +8843,84 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!1 &4502419685604890423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8892724624926849687}
+  - component: {fileID: 2508286242790084429}
+  m_Layer: 0
+  m_Name: Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8892724624926849687
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4502419685604890423}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -18.4, y: -22.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2016139110470980385}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &2508286242790084429
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4502419685604890423}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 1.6039166, y: -0.20048904}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 6.079068, y: 5.0097923}
+  m_EdgeRadius: 0
 --- !u!1 &4593616781526751215
 GameObject:
   m_ObjectHideFlags: 0
@@ -8967,32 +9046,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints:
+  - {fileID: 4903511069533582137}
+  - {fileID: 8330973110544440093}
+  - {fileID: 3200932276095596349}
+  spawnEffectPrefab: {fileID: 4005435086369086175, guid: ccb1995c047a4ef44843c60e0820146a, type: 3}
+  spawnEffectDelay: 1
+  spawnEffectYOffset: -0.5
   waves:
-  - entries:
+  - groups:
     - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
-      spawnPoint: {fileID: 8330973110544440093}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 1
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
-      spawnPoint: {fileID: 4903511069533582137}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 1
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-      spawnPoint: {fileID: 3200932276095596349}
-      activeEnemy: {fileID: 0}
-    - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-      spawnPoint: {fileID: 8330973110544440093}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 0
+      count: 2
+      interval: 0.5
     delayBeforeSpawn: 1
-  - entries:
+    triggerZone: {fileID: 0}
+  - groups:
     - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
-      spawnPoint: {fileID: 8330973110544440093}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 2
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
-      spawnPoint: {fileID: 4903511069533582137}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 2
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-      spawnPoint: {fileID: 3200932276095596349}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 2
+      count: 2
+      interval: 0.5
     delayBeforeSpawn: 2
+    triggerZone: {fileID: 2508286242790084429}
 --- !u!1 &5673144623520710028
 GameObject:
   m_ObjectHideFlags: 0
@@ -13685,7 +13776,7 @@ Transform:
   m_GameObject: {fileID: 6454438977501903900}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -26.5, y: -13.3, z: 0}
+  m_LocalPosition: {x: -29.53, y: -25.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13716,7 +13807,7 @@ Transform:
   m_GameObject: {fileID: 6660766912042081144}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -34.17, y: -13.39, z: 0}
+  m_LocalPosition: {x: -28.1, y: -7.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13747,7 +13838,7 @@ Transform:
   m_GameObject: {fileID: 9175685068796067079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -38.2, y: -13.4, z: 0}
+  m_LocalPosition: {x: -34.2, y: -7.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

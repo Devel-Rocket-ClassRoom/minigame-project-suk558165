@@ -358,38 +358,7 @@ Transform:
   m_GameObject: {fileID: 4052507937772518662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -32.74, y: -9.19, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 9051518590846871933}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4366452014888425558
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8681790195392641493}
-  m_Layer: 0
-  m_Name: SpawnPoint_Left
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8681790195392641493
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4366452014888425558}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -42.31, y: -12.12, z: 0}
+  m_LocalPosition: {x: 276.85, y: 99.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2449,9 +2418,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8681790195392641493}
   - {fileID: 4029621844330895054}
-  - {fileID: 3148079163398800335}
   m_Father: {fileID: 1316508787331712125}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &516894330480362864
@@ -2466,23 +2433,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints:
+  - {fileID: 4029621844330895054}
+  spawnEffectPrefab: {fileID: 0}
+  spawnEffectDelay: 1
+  spawnEffectYOffset: -0.5
   waves:
-  - entries:
-    - prefab: {fileID: 9100000, guid: f11f116f904c68841a699156638bc453, type: 3}
-      spawnPoint: {fileID: 8681790195392641493}
-      activeEnemy: {fileID: 0}
-    - prefab: {fileID: 9100000, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
-      spawnPoint: {fileID: 4029621844330895054}
-      activeEnemy: {fileID: 0}
-    delayBeforeSpawn: 1.0
-  - entries:
-    - prefab: {fileID: 9100000, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
-      spawnPoint: {fileID: 3148079163398800335}
-      activeEnemy: {fileID: 0}
-    - prefab: {fileID: 9100000, guid: f11f116f904c68841a699156638bc453, type: 3}
-      spawnPoint: {fileID: 8681790195392641493}
-      activeEnemy: {fileID: 0}
-    delayBeforeSpawn: 4.0
+  - groups:
+    - prefab: {fileID: 6703836035709968910, guid: 639ffe939eb787f4d8c532373c5c424f, type: 3}
+      spawnPointIndex: 0
+      count: 1
+      interval: 1
+    delayBeforeSpawn: 0
+    triggerZone: {fileID: 0}
 --- !u!1 &5182288010703023697
 GameObject:
   m_ObjectHideFlags: 0
@@ -4457,37 +4420,6 @@ Transform:
   - {fileID: 7415267243806295527}
   - {fileID: 1654253303421138552}
   m_Father: {fileID: 1316508787331712125}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &7035414682881415391
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3148079163398800335}
-  m_Layer: 0
-  m_Name: SpawnPoint_Right
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3148079163398800335
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7035414682881415391}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -25.21, y: -13.05, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 9051518590846871933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7275584546996790748
 GameObject:

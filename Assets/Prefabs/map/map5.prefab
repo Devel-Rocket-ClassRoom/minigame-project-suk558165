@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 50522295609157978}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -34.6, y: -20.5, z: 0}
+  m_LocalPosition: {x: -31.21, y: -21.87, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7163,7 +7163,7 @@ Transform:
   m_GameObject: {fileID: 8593226990434423079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -38.7, y: -19, z: 0}
+  m_LocalPosition: {x: -39.27, y: -21.97, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7216,35 +7216,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfda11974fd76a41ad63e20059c9cfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints:
+  - {fileID: 8714340623538111283}
+  - {fileID: 5883466823746985488}
+  - {fileID: 5339312000942866130}
+  spawnEffectPrefab: {fileID: 4005435086369086175, guid: ccb1995c047a4ef44843c60e0820146a, type: 3}
+  spawnEffectDelay: 1
+  spawnEffectYOffset: -0.5
   waves:
-  - entries:
+  - groups:
     - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
-      spawnPoint: {fileID: 5883466823746985488}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 1
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
-      spawnPoint: {fileID: 8714340623538111283}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 2
+      count: 1
+      interval: 0.5
     - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-      spawnPoint: {fileID: 5339312000942866130}
-      activeEnemy: {fileID: 0}
-    - prefab: {fileID: 260632567562801992, guid: abb9608fc1ef1d54d86abb50d8a69ce4, type: 3}
-      spawnPoint: {fileID: 5883466823746985488}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 0
+      count: 2
+      interval: 0.5
     delayBeforeSpawn: 1
-  - entries:
+    triggerZone: {fileID: 0}
+  - groups:
     - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
-      spawnPoint: {fileID: 5883466823746985488}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 0
+      count: 2
+      interval: 0.4
     - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
-      spawnPoint: {fileID: 8714340623538111283}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 1
+      count: 1
+      interval: 0.4
     - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-      spawnPoint: {fileID: 5339312000942866130}
-      activeEnemy: {fileID: 0}
-    - prefab: {fileID: 2024677788965600820, guid: e222791b57b3c4d4483e46d7e0c6fc5c, type: 3}
-      spawnPoint: {fileID: 5883466823746985488}
-      activeEnemy: {fileID: 0}
+      spawnPointIndex: 2
+      count: 2
+      interval: 0.5
     delayBeforeSpawn: 2
+    triggerZone: {fileID: 0}
 --- !u!1 &8801190709634579301
 GameObject:
   m_ObjectHideFlags: 0
@@ -7374,7 +7383,7 @@ Transform:
   m_GameObject: {fileID: 9149343206608406039}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -31.8, y: -20.3, z: 0}
+  m_LocalPosition: {x: -21.19, y: -17.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

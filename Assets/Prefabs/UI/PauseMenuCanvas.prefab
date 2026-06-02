@@ -818,8 +818,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2063,6 +2063,7 @@ MonoBehaviour:
   masterVolumeSlider: {fileID: 3208559137080008321}
   bgmVolumeSlider: {fileID: 2424431078817447553}
   sfxVolumeSlider: {fileID: 9122823373327089788}
+  languageDropdown: {fileID: 0}
 --- !u!1 &3900000000000000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -3617,7 +3618,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 106.83}
+  m_SizeDelta: {x: 0, y: 96.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1995163256308746824
 CanvasRenderer:
@@ -3890,7 +3891,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 106.83}
+  m_SizeDelta: {x: 0, y: 96.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1343424653939274461
 CanvasRenderer:
@@ -4401,7 +4402,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 106.83}
+  m_SizeDelta: {x: 0, y: 96.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &571192531229838181
 CanvasRenderer:

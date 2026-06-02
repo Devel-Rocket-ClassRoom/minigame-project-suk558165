@@ -30,6 +30,7 @@ public class TitleUI : MonoBehaviour
         {
             var instance = Instantiate(optionsPanel, transform.root);
             instance.name = "TitleOptionsPanel";
+            instance.SetActive(false);
             optionsPanel = instance;
         }
 

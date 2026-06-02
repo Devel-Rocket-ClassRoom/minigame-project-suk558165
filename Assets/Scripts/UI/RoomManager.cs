@@ -191,6 +191,9 @@ public class RoomManager : MonoBehaviour
                 ? boundsObj.GetComponent<PolygonCollider2D>()
                 : currentRoom.GetComponentInChildren<PolygonCollider2D>();
 
+        if (cameraFollow == null)
+            cameraFollow = FindAnyObjectByType<CameraFollow>();
+
         if (cameraBounds != null)
         {
             if (confiner != null)
@@ -199,9 +202,12 @@ public class RoomManager : MonoBehaviour
                 confiner.InvalidateBoundingShapeCache();
             }
 
-            if (cameraFollow == null)
-                cameraFollow = FindAnyObjectByType<CameraFollow>();
             cameraFollow?.SetBoundsFromPolygon(cameraBounds);
+        }
+        else
+        {
+            // 명시적 CameraBounds 없으면 Tilemap에서 자동 감지
+            cameraFollow?.RefreshBounds();
         }
 
         // 카메라를 플레이어 위치로 즉시 스냅 (부드러운 추적 시작 전 초기 위치 보정)

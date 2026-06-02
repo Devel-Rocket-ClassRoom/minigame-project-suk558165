@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class CameraFollow : MonoBehaviour
 {
@@ -10,14 +11,14 @@ public class CameraFollow : MonoBehaviour
 
     [Header("Offset")]
     [Tooltip("카메라가 플레이어보다 오른쪽으로 얼마나 앞서는지 (플레이어를 화면 왼쪽에 배치)")]
-    public float horizontalOffset = 4f;
+    public float horizontalOffset = 0f;
 
     [Tooltip("카메라가 플레이어보다 위로 얼마나 높은지 (플레이어를 화면 하단부에 배치)")]
-    public float verticalOffset = 1.8f;
+    public float verticalOffset = 0f;
 
     [Header("Lookahead")]
     [Tooltip("이동 방향으로 추가로 앞을 보는 거리")]
-    public float lookAheadDistance = 2f;
+    public float lookAheadDistance = 0f;
 
     [Tooltip("룩어헤드 전환 속도")]
     public float lookAheadSpeed = 3f;
@@ -28,6 +29,9 @@ public class CameraFollow : MonoBehaviour
 
     [Header("Bounds (선택)")]
     public bool useBounds = false;
+
+    [Tooltip("바운드 미설정 시 씬의 Tilemap에서 자동 감지")]
+    public bool autoDetectBoundsFromTilemap = true;
     public float minX = -100f;
     public float maxX = 100f;
     public float minY = -100f;
@@ -45,7 +49,7 @@ public class CameraFollow : MonoBehaviour
             return;
         _velocity = Vector3.zero;
         _currentLookAhead = _lastFacingDir * lookAheadDistance;
-        transform.position = CalculateTargetPosition();
+        transform.position = ClampToBounds(CalculateTargetPosition());
     }
 
     public void SetBoundsFromPolygon(PolygonCollider2D boundsCollider)
@@ -89,13 +93,62 @@ public class CameraFollow : MonoBehaviour
         if (target != null)
             _playerMovement = target.GetComponent<PlayerMovement>();
 
+        if (!useBounds && autoDetectBoundsFromTilemap)
+            TryAutoDetectBoundsFromTilemap();
+
         // 시작 위치를 즉시 설정 (튀는 현상 방지)
         if (target != null)
         {
             float facingDir = GetFacingDirection();
             _currentLookAhead = facingDir * lookAheadDistance;
-            transform.position = CalculateTargetPosition();
+            transform.position = ClampToBounds(CalculateTargetPosition());
         }
+    }
+
+    public void RefreshBounds()
+    {
+        if (!useBounds && autoDetectBoundsFromTilemap)
+            TryAutoDetectBoundsFromTilemap();
+    }
+
+    void TryAutoDetectBoundsFromTilemap()
+    {
+        var tilemaps = FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
+        if (tilemaps.Length == 0)
+            return;
+
+        bool first = true;
+        Bounds combined = default;
+        foreach (var tm in tilemaps)
+        {
+            tm.CompressBounds();
+            var b = tm.localBounds;
+            if (b.size == Vector3.zero)
+                continue;
+            // 로컬 → 월드 변환
+            var worldMin = tm.transform.TransformPoint(b.min);
+            var worldMax = tm.transform.TransformPoint(b.max);
+            if (first)
+            {
+                combined = new Bounds();
+                combined.SetMinMax(worldMin, worldMax);
+                first = false;
+            }
+            else
+            {
+                combined.Encapsulate(worldMin);
+                combined.Encapsulate(worldMax);
+            }
+        }
+
+        if (first)
+            return;
+
+        minX = combined.min.x;
+        maxX = combined.max.x;
+        minY = combined.min.y;
+        maxY = combined.max.y;
+        useBounds = true;
     }
 
     void LateUpdate()
@@ -124,15 +177,7 @@ public class CameraFollow : MonoBehaviour
             Time.deltaTime * lookAheadSpeed
         );
 
-        Vector3 targetPos = CalculateTargetPosition();
-
-        if (useBounds)
-        {
-            float halfH = _cam != null ? _cam.orthographicSize : orthographicSize;
-            float halfW = halfH * (_cam != null ? _cam.aspect : 16f / 9f);
-            targetPos.x = Mathf.Clamp(targetPos.x, minX + halfW, maxX - halfW);
-            targetPos.y = Mathf.Clamp(targetPos.y, minY + halfH, maxY - halfH);
-        }
+        Vector3 targetPos = ClampToBounds(CalculateTargetPosition());
 
         transform.position = Vector3.SmoothDamp(
             transform.position,
@@ -140,6 +185,17 @@ public class CameraFollow : MonoBehaviour
             ref _velocity,
             smoothTime
         );
+    }
+
+    Vector3 ClampToBounds(Vector3 pos)
+    {
+        if (!useBounds)
+            return pos;
+        float halfH = _cam != null ? _cam.orthographicSize : orthographicSize;
+        float halfW = halfH * (_cam != null ? _cam.aspect : 16f / 9f);
+        pos.x = Mathf.Clamp(pos.x, minX + halfW, maxX - halfW);
+        pos.y = Mathf.Clamp(pos.y, minY + halfH, maxY - halfH);
+        return pos;
     }
 
     Vector3 CalculateTargetPosition()
