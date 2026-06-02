@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
         // F1 : 현재 방 즉시 클리어 → 다음 방으로 이동
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            var rm = FindAnyObjectByType<RoomManager>();
+            var rm = RoomManager.Instance;
             if (rm != null && rm.CurrentRoomNumber > 0)
             {
                 var enemies = FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
@@ -23,5 +23,4 @@ public class GameManager : MonoBehaviour
         }
 #endif
     }
-
 }

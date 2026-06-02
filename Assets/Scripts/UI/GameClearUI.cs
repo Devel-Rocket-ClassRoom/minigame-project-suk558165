@@ -24,7 +24,22 @@ public class GameClearUI : MonoBehaviour
     private bool triggered;
     private bool canReturn;
 
-    void Awake() => Hide();
+    public static GameClearUI Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
+    void Awake()
+    {
+        Instance = this;
+        Hide();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 
     public void Show()
     {

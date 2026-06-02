@@ -11,7 +11,7 @@ public class GoldDisplay : MonoBehaviour
     void Update()
     {
         if (inventory == null)
-            inventory = FindFirstObjectByType<Inventory>();
+            inventory = Inventory.Instance;
 
         if (inventory == null || goldText == null)
             return;

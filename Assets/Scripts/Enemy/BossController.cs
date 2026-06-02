@@ -7,55 +7,103 @@ using UnityEngine;
 public class BossController : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
-    [SerializeField] private float maxHp = 500f;
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float damage = 20f;
+    [SerializeField]
+    private float maxHp = 500f;
+
+    [SerializeField]
+    private float moveSpeed = 3f;
+
+    [SerializeField]
+    private float damage = 20f;
 
     [Header("Phase 2")]
     [Tooltip("HP 비율이 이 값 이하가 되면 Phase 2 진입")]
-    [SerializeField] private float phase2Threshold = 0.5f;
+    [SerializeField]
+    private float phase2Threshold = 0.5f;
+
     [Tooltip("Phase 2에서 패턴 간 쿨타임 배율 (1보다 작으면 빨라짐)")]
-    [SerializeField] private float phase2CooldownMult = 0.7f;
+    [SerializeField]
+    private float phase2CooldownMult = 0.7f;
 
     [Header("돌진 패턴")]
-    [SerializeField] private float chargeSpeed = 12f;
-    [SerializeField] private float chargeDuration = 0.5f;
-    [SerializeField] private float chargeStunDuration = 1f;
+    [SerializeField]
+    private float chargeSpeed = 12f;
+
+    [SerializeField]
+    private float chargeDuration = 0.5f;
+
+    [SerializeField]
+    private float chargeStunDuration = 1f;
 
     [Header("내려찍기 패턴")]
-    [SerializeField] private float slamJumpForce = 15f;
-    [SerializeField] private float slamFallSpeed = 20f;
-    [SerializeField] private float slamRadius = 3f;
-    [SerializeField] private GameObject slamWarningPrefab;
+    [SerializeField]
+    private float slamJumpForce = 15f;
+
+    [SerializeField]
+    private float slamFallSpeed = 20f;
+
+    [SerializeField]
+    private float slamRadius = 3f;
+
+    [SerializeField]
+    private GameObject slamWarningPrefab;
 
     [Header("투사체 패턴")]
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private int projectileCount = 3;
-    [SerializeField] private float projectileSpeed = 8f;
-    [SerializeField] private float projectileSpread = 30f;
+    [SerializeField]
+    private GameObject projectilePrefab;
+
+    [SerializeField]
+    private int projectileCount = 3;
+
+    [SerializeField]
+    private float projectileSpeed = 8f;
+
+    [SerializeField]
+    private float projectileSpread = 30f;
 
     [Header("연속 베기 패턴")]
-    [SerializeField] private int comboHitCount = 3;
-    [SerializeField] private float comboInterval = 0.3f;
-    [SerializeField] private float comboRange = 1.5f;
-    [SerializeField] private Collider2D meleeHitbox;
+    [SerializeField]
+    private int comboHitCount = 3;
+
+    [SerializeField]
+    private float comboInterval = 0.3f;
+
+    [SerializeField]
+    private float comboRange = 1.5f;
+
+    [SerializeField]
+    private Collider2D meleeHitbox;
 
     [Header("패턴 공통")]
-    [SerializeField] private float patternCooldown = 2f;
-    [SerializeField] private float tellDuration = 0.6f;
-    [SerializeField] private float detectionRange = 12f;
+    [SerializeField]
+    private float patternCooldown = 2f;
+
+    [SerializeField]
+    private float tellDuration = 0.6f;
+
+    [SerializeField]
+    private float detectionRange = 12f;
 
     [Header("Drops")]
-    [SerializeField] private GameObject goldDropPrefab;
-    [SerializeField] private int goldDropMin = 20;
-    [SerializeField] private int goldDropMax = 40;
+    [SerializeField]
+    private GameObject goldDropPrefab;
+
+    [SerializeField]
+    private int goldDropMin = 20;
+
+    [SerializeField]
+    private int goldDropMax = 40;
 
     [Header("Knockback")]
-    [SerializeField] private float knockbackForce = 3f;
-    [SerializeField] private float knockbackDuration = 0.1f;
+    [SerializeField]
+    private float knockbackForce = 3f;
+
+    [SerializeField]
+    private float knockbackDuration = 0.1f;
 
     [Header("Ground Check")]
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField]
+    private LayerMask groundLayer;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -87,11 +135,10 @@ public class BossController : MonoBehaviour, IDamageable
 
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
+        if (PlayerRef.Exists)
         {
-            player = playerGO.transform;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+            player = PlayerRef.Transform;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
     }
 
@@ -276,8 +323,11 @@ public class BossController : MonoBehaviour, IDamageable
         {
             float offset = 0f;
             if (projectileCount > 1)
-                offset = Mathf.Lerp(-projectileSpread / 2f, projectileSpread / 2f,
-                    (float)i / (projectileCount - 1));
+                offset = Mathf.Lerp(
+                    -projectileSpread / 2f,
+                    projectileSpread / 2f,
+                    (float)i / (projectileCount - 1)
+                );
 
             float angle = (baseAngle + offset) * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));

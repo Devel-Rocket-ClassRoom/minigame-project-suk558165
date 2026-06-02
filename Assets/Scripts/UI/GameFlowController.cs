@@ -144,8 +144,8 @@ public class GameFlowController : MonoBehaviour
             playerInstance = null;
         }
 
-        FindFirstObjectByType<GameOverUI>()?.ResetUI();
-        FindFirstObjectByType<GameClearUI>()?.ResetUI();
+        GameOverUI.Instance?.ResetUI();
+        GameClearUI.Instance?.ResetUI();
 
         titleInstance = Instantiate(titlePrefab);
     }
@@ -359,8 +359,8 @@ public class GameFlowController : MonoBehaviour
     public void ReturnToVillage()
     {
         roomManager.ResetDungeon();
-        FindFirstObjectByType<GameClearUI>()?.ResetUI();
-        FindFirstObjectByType<GameOverUI>()?.ResetUI();
+        GameClearUI.Instance?.ResetUI();
+        GameOverUI.Instance?.ResetUI();
 
         // 사망 후 귀환 시 플레이어 전체 상태 복구 (HP + 물리 + 애니메이터)
         if (playerInstance != null)

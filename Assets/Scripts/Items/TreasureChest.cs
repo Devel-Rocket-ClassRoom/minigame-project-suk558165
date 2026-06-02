@@ -37,9 +37,7 @@ public class TreasureChest : MonoBehaviour
 
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
-            player = playerGO.transform;
+        player = PlayerRef.Transform;
 
         animator = GetComponent<Animator>();
         originScale = transform.localScale;

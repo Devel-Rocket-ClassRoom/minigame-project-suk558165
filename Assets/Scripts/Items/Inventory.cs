@@ -47,10 +47,22 @@ public class Inventory : MonoBehaviour
 
     public event Action OnInventoryChanged;
 
+    public static Inventory Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     void Awake()
     {
+        Instance = this;
         if (weaponInventory == null)
             weaponInventory = GetComponent<WeaponInventory>();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public bool AddToBackpack(ScriptableObject item)

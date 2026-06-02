@@ -99,11 +99,10 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
+        if (PlayerRef.Exists)
         {
-            player = playerGO.transform;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+            player = PlayerRef.Transform;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
         spawnDelayTimer = spawnDelay;
     }

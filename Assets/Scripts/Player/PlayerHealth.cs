@@ -16,6 +16,12 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         inventory = GetComponent<Inventory>();
         hp = maxHp;
+        PlayerRef.Register(this);
+    }
+
+    void OnDestroy()
+    {
+        PlayerRef.Clear(this);
     }
 
     public void TakeDamage(float amount)

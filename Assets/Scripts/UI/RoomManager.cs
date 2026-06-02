@@ -49,6 +49,11 @@ public class RoomManager : MonoBehaviour
     public int CurrentRoomNumber { get; private set; }
     public RoomType CurrentRoomType { get; private set; }
 
+    public static RoomManager Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     private GameObject currentRoom;
     private List<int> normalRoomOrder;
     private int normalRoomCursor;
@@ -57,12 +62,23 @@ public class RoomManager : MonoBehaviour
 
     private CameraFollow cameraFollow;
 
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     void Start()
     {
         cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
         if (confiner == null && cinemachineCamera != null)
             confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
-        cameraFollow = FindAnyObjectByType<CameraFollow>();
+        cameraFollow = CameraFollow.Instance;
     }
 
     public void SetPlayer(Transform playerTransform)
@@ -192,7 +208,7 @@ public class RoomManager : MonoBehaviour
                 : currentRoom.GetComponentInChildren<PolygonCollider2D>();
 
         if (cameraFollow == null)
-            cameraFollow = FindAnyObjectByType<CameraFollow>();
+            cameraFollow = CameraFollow.Instance;
 
         if (cameraBounds != null)
         {
@@ -208,17 +224,6 @@ public class RoomManager : MonoBehaviour
         {
             // 명시적 CameraBounds 없으면 Tilemap에서 자동 감지
             cameraFollow?.RefreshBounds();
-        }
-
-        // 카메라를 플레이어 위치로 즉시 스냅 (부드러운 추적 시작 전 초기 위치 보정)
-        if (cinemachineCamera != null && player != null)
-        {
-            var targetPos = new Vector3(
-                player.position.x,
-                player.position.y,
-                cinemachineCamera.transform.position.z
-            );
-            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
         }
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
@@ -287,7 +292,7 @@ public class RoomManager : MonoBehaviour
         ResetPlayerInventory();
 
         if (gameClearUI == null)
-            gameClearUI = FindAnyObjectByType<GameClearUI>();
+            gameClearUI = GameClearUI.Instance;
 
         if (gameClearUI != null)
             gameClearUI.Show();
@@ -327,9 +332,11 @@ public class RoomManager : MonoBehaviour
 
     IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
     {
+        // 1. 화면을 어둡게 (이전 방이 더이상 보이지 않게)
         if (!isFirst && ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeOut();
 
+        // 2. 카메라 보간을 잠시 끄고
         float savedDamping = 0f;
         if (confiner != null)
         {
@@ -337,21 +344,47 @@ public class RoomManager : MonoBehaviour
             confiner.Damping = 0f;
         }
 
+        // 3. 새 방 로드 (플레이어 위치도 새 스폰포인트로 이동)
         LoadRoom(roomNumber);
 
-        // 페이드 아웃 상태에서 카메라를 즉시 스냅하여 페이드 인 시 튀는 현상 방지
-        if (cameraFollow == null)
-            cameraFollow = FindAnyObjectByType<CameraFollow>();
-        cameraFollow?.SnapToTarget();
+        // 4. 플레이어 위치를 함수로 미리 받아서
+        Vector3 spawnPos = GetPlayerWorldPosition();
 
-        // Cinemachine 및 CameraFollow가 새 위치를 반영할 시간 확보
+        // 5. 카메라를 그 위치로 즉시 이동
+        SnapCameraTo(spawnPos);
+
+        // 6. Cinemachine/CameraFollow가 새 위치를 반영할 시간 확보 (두 프레임)
         yield return null;
         yield return null;
 
+        // 7. 카메라 보간 복구
         if (confiner != null)
             confiner.Damping = savedDamping;
 
+        // 8. 페이드 인 → 카메라가 새 위치에 자리 잡힌 상태에서 맵이 드러남
         if (ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeIn();
+    }
+
+    Vector3 GetPlayerWorldPosition()
+    {
+        if (player != null)
+            return player.position;
+        if (PlayerRef.Exists)
+            return PlayerRef.Transform.position;
+        return Vector3.zero;
+    }
+
+    void SnapCameraTo(Vector3 worldPos)
+    {
+        if (cameraFollow == null)
+            cameraFollow = CameraFollow.Instance;
+        cameraFollow?.SnapToTarget();
+
+        if (cinemachineCamera != null)
+        {
+            var pos = new Vector3(worldPos.x, worldPos.y, cinemachineCamera.transform.position.z);
+            cinemachineCamera.ForceCameraPosition(pos, cinemachineCamera.transform.rotation);
+        }
     }
 }

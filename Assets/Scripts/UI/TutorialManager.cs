@@ -32,7 +32,7 @@ public class TutorialManager : MonoBehaviour
     public void Begin()
     {
         if (stepUI == null)
-            stepUI = FindAnyObjectByType<TutorialStepUI>();
+            stepUI = TutorialStepUI.Instance;
         StartCoroutine(RunSteps());
     }
 

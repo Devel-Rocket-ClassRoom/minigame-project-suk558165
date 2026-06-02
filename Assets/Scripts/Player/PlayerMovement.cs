@@ -257,7 +257,11 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             // 아랫점프 중이면 FixedUpdate에서 속도를 강제 적용 (코루틴에서 설정한 속도가 물리 보정에 덮어써지는 문제 방지)
-            float yVel = isDropping ? Mathf.Min(rb.linearVelocity.y, -10f) : rb.linearVelocity.y;
+            // 단, 이미 다른 플랫폼/지면에 착지했다면 강제 속도를 풀어서 통과해 버리는 문제 방지
+            float yVel =
+                (isDropping && !IsGrounded)
+                    ? Mathf.Min(rb.linearVelocity.y, -10f)
+                    : rb.linearVelocity.y;
             rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, yVel);
 
             if (rb.linearVelocity.y < 0f)
@@ -269,8 +273,19 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // 점프 상승 중엔 플랫폼 충돌 제외 (아랫점프는 DropDown에서 콜라이더를 직접 끔)
+        // 점프 정점에서 플레이어가 플랫폼 내부에 있으면 끼임이 발생하므로, 겹치는 동안에는 계속 제외 유지
         if (mainCollider != null)
-            mainCollider.excludeLayers = rb.linearVelocity.y > 0.5f ? platformLayer : (LayerMask)0;
+        {
+            bool overlappingPlatform = Physics2D.OverlapBox(
+                mainCollider.bounds.center,
+                mainCollider.bounds.size * 0.95f,
+                0f,
+                platformLayer
+            );
+            bool goingUp = rb.linearVelocity.y > 0.5f;
+            mainCollider.excludeLayers =
+                (goingUp || overlappingPlatform) ? platformLayer : (LayerMask)0;
+        }
 
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;

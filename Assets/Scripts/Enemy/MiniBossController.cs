@@ -100,11 +100,10 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
+        if (PlayerRef.Exists)
         {
-            player = playerGO.transform;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+            player = PlayerRef.Transform;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
     }
 
@@ -142,7 +141,21 @@ public class MiniBossController : MonoBehaviour, IDamageable
     void ChasePlayer()
     {
         float dir = player.position.x > transform.position.x ? 1f : -1f;
+        if (IsWallAhead(dir))
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
         rb.linearVelocity = new Vector2(dir * moveSpeed, rb.linearVelocity.y);
+    }
+
+    bool IsWallAhead(float direction)
+    {
+        float centerY = col != null ? col.bounds.center.y : transform.position.y;
+        Vector2 origin = new Vector2(transform.position.x, centerY);
+        Vector2 dir = direction > 0 ? Vector2.right : Vector2.left;
+        float dist = col != null ? col.bounds.extents.x + 0.2f : 0.7f;
+        return Physics2D.Raycast(origin, dir, dist, groundLayer).collider != null;
     }
 
     IEnumerator ExecutePattern()

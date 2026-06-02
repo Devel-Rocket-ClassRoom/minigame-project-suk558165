@@ -39,7 +39,7 @@ public class InventoryUI : MonoBehaviour
         frame = transform.Find("Frame")?.gameObject;
         canvasGroup = GetComponent<CanvasGroup>();
 
-        inventory = FindFirstObjectByType<Inventory>();
+        inventory = Inventory.Instance;
         InitSlotMeta();
         ClearAllSlots();
         BindEvents();
@@ -136,7 +136,7 @@ public class InventoryUI : MonoBehaviour
 
         if (inventory == null)
         {
-            inventory = FindFirstObjectByType<Inventory>();
+            inventory = Inventory.Instance;
             if (inventory == null)
                 return;
         }

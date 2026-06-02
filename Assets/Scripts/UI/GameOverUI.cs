@@ -24,23 +24,32 @@ public class GameOverUI : MonoBehaviour
     public TextMeshProUGUI returnHintText;
     public KeyCode returnKey = KeyCode.X;
 
-    private PlayerHealth playerHealth;
     private bool triggered;
     private bool canReturn;
 
+    public static GameOverUI Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     void Awake()
     {
+        Instance = this;
         Hide();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     void Update()
     {
         if (!triggered)
         {
-            if (playerHealth == null)
-                playerHealth = FindFirstObjectByType<PlayerHealth>();
-
-            if (playerHealth != null && playerHealth.IsDead)
+            var ph = PlayerRef.Health;
+            if (ph != null && ph.IsDead)
             {
                 triggered = true;
                 RunStats.Instance?.StopTimer();
@@ -123,7 +132,6 @@ public class GameOverUI : MonoBehaviour
         Time.timeScale = 1f;
         triggered = false;
         canReturn = false;
-        playerHealth = null;
         StopAllCoroutines();
         Hide();
     }
