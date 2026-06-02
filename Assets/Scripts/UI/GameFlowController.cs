@@ -291,6 +291,8 @@ public class GameFlowController : MonoBehaviour
         if (confiner != null)
             confiner.Damping = savedDamping;
 
+        ScreenFader.Instance?.FadeIn();
+
         var tutorial = tutorialInstance.GetComponentInChildren<TutorialManager>();
         if (tutorial != null)
         {
