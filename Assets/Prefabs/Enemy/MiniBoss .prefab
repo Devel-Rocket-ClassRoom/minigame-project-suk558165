@@ -261,7 +261,7 @@ MonoBehaviour:
   maxHp: 250
   moveSpeed: 3.5
   damage: 15
-  wavePrefab: {fileID: 0}
+  wavePrefab: {fileID: 7915919628461615539, guid: 7cc1028d63a1bd945b0c8a555bab478e, type: 3}
   waveSpeed: 6
   leapJumpForce: 18
   leapFallSpeed: 25
