@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -6,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class EnemyController : MonoBehaviour, IDamageable
 {
+    public static readonly List<EnemyController> Instances = new List<EnemyController>();
     [Header("Stats")]
     public float maxHp = 50f;
     public float moveSpeed = 2f;
@@ -96,6 +98,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
     }
+
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
 
     void Start()
     {
@@ -391,6 +396,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     void SpawnDrops()
     {
         float floorY = transform.position.y;
+        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
+        if (groundHit.collider != null)
+            floorY = groundHit.point.y;
         Vector3 pos = transform.position + Vector3.up * 0.3f;
 
         if (goldDropPrefab != null)

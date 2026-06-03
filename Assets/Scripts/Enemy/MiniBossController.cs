@@ -1,10 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class MiniBossController : MonoBehaviour, IDamageable
 {
+    public static readonly List<MiniBossController> Instances = new List<MiniBossController>();
     [Header("Stats")]
     [SerializeField]
     private float maxHp = 250f;
@@ -84,6 +86,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
     private bool dashHitThisSegment;
 
     private Transform player;
+    private EnemyHealthBar healthBar;
     public System.Action onDeath;
 
     void Awake()
@@ -93,10 +96,15 @@ public class MiniBossController : MonoBehaviour, IDamageable
         col = GetComponent<Collider2D>();
         hp = maxHp;
         originalColor = sr.color;
+        healthBar = gameObject.AddComponent<EnemyHealthBar>();
+        healthBar.Init(new Vector3(0f, -0.6f, 0f));
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
     }
+
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
 
     void Start()
     {
@@ -362,6 +370,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         hp -= amount;
 
+        healthBar?.SetHealth(hp, maxHp);
+
         if (hp <= 0f)
         {
             Die();
@@ -384,6 +394,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         isDead = true;
         StopAllCoroutines();
         sr.color = originalColor;
+        healthBar?.SetHealth(0, maxHp);
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
@@ -403,6 +414,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         Vector3 pos = transform.position + Vector3.up * 0.3f;
         float floorY = transform.position.y;
+        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
+        if (groundHit.collider != null)
+            floorY = groundHit.point.y;
         for (int i = 0; i < 3; i++)
         {
             var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);

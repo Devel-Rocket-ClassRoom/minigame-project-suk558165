@@ -127,10 +127,10 @@ public class CameraFollow : MonoBehaviour
 
     public void ClearBounds() => useBounds = false;
 
-    public void RefreshBounds()
+    public void RefreshBounds(Transform root = null)
     {
         if (!useBounds && autoDetectBoundsFromTilemap)
-            TryAutoDetectBoundsFromTilemap();
+            TryAutoDetectBoundsFromTilemap(root);
     }
 
     /// <summary>월드 좌표로 카메라 위치를 강제 이동. 페이드 전환 시 사용.</summary>
@@ -199,9 +199,11 @@ public class CameraFollow : MonoBehaviour
             _cam.orthographicSize = orthographicSize;
     }
 
-    void TryAutoDetectBoundsFromTilemap()
+    void TryAutoDetectBoundsFromTilemap(Transform root = null)
     {
-        var tilemaps = FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
+        var tilemaps = root != null
+            ? root.GetComponentsInChildren<Tilemap>()
+            : FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
         if (tilemaps.Length == 0)
             return;
 

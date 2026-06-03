@@ -170,9 +170,9 @@ public class RoomManager : MonoBehaviour
 
     void LoadRoom(int roomNumber)
     {
-        foreach (var g in FindObjectsByType<WorldGold>(FindObjectsSortMode.None))
+        foreach (var g in WorldGold.Instances.ToArray())
             Destroy(g.gameObject);
-        foreach (var p in FindObjectsByType<WorldPotion>(FindObjectsSortMode.None))
+        foreach (var p in WorldPotion.Instances.ToArray())
             Destroy(p.gameObject);
 
         if (currentRoom != null)
@@ -205,7 +205,7 @@ public class RoomManager : MonoBehaviour
         if (cameraBounds != null)
             cameraFollow?.SetBoundsFromPolygon(cameraBounds);
         else
-            cameraFollow?.RefreshBounds();
+            cameraFollow?.RefreshBounds(currentRoom.transform);
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
 

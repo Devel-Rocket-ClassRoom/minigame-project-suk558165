@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGold : MonoBehaviour
 {
+    public static readonly List<WorldGold> Instances = new List<WorldGold>();
+
     public int amount = 5;
     public float magnetRadius = 3f;
     public float pickupRadius = 0.8f;
@@ -22,6 +25,9 @@ public class WorldGold : MonoBehaviour
         groundY = floorY;
         launched = true;
     }
+
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
 
     void Start()
     {

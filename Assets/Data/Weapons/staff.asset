@@ -23,7 +23,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   sprite: {fileID: 21300000, guid: bab758647f0fc5a4d8a1ada501dd4f74, type: 3}
-  weaponType: 1
+  weaponType: 2
   description:
     m_TableReference:
       m_TableCollectionName: Items

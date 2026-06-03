@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldPotion : MonoBehaviour
 {
+    public static readonly List<WorldPotion> Instances = new List<WorldPotion>();
+
     public float healAmount = 20f;
     public float pickupRadius = 1.2f;
     public float magnetRadius = 4f;
@@ -22,6 +25,9 @@ public class WorldPotion : MonoBehaviour
         groundY = floorY;
         launched = true;
     }
+
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
 
     void Start()
     {

@@ -5,6 +5,7 @@ public enum WeaponType
 {
     Melee,
     Ranged,
+    Magic,
 }
 
 [CreateAssetMenu(menuName = "Game/WeaponData", fileName = "NewWeapon")]
