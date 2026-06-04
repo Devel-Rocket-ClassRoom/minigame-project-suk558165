@@ -42,7 +42,7 @@ public class MinimapController : MonoBehaviour
     void Start()
     {
         CreateMinimapCamera();
-        roomManager = FindAnyObjectByType<RoomManager>();
+        roomManager = RoomManager.Instance;
     }
 
     void CreateMinimapCamera()
@@ -68,11 +68,10 @@ public class MinimapController : MonoBehaviour
     void LateUpdate()
     {
         if (player == null)
-        {
-            var playerGO = GameObject.FindGameObjectWithTag("Player");
-            if (playerGO != null)
-                player = playerGO.transform;
-        }
+            player = PlayerRef.Transform;
+
+        if (roomManager == null)
+            roomManager = RoomManager.Instance;
 
         bool inDungeon = roomManager != null && roomManager.CurrentRoomNumber > 0;
         bool shouldShow = isVisible && inDungeon && player != null;

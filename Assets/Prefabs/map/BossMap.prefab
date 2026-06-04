@@ -2538,6 +2538,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8255316746545090209}
   - component: {fileID: 7151501577090584765}
+  - component: {fileID: 5550000000000000001}
   m_Layer: 0
   m_Name: SpawnManager
   m_TagString: Untagged
@@ -2586,6 +2587,24 @@ MonoBehaviour:
       interval: 0.5
     delayBeforeSpawn: 1
     triggerZone: {fileID: 0}
+--- !u!114 &5550000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7090203586152791109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f325f0bc8c08445a659c0833ff767c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bossName: "보스"
+  bossTitle: ""
+  zoomOutSize: 8
+  zoomDuration: 0.8
+  nameDisplayDuration: 1.5
+  bossNameUIPrefab: {fileID: 1000000000000000001, guid: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6, type: 3}
 --- !u!1 &7149492321709860382
 GameObject:
   m_ObjectHideFlags: 0

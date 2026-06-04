@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class MiniBossController : MonoBehaviour, IDamageable
 {
+    public static readonly List<MiniBossController> Instances = new List<MiniBossController>();
+
     [Header("Stats")]
     [SerializeField]
     private float maxHp = 250f;
@@ -48,6 +51,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private float dashInterval = 0.3f;
 
+    [SerializeField]
+    private float dashHitRadius = 1.3f;
+
     [Header("패턴 공통")]
     [SerializeField]
     private float patternCooldown = 2.5f;
@@ -72,6 +78,10 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private LayerMask groundLayer;
 
+    [Header("Audio")]
+    [SerializeField]
+    private AudioClip deathSound;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Collider2D col;
@@ -84,6 +94,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
     private bool dashHitThisSegment;
 
     private Transform player;
+    private EnemyHealthBar healthBar;
+    private Animator animator;
     public System.Action onDeath;
 
     void Awake()
@@ -91,20 +103,26 @@ public class MiniBossController : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
         hp = maxHp;
         originalColor = sr.color;
+        healthBar = gameObject.AddComponent<EnemyHealthBar>();
+        healthBar.Init(new Vector3(0f, -0.6f, 0f));
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
     }
 
+    void OnEnable() => Instances.Add(this);
+
+    void OnDisable() => Instances.Remove(this);
+
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
+        if (PlayerRef.Exists)
         {
-            player = playerGO.transform;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+            player = PlayerRef.Transform;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
     }
 
@@ -142,7 +160,21 @@ public class MiniBossController : MonoBehaviour, IDamageable
     void ChasePlayer()
     {
         float dir = player.position.x > transform.position.x ? 1f : -1f;
+        if (IsWallAhead(dir))
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
         rb.linearVelocity = new Vector2(dir * moveSpeed, rb.linearVelocity.y);
+    }
+
+    bool IsWallAhead(float direction)
+    {
+        float centerY = col != null ? col.bounds.center.y : transform.position.y;
+        Vector2 origin = new Vector2(transform.position.x, centerY);
+        Vector2 dir = direction > 0 ? Vector2.right : Vector2.left;
+        float dist = col != null ? col.bounds.extents.x + 0.2f : 0.7f;
+        return Physics2D.Raycast(origin, dir, dist, groundLayer).collider != null;
     }
 
     IEnumerator ExecutePattern()
@@ -165,6 +197,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
         }
 
         isActing = false;
+        if (animator != null && !isDead)
+            animator.Play("Idle", 0, 0f);
     }
 
     // ── 텔 연출 ──────────────────────────────────────
@@ -199,6 +233,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     IEnumerator GroundWave()
     {
+        if (animator != null)
+            animator.Play("GroundWave", 0, 0f);
         yield return TellShake();
 
         rb.linearVelocity = Vector2.zero;
@@ -209,9 +245,14 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
             var left = Instantiate(wavePrefab, origin, Quaternion.identity);
             left.GetComponent<Projectile>()?.Init(Vector2.left, waveSpeed, damage, gameObject);
+            left.transform.rotation = Quaternion.identity;
 
             var right = Instantiate(wavePrefab, origin, Quaternion.identity);
             right.GetComponent<Projectile>()?.Init(Vector2.right, waveSpeed, damage, gameObject);
+            right.transform.rotation = Quaternion.identity;
+            var rightSr = right.GetComponent<SpriteRenderer>();
+            if (rightSr != null)
+                rightSr.flipX = true;
         }
 
         yield return new WaitForSeconds(0.6f);
@@ -222,6 +263,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     IEnumerator LeapSlash()
     {
+        if (animator != null)
+            animator.Play("LeapSlash", 0, 0f);
         yield return TellFlash(Color.yellow);
 
         rb.linearVelocity = new Vector2(0f, leapJumpForce);
@@ -243,17 +286,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         rb.linearVelocity = Vector2.zero;
 
-        // 착지 충격 — 멜레이 히트박스 순간 활성
-        if (meleeHitbox != null)
-        {
-            meleeHitbox.enabled = true;
-            yield return new WaitForSeconds(0.1f);
-            meleeHitbox.enabled = false;
-        }
-        else
-        {
-            DealAreaDamage(transform.position, leapRadius);
-        }
+        // 착지 충격 — IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
+        DealAreaDamage(transform.position, leapRadius);
 
         yield return new WaitForSeconds(0.4f);
     }
@@ -263,6 +297,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     IEnumerator MultiDash()
     {
+        if (animator != null)
+            animator.Play("MultiDash", 0, 0f);
         yield return TellFlash(Color.cyan);
 
         for (int i = 0; i < dashCount; i++)
@@ -280,7 +316,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
                 rb.linearVelocity = new Vector2(dir * dashSpeed, rb.linearVelocity.y);
 
                 if (!dashHitThisSegment)
-                    DealAreaDamage(transform.position, 0.9f);
+                    DealAreaDamage(transform.position, dashHitRadius);
 
                 elapsed += Time.deltaTime;
                 yield return null;
@@ -349,6 +385,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         hp -= amount;
 
+        healthBar?.SetHealth(hp, maxHp);
+
         if (hp <= 0f)
         {
             Die();
@@ -369,8 +407,12 @@ public class MiniBossController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        AudioManager.Instance?.PlaySFX(deathSound);
         StopAllCoroutines();
+        if (animator != null)
+            animator.enabled = false;
         sr.color = originalColor;
+        healthBar?.SetHealth(0, maxHp);
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
@@ -390,6 +432,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         Vector3 pos = transform.position + Vector3.up * 0.3f;
         float floorY = transform.position.y;
+        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
+        if (groundHit.collider != null)
+            floorY = groundHit.point.y;
         for (int i = 0; i < 3; i++)
         {
             var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);

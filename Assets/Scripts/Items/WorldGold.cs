@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGold : MonoBehaviour
 {
+    public static readonly List<WorldGold> Instances = new List<WorldGold>();
+
     public int amount = 5;
     public float magnetRadius = 3f;
     public float pickupRadius = 0.8f;
@@ -23,6 +26,9 @@ public class WorldGold : MonoBehaviour
         launched = true;
     }
 
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
+
     void Start()
     {
         if (!launched)
@@ -40,7 +46,11 @@ public class WorldGold : MonoBehaviour
 
             if (velocity.y < 0f && transform.position.y <= groundY)
             {
-                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                transform.position = new Vector3(
+                    transform.position.x,
+                    groundY,
+                    transform.position.z
+                );
                 launched = false;
                 grounded = true;
             }
@@ -50,7 +60,11 @@ public class WorldGold : MonoBehaviour
                 float realGround = FindGroundY();
                 if (transform.position.y <= realGround)
                 {
-                    transform.position = new Vector3(transform.position.x, realGround, transform.position.z);
+                    transform.position = new Vector3(
+                        transform.position.x,
+                        realGround,
+                        transform.position.z
+                    );
                     launched = false;
                     grounded = true;
                 }
@@ -89,8 +103,12 @@ public class WorldGold : MonoBehaviour
 
     float FindGroundY()
     {
-        var hit = Physics2D.Raycast(transform.position, Vector2.down, 20f,
-            LayerMask.GetMask("Ground", "Platform"));
+        var hit = Physics2D.Raycast(
+            transform.position,
+            Vector2.down,
+            20f,
+            LayerMask.GetMask("Ground", "Platform")
+        );
         if (hit.collider != null)
             return hit.point.y;
         return groundY;
@@ -100,14 +118,9 @@ public class WorldGold : MonoBehaviour
     {
         if (player != null)
             return;
-
-        var go = GameObject.FindGameObjectWithTag("Player");
-        if (go == null)
+        if (!PlayerRef.Exists)
             return;
-        player = go.transform;
-        inventory =
-            go.GetComponent<Inventory>()
-            ?? go.GetComponentInChildren<Inventory>()
-            ?? go.GetComponentInParent<Inventory>();
+        player = PlayerRef.Transform;
+        inventory = PlayerRef.Inventory;
     }
 }

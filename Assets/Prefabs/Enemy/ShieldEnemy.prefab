@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: 426108173593186035}
   - component: {fileID: 8284055532814429743}
   - component: {fileID: 1051856010959419470}
+  - component: {fileID: 3864755098429980083}
   m_Layer: 7
   m_Name: ShieldEnemy
   m_TagString: Untagged
@@ -314,9 +315,12 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  projectileSpinSpeed: 0
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
+  attackSound: {fileID: 8300000, guid: a7b5af98318064c40a1393425cf1729a, type: 3}
+  deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
   meleeHitbox: {fileID: 2114419280557197980}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3
@@ -329,3 +333,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   attackDamageDelay: 0.4
+--- !u!114 &3864755098429980083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5673119980097987662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4ce8ba31c37e4747b3d02cf9a3d4423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShieldController
+  blockAngle: 70
+  blockSound: {fileID: 0}

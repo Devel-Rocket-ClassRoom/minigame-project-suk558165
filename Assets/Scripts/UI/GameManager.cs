@@ -12,16 +12,19 @@ public class GameManager : MonoBehaviour
         // F1 : 현재 방 즉시 클리어 → 다음 방으로 이동
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            var rm = FindAnyObjectByType<RoomManager>();
+            var rm = RoomManager.Instance;
             if (rm != null && rm.CurrentRoomNumber > 0)
             {
-                var enemies = FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
-                Debug.Log($"[Debug] 적 전멸: {enemies.Length}마리 처치");
-                foreach (var enemy in enemies)
-                    enemy.TakeDamage(99999f);
+                int count = 0;
+                foreach (var e in EnemyController.Instances.ToArray())
+                    { e.TakeDamage(99999f); count++; }
+                foreach (var m in MiniBossController.Instances.ToArray())
+                    { m.TakeDamage(99999f); count++; }
+                foreach (var b in BossController.Instances.ToArray())
+                    { b.TakeDamage(99999f); count++; }
+                Debug.Log($"[Debug] 적 전멸: {count}마리 처치");
             }
         }
 #endif
     }
-
 }

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
 
 public enum RoomType
@@ -40,29 +39,35 @@ public class RoomManager : MonoBehaviour
     [SerializeField]
     private Transform player;
 
-    [SerializeField]
-    private CinemachineConfiner2D confiner;
-
-    [SerializeField]
-    private GameClearUI gameClearUI;
-
     public int CurrentRoomNumber { get; private set; }
     public RoomType CurrentRoomType { get; private set; }
+
+    public static RoomManager Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
 
     private GameObject currentRoom;
     private List<int> normalRoomOrder;
     private int normalRoomCursor;
     private Portal currentPortal;
-    private CinemachineCamera cinemachineCamera;
 
     private CameraFollow cameraFollow;
 
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     void Start()
     {
-        cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
-        if (confiner == null && cinemachineCamera != null)
-            confiner = cinemachineCamera.GetComponent<CinemachineConfiner2D>();
-        cameraFollow = FindAnyObjectByType<CameraFollow>();
+        cameraFollow = CameraFollow.Instance;
     }
 
     public void SetPlayer(Transform playerTransform)
@@ -162,9 +167,9 @@ public class RoomManager : MonoBehaviour
 
     void LoadRoom(int roomNumber)
     {
-        foreach (var g in FindObjectsByType<WorldGold>(FindObjectsSortMode.None))
+        foreach (var g in WorldGold.Instances.ToArray())
             Destroy(g.gameObject);
-        foreach (var p in FindObjectsByType<WorldPotion>(FindObjectsSortMode.None))
+        foreach (var p in WorldPotion.Instances.ToArray())
             Destroy(p.gameObject);
 
         if (currentRoom != null)
@@ -192,34 +197,12 @@ public class RoomManager : MonoBehaviour
                 : currentRoom.GetComponentInChildren<PolygonCollider2D>();
 
         if (cameraFollow == null)
-            cameraFollow = FindAnyObjectByType<CameraFollow>();
+            cameraFollow = CameraFollow.Instance;
 
         if (cameraBounds != null)
-        {
-            if (confiner != null)
-            {
-                confiner.BoundingShape2D = cameraBounds;
-                confiner.InvalidateBoundingShapeCache();
-            }
-
             cameraFollow?.SetBoundsFromPolygon(cameraBounds);
-        }
         else
-        {
-            // 명시적 CameraBounds 없으면 Tilemap에서 자동 감지
-            cameraFollow?.RefreshBounds();
-        }
-
-        // 카메라를 플레이어 위치로 즉시 스냅 (부드러운 추적 시작 전 초기 위치 보정)
-        if (cinemachineCamera != null && player != null)
-        {
-            var targetPos = new Vector3(
-                player.position.x,
-                player.position.y,
-                cinemachineCamera.transform.position.z
-            );
-            cinemachineCamera.ForceCameraPosition(targetPos, cinemachineCamera.transform.rotation);
-        }
+            cameraFollow?.RefreshBounds(currentRoom.transform);
 
         currentPortal = currentRoom.GetComponentInChildren<Portal>();
 
@@ -285,12 +268,7 @@ public class RoomManager : MonoBehaviour
     void OnGameClear()
     {
         ResetPlayerInventory();
-
-        if (gameClearUI == null)
-            gameClearUI = FindAnyObjectByType<GameClearUI>();
-
-        if (gameClearUI != null)
-            gameClearUI.Show();
+        GameClearUI.Instance?.Show();
     }
 
     void ResetPlayerInventory()
@@ -327,31 +305,41 @@ public class RoomManager : MonoBehaviour
 
     IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
     {
+        // 1. 화면을 어둡게 (이전 방이 더이상 보이지 않게)
         if (!isFirst && ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeOut();
 
-        float savedDamping = 0f;
-        if (confiner != null)
-        {
-            savedDamping = confiner.Damping;
-            confiner.Damping = 0f;
-        }
-
+        // 2. 새 방 로드 (플레이어 위치도 새 스폰포인트로 이동)
         LoadRoom(roomNumber);
 
-        // 페이드 아웃 상태에서 카메라를 즉시 스냅하여 페이드 인 시 튀는 현상 방지
-        if (cameraFollow == null)
-            cameraFollow = FindAnyObjectByType<CameraFollow>();
-        cameraFollow?.SnapToTarget();
+        // 3. 플레이어 위치를 함수로 미리 받아서
+        Vector3 spawnPos = GetPlayerWorldPosition();
 
-        // Cinemachine 및 CameraFollow가 새 위치를 반영할 시간 확보
+        // 4. 카메라를 그 위치로 즉시 이동
+        SnapCameraTo(spawnPos);
+
+        // 5. CameraFollow가 새 위치를 반영할 시간 확보
         yield return null;
-        yield return null;
 
-        if (confiner != null)
-            confiner.Damping = savedDamping;
-
+        // 6. 페이드 인 → 카메라가 새 위치에 자리 잡힌 상태에서 맵이 드러남
         if (ScreenFader.Instance != null)
             yield return ScreenFader.Instance.FadeIn();
+    }
+
+    Vector3 GetPlayerWorldPosition()
+    {
+        if (player != null)
+            return player.position;
+        if (PlayerRef.Exists)
+            return PlayerRef.Transform.position;
+        return Vector3.zero;
+    }
+
+    void SnapCameraTo(Vector3 worldPos)
+    {
+        if (cameraFollow == null)
+            cameraFollow = CameraFollow.Instance;
+        cameraFollow?.ForcePosition(worldPos);
+        cameraFollow?.SnapToTarget();
     }
 }

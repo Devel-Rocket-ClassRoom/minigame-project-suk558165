@@ -11,9 +11,9 @@ public class EnemyHealthBar : MonoBehaviour
 
     private static Sprite _whiteSprite;
 
-    public void Init(Vector3 worldOffset)
+    public void Init(Vector3 worldOffset, float scale = 1f)
     {
-        BuildBar(worldOffset);
+        BuildBar(worldOffset, scale);
     }
 
     static Sprite GetWhiteSprite()
@@ -28,7 +28,7 @@ public class EnemyHealthBar : MonoBehaviour
         return _whiteSprite;
     }
 
-    void BuildBar(Vector3 offset)
+    void BuildBar(Vector3 offset, float scale = 1f)
     {
         var sprite = GetWhiteSprite();
 
@@ -36,7 +36,7 @@ public class EnemyHealthBar : MonoBehaviour
         bgGo.transform.SetParent(transform);
         bgGo.transform.localPosition = offset;
         bgGo.transform.localRotation = Quaternion.identity;
-        bgGo.transform.localScale = new Vector3(1f, 0.08f, 1f);
+        bgGo.transform.localScale = new Vector3(1f * scale, 0.08f * scale, 1f);
         var bgSr = bgGo.AddComponent<SpriteRenderer>();
         bgSr.sprite = sprite;
         bgSr.color = new Color(0.15f, 0.15f, 0.15f, 0.9f);

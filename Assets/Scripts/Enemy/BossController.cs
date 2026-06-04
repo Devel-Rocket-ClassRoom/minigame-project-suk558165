@@ -6,56 +6,110 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class BossController : MonoBehaviour, IDamageable
 {
+    public static readonly List<BossController> Instances = new List<BossController>();
+
     [Header("Stats")]
-    [SerializeField] private float maxHp = 500f;
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float damage = 20f;
+    [SerializeField]
+    private float maxHp = 500f;
+
+    [SerializeField]
+    private float moveSpeed = 3f;
+
+    [SerializeField]
+    private float damage = 20f;
 
     [Header("Phase 2")]
     [Tooltip("HP 비율이 이 값 이하가 되면 Phase 2 진입")]
-    [SerializeField] private float phase2Threshold = 0.5f;
+    [SerializeField]
+    private float phase2Threshold = 0.5f;
+
     [Tooltip("Phase 2에서 패턴 간 쿨타임 배율 (1보다 작으면 빨라짐)")]
-    [SerializeField] private float phase2CooldownMult = 0.7f;
+    [SerializeField]
+    private float phase2CooldownMult = 0.7f;
 
     [Header("돌진 패턴")]
-    [SerializeField] private float chargeSpeed = 12f;
-    [SerializeField] private float chargeDuration = 0.5f;
-    [SerializeField] private float chargeStunDuration = 1f;
+    [SerializeField]
+    private float chargeSpeed = 12f;
+
+    [SerializeField]
+    private float chargeDuration = 0.5f;
+
+    [SerializeField]
+    private float chargeStunDuration = 1f;
 
     [Header("내려찍기 패턴")]
-    [SerializeField] private float slamJumpForce = 15f;
-    [SerializeField] private float slamFallSpeed = 20f;
-    [SerializeField] private float slamRadius = 3f;
-    [SerializeField] private GameObject slamWarningPrefab;
+    [SerializeField]
+    private float slamJumpForce = 15f;
+
+    [SerializeField]
+    private float slamFallSpeed = 20f;
+
+    [SerializeField]
+    private float slamRadius = 3f;
+
+    [SerializeField]
+    private GameObject slamWarningPrefab;
 
     [Header("투사체 패턴")]
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private int projectileCount = 3;
-    [SerializeField] private float projectileSpeed = 8f;
-    [SerializeField] private float projectileSpread = 30f;
+    [SerializeField]
+    private GameObject projectilePrefab;
+
+    [SerializeField]
+    private int projectileCount = 3;
+
+    [SerializeField]
+    private float projectileSpeed = 8f;
+
+    [SerializeField]
+    private float projectileSpread = 30f;
 
     [Header("연속 베기 패턴")]
-    [SerializeField] private int comboHitCount = 3;
-    [SerializeField] private float comboInterval = 0.3f;
-    [SerializeField] private float comboRange = 1.5f;
-    [SerializeField] private Collider2D meleeHitbox;
+    [SerializeField]
+    private int comboHitCount = 3;
+
+    [SerializeField]
+    private float comboInterval = 0.3f;
+
+    [SerializeField]
+    private float comboRange = 1.5f;
+
+    [SerializeField]
+    private Collider2D meleeHitbox;
 
     [Header("패턴 공통")]
-    [SerializeField] private float patternCooldown = 2f;
-    [SerializeField] private float tellDuration = 0.6f;
-    [SerializeField] private float detectionRange = 12f;
+    [SerializeField]
+    private float patternCooldown = 2f;
+
+    [SerializeField]
+    private float tellDuration = 0.6f;
+
+    [SerializeField]
+    private float detectionRange = 12f;
 
     [Header("Drops")]
-    [SerializeField] private GameObject goldDropPrefab;
-    [SerializeField] private int goldDropMin = 20;
-    [SerializeField] private int goldDropMax = 40;
+    [SerializeField]
+    private GameObject goldDropPrefab;
+
+    [SerializeField]
+    private int goldDropMin = 20;
+
+    [SerializeField]
+    private int goldDropMax = 40;
 
     [Header("Knockback")]
-    [SerializeField] private float knockbackForce = 3f;
-    [SerializeField] private float knockbackDuration = 0.1f;
+    [SerializeField]
+    private float knockbackForce = 3f;
+
+    [SerializeField]
+    private float knockbackDuration = 0.1f;
 
     [Header("Ground Check")]
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField]
+    private LayerMask groundLayer;
+
+    [Header("Audio")]
+    [SerializeField]
+    private AudioClip deathSound;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -71,6 +125,16 @@ public class BossController : MonoBehaviour, IDamageable
     private Transform player;
     private Color originalColor;
 
+    [Header("UI")]
+    [SerializeField]
+    private string bossDisplayName = "BOSS";
+
+    [SerializeField]
+    private GameObject bossHealthBarUIPrefab;
+
+    private BossHealthBarUI healthBarUI;
+    private Animator animator;
+
     public System.Action onDeath;
 
     void Awake()
@@ -78,20 +142,42 @@ public class BossController : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
         hp = maxHp;
         originalColor = sr.color;
+
+        // BossHealthBarUI 인스턴스 확보: 씬에 없으면 프리팹/스크립트로 생성
+        healthBarUI = BossHealthBarUI.Instance;
+        if (healthBarUI == null)
+        {
+            if (bossHealthBarUIPrefab != null)
+            {
+                var go = Instantiate(bossHealthBarUIPrefab);
+                healthBarUI = go.GetComponent<BossHealthBarUI>();
+            }
+            else
+            {
+                var go = new GameObject("BossHealthBarUI");
+                healthBarUI = go.AddComponent<BossHealthBarUI>();
+            }
+        }
+        healthBarUI.Show(bossDisplayName);
+        healthBarUI.SetHealth(hp, maxHp);
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
     }
 
+    void OnEnable() => Instances.Add(this);
+
+    void OnDisable() => Instances.Remove(this);
+
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
+        if (PlayerRef.Exists)
         {
-            player = playerGO.transform;
-            Physics2D.IgnoreLayerCollision(gameObject.layer, playerGO.layer, true);
+            player = PlayerRef.Transform;
+            Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
     }
 
@@ -99,6 +185,13 @@ public class BossController : MonoBehaviour, IDamageable
     {
         if (isDead || player == null)
             return;
+
+        // 보스 인트로 연출 중에는 행동 금지.
+        if (BossIntro.IsPlaying)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
 
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist > detectionRange)
@@ -167,6 +260,8 @@ public class BossController : MonoBehaviour, IDamageable
         }
 
         isActing = false;
+        if (animator != null && !isDead)
+            animator.Play("Idle", 0, 0f);
     }
 
     // ── 텔 (예고 연출) ──
@@ -204,12 +299,23 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellFlash(Color.red);
 
+        if (animator != null)
+            animator.Play("Dash", 0, 0f);
+
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
+        bool hitPlayer = false;
 
         while (elapsed < chargeDuration)
         {
             rb.linearVelocity = new Vector2(dir * chargeSpeed, rb.linearVelocity.y);
+
+            if (!hitPlayer && Vector2.Distance(transform.position, player.position) <= 1.2f)
+            {
+                DealAreaDamage(transform.position, 1.2f);
+                hitPlayer = true;
+            }
+
             elapsed += Time.deltaTime;
             yield return null;
         }
@@ -226,6 +332,9 @@ public class BossController : MonoBehaviour, IDamageable
     IEnumerator SlamAttack()
     {
         yield return TellShake();
+
+        if (animator != null)
+            animator.Play("Slam", 0, 0f);
 
         // 점프
         rb.linearVelocity = new Vector2(0f, slamJumpForce);
@@ -266,6 +375,9 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellFlash(new Color(1f, 0.5f, 0f));
 
+        if (animator != null)
+            animator.Play("Charge", 0, 0f);
+
         if (projectilePrefab == null || player == null)
             yield break;
 
@@ -276,8 +388,11 @@ public class BossController : MonoBehaviour, IDamageable
         {
             float offset = 0f;
             if (projectileCount > 1)
-                offset = Mathf.Lerp(-projectileSpread / 2f, projectileSpread / 2f,
-                    (float)i / (projectileCount - 1));
+                offset = Mathf.Lerp(
+                    -projectileSpread / 2f,
+                    projectileSpread / 2f,
+                    (float)i / (projectileCount - 1)
+                );
 
             float angle = (baseAngle + offset) * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
@@ -301,16 +416,8 @@ public class BossController : MonoBehaviour, IDamageable
         {
             FlipToPlayer();
 
-            if (meleeHitbox != null)
-            {
-                meleeHitbox.enabled = true;
-                yield return new WaitForSeconds(0.1f);
-                meleeHitbox.enabled = false;
-            }
-            else
-            {
-                DealAreaDamage(transform.position, comboRange);
-            }
+            // IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
+            DealAreaDamage(transform.position, comboRange);
 
             if (i < comboHitCount - 1)
                 yield return new WaitForSeconds(comboInterval);
@@ -368,6 +475,8 @@ public class BossController : MonoBehaviour, IDamageable
             StartCoroutine(Phase2Flash());
         }
 
+        healthBarUI?.SetHealth(hp, maxHp);
+
         if (hp <= 0f)
         {
             if (meleeHitbox != null)
@@ -418,8 +527,13 @@ public class BossController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        AudioManager.Instance?.PlaySFX(deathSound);
         StopAllCoroutines();
+        if (animator != null)
+            animator.enabled = false;
         sr.color = originalColor;
+        healthBarUI?.SetHealth(0, maxHp);
+        healthBarUI?.Hide();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
@@ -440,6 +554,9 @@ public class BossController : MonoBehaviour, IDamageable
 
         Vector3 pos = transform.position + Vector3.up * 0.3f;
         float floorY = transform.position.y;
+        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
+        if (groundHit.collider != null)
+            floorY = groundHit.point.y;
 
         for (int i = 0; i < 5; i++)
         {

@@ -23,10 +23,7 @@ public class ShieldController : MonoBehaviour
 
     void Start()
     {
-        var playerGO = GameObject.FindGameObjectWithTag("Player");
-        if (playerGO != null)
-            _player = playerGO.transform;
-
+        _player = PlayerRef.Transform;
         _enemy.isAttackBlocked = IsBlocked;
     }
 

@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private PlayerMovement movement;
     private PlayerCombat combat;
+    private WeaponInventory weaponInventory;
     private bool deathHandled;
 
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
@@ -27,6 +28,7 @@ public class PlayerController : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         combat = GetComponent<PlayerCombat>();
         health = GetComponent<PlayerHealth>();
+        weaponInventory = GetComponentInChildren<WeaponInventory>();
     }
 
     void Update()
@@ -53,7 +55,9 @@ public class PlayerController : MonoBehaviour
 
         movement.HandleInput();
         combat.HandleInput();
-        movement.UpdateAnimatorAndFlip(combat.IsAttacking);
+        bool flipAllowed =
+            !combat.IsAttacking || (weaponInventory?.Current?.flipDuringAttack ?? false);
+        movement.UpdateAnimatorAndFlip(combat.IsAttacking, flipAllowed);
     }
 
     void FixedUpdate()
@@ -75,6 +79,7 @@ public class PlayerController : MonoBehaviour
     public void Revive()
     {
         health?.Revive();
+        weaponInventory?.ResetToDefault();
 
         deathHandled = false;
         rb.bodyType = RigidbodyType2D.Dynamic;

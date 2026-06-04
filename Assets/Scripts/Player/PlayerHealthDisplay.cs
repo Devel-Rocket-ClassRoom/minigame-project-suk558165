@@ -13,7 +13,7 @@ public class PlayerHealthDisplay : MonoBehaviour
     void Update()
     {
         if (playerHealth == null)
-            playerHealth = FindFirstObjectByType<PlayerHealth>();
+            playerHealth = PlayerRef.Health;
 
         if (playerHealth == null)
             return;

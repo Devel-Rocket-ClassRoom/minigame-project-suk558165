@@ -2468,6 +2468,7 @@ MonoBehaviour:
   itemsGainedText: {fileID: 6700000004}
   returnHintText: {fileID: 6800000004}
   returnKey: 120
+  gameOverSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
 --- !u!114 &6683160771605683206
 MonoBehaviour:
   m_ObjectHideFlags: 0

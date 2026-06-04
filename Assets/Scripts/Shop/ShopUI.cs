@@ -75,7 +75,7 @@ public class ShopUI : MonoBehaviour
 
     public void Open(List<ScriptableObject> items, HashSet<ScriptableObject> soldItems = null)
     {
-        inventory = FindFirstObjectByType<Inventory>();
+        inventory = Inventory.Instance;
         if (frame == null)
             return;
 

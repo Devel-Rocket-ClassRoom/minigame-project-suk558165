@@ -62,6 +62,6 @@ public class Portal : MonoBehaviour
         if (portalType == PortalType.DungeonEntrance)
             GameFlowController.Instance?.EnterDungeon();
         else
-            FindAnyObjectByType<RoomManager>()?.GoToNextRoom();
+            RoomManager.Instance?.GoToNextRoom();
     }
 }

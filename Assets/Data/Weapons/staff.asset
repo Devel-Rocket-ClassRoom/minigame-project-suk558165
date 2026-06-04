@@ -23,7 +23,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   sprite: {fileID: 21300000, guid: bab758647f0fc5a4d8a1ada501dd4f74, type: 3}
-  weaponType: 1
+  weaponType: 2
   description:
     m_TableReference:
       m_TableCollectionName: Items
@@ -36,7 +36,7 @@ MonoBehaviour:
   price: 220
   damage: 20
   attackCooldown: 1
-  attackSound: {fileID: 8300000, guid: f8cb64146b4d3ea4794e300e3b77da58, type: 3}
+  attackSound: {fileID: 8300000, guid: 2e613ef3a69195c43b4bcc08896be9b1, type: 3}
   spriteScale: 2
   swingAngle: 0
   swingDuration: 0

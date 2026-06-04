@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldPotion : MonoBehaviour
 {
+    public static readonly List<WorldPotion> Instances = new List<WorldPotion>();
+
     public float healAmount = 20f;
     public float pickupRadius = 1.2f;
     public float magnetRadius = 4f;
@@ -23,6 +26,9 @@ public class WorldPotion : MonoBehaviour
         launched = true;
     }
 
+    void OnEnable() => Instances.Add(this);
+    void OnDisable() => Instances.Remove(this);
+
     void Start()
     {
         if (!launched)
@@ -38,7 +44,11 @@ public class WorldPotion : MonoBehaviour
 
             if (velocity.y < 0f && transform.position.y <= groundY)
             {
-                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                transform.position = new Vector3(
+                    transform.position.x,
+                    groundY,
+                    transform.position.z
+                );
                 launched = false;
                 grounded = true;
             }
@@ -48,7 +58,11 @@ public class WorldPotion : MonoBehaviour
                 float realGround = FindGroundY();
                 if (transform.position.y <= realGround)
                 {
-                    transform.position = new Vector3(transform.position.x, realGround, transform.position.z);
+                    transform.position = new Vector3(
+                        transform.position.x,
+                        realGround,
+                        transform.position.z
+                    );
                     launched = false;
                     grounded = true;
                 }
@@ -62,14 +76,10 @@ public class WorldPotion : MonoBehaviour
 
         if (player == null)
         {
-            var go = GameObject.FindGameObjectWithTag("Player");
-            if (go == null)
+            if (!PlayerRef.Exists)
                 return;
-            player = go.transform;
-            health =
-                go.GetComponent<PlayerHealth>()
-                ?? go.GetComponentInChildren<PlayerHealth>()
-                ?? go.GetComponentInParent<PlayerHealth>();
+            player = PlayerRef.Transform;
+            health = PlayerRef.Health;
         }
 
         if (health == null || health.IsDead)
@@ -102,8 +112,12 @@ public class WorldPotion : MonoBehaviour
 
     float FindGroundY()
     {
-        var hit = Physics2D.Raycast(transform.position, Vector2.down, 20f,
-            LayerMask.GetMask("Ground", "Platform"));
+        var hit = Physics2D.Raycast(
+            transform.position,
+            Vector2.down,
+            20f,
+            LayerMask.GetMask("Ground", "Platform")
+        );
         if (hit.collider != null)
             return hit.point.y;
         return groundY;

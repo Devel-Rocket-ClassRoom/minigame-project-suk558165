@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -43,6 +44,63 @@ public class CameraFollow : MonoBehaviour
     private Camera _cam;
     private PlayerMovement _playerMovement;
 
+    public static CameraFollow Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
+    void Awake()
+    {
+        Instance = this;
+        _cam = GetComponent<Camera>();
+        ApplyCameraSettings();
+
+        // Z축 강제 보정
+        var pos = transform.position;
+        pos.z = cameraZ;
+        transform.position = pos;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
+    void Start()
+    {
+        TryAcquireTarget();
+        RefreshBounds();
+
+        if (target != null)
+            SnapToTarget();
+    }
+
+    void LateUpdate()
+    {
+        if (!TryAcquireTarget())
+            return;
+
+        float facingDir = GetFacingDirection();
+        if (facingDir != 0f)
+            _lastFacingDir = facingDir;
+
+        float targetLookAhead = _lastFacingDir * lookAheadDistance;
+        _currentLookAhead = Mathf.Lerp(
+            _currentLookAhead,
+            targetLookAhead,
+            Time.deltaTime * lookAheadSpeed
+        );
+
+        Vector3 targetPos = ClampToBounds(CalculateTargetPosition());
+        transform.position = Vector3.SmoothDamp(
+            transform.position,
+            targetPos,
+            ref _velocity,
+            smoothTime
+        );
+    }
+
     public void SnapToTarget()
     {
         if (target == null)
@@ -69,51 +127,83 @@ public class CameraFollow : MonoBehaviour
 
     public void ClearBounds() => useBounds = false;
 
-    void Awake()
+    public void RefreshBounds(Transform root = null)
     {
-        _cam = GetComponent<Camera>();
+        if (!useBounds && autoDetectBoundsFromTilemap)
+            TryAutoDetectBoundsFromTilemap(root);
+    }
+
+    /// <summary>월드 좌표로 카메라 위치를 강제 이동. 페이드 전환 시 사용.</summary>
+    public void ForcePosition(Vector3 worldPos)
+    {
+        _velocity = Vector3.zero;
+        transform.position = new Vector3(worldPos.x, worldPos.y, cameraZ);
+    }
+
+    /// <summary>추적 대상 변경. 보스 인트로 줌인 등에서 사용.</summary>
+    public void SetFollowTarget(Transform t)
+    {
+        target = t;
+        _playerMovement = t != null ? t.GetComponent<PlayerMovement>() : null;
+    }
+
+    public float OrthographicSize
+    {
+        get => _cam != null ? _cam.orthographicSize : orthographicSize;
+        set
+        {
+            orthographicSize = value;
+            if (_cam != null)
+                _cam.orthographicSize = value;
+        }
+    }
+
+    /// <summary>OrthographicSize를 from에서 to까지 duration 동안 보간.</summary>
+    public IEnumerator LerpOrthographicSize(float from, float to, float duration)
+    {
+        if (_cam == null)
+        {
+            OrthographicSize = to;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            OrthographicSize = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        OrthographicSize = to;
+    }
+
+    bool TryAcquireTarget()
+    {
+        if (target != null)
+            return true;
+
+        if (PlayerRef.Movement == null)
+            return false;
+
+        target = PlayerRef.Transform;
+        _playerMovement = PlayerRef.Movement;
+        return true;
+    }
+
+    void ApplyCameraSettings()
+    {
+        if (_cam == null)
+            _cam = GetComponent<Camera>();
         if (_cam != null)
             _cam.orthographicSize = orthographicSize;
-
-        // Cinemachine 등이 Z를 바꿨을 수 있으므로 강제 보정
-        var pos = transform.position;
-        pos.z = cameraZ;
-        transform.position = pos;
     }
 
-    void Start()
+    void TryAutoDetectBoundsFromTilemap(Transform root = null)
     {
-        if (target == null)
-        {
-            var player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-                target = player.transform;
-        }
-
-        if (target != null)
-            _playerMovement = target.GetComponent<PlayerMovement>();
-
-        if (!useBounds && autoDetectBoundsFromTilemap)
-            TryAutoDetectBoundsFromTilemap();
-
-        // 시작 위치를 즉시 설정 (튀는 현상 방지)
-        if (target != null)
-        {
-            float facingDir = GetFacingDirection();
-            _currentLookAhead = facingDir * lookAheadDistance;
-            transform.position = ClampToBounds(CalculateTargetPosition());
-        }
-    }
-
-    public void RefreshBounds()
-    {
-        if (!useBounds && autoDetectBoundsFromTilemap)
-            TryAutoDetectBoundsFromTilemap();
-    }
-
-    void TryAutoDetectBoundsFromTilemap()
-    {
-        var tilemaps = FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
+        var tilemaps = root != null
+            ? root.GetComponentsInChildren<Tilemap>()
+            : FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
         if (tilemaps.Length == 0)
             return;
 
@@ -125,7 +215,6 @@ public class CameraFollow : MonoBehaviour
             var b = tm.localBounds;
             if (b.size == Vector3.zero)
                 continue;
-            // 로컬 → 월드 변환
             var worldMin = tm.transform.TransformPoint(b.min);
             var worldMax = tm.transform.TransformPoint(b.max);
             if (first)
@@ -151,42 +240,6 @@ public class CameraFollow : MonoBehaviour
         useBounds = true;
     }
 
-    void LateUpdate()
-    {
-        if (target == null)
-        {
-            var pm = FindFirstObjectByType<PlayerMovement>();
-            if (pm != null)
-            {
-                target = pm.transform;
-                _playerMovement = pm;
-                SnapToTarget();
-            }
-            return;
-        }
-
-        float facingDir = GetFacingDirection();
-        if (facingDir != 0f)
-            _lastFacingDir = facingDir;
-
-        // 이동 방향으로 부드럽게 룩어헤드
-        float targetLookAhead = _lastFacingDir * lookAheadDistance;
-        _currentLookAhead = Mathf.Lerp(
-            _currentLookAhead,
-            targetLookAhead,
-            Time.deltaTime * lookAheadSpeed
-        );
-
-        Vector3 targetPos = ClampToBounds(CalculateTargetPosition());
-
-        transform.position = Vector3.SmoothDamp(
-            transform.position,
-            targetPos,
-            ref _velocity,
-            smoothTime
-        );
-    }
-
     Vector3 ClampToBounds(Vector3 pos)
     {
         if (!useBounds)
@@ -209,23 +262,19 @@ public class CameraFollow : MonoBehaviour
 
     float GetFacingDirection()
     {
-        if (_playerMovement != null && _playerMovement.MoveInput != 0f)
+        if (_playerMovement == null)
+            return 0f;
+
+        if (_playerMovement.MoveInput != 0f)
             return Mathf.Sign(_playerMovement.MoveInput);
 
-        // Visuals의 scaleX로 방향 확인
-        if (_playerMovement != null && _playerMovement.Visuals != null)
+        if (_playerMovement.Visuals != null)
             return _playerMovement.Visuals.localScale.x >= 0f ? 1f : -1f;
 
         return 0f;
     }
 
 #if UNITY_EDITOR
-    void OnValidate()
-    {
-        if (_cam == null)
-            _cam = GetComponent<Camera>();
-        if (_cam != null)
-            _cam.orthographicSize = orthographicSize;
-    }
+    void OnValidate() => ApplyCameraSettings();
 #endif
 }
