@@ -4013,6 +4013,7 @@ MonoBehaviour:
   goldText: {fileID: 9165520106351079639}
   closeButton: {fileID: 3140819758977508556}
   noticeText: {fileID: 0}
+  buySound: {fileID: 8300000, guid: 91d787c28919cf443989f45e7c3cfbd2, type: 3}
 --- !u!1 &8022584438583201257
 GameObject:
   m_ObjectHideFlags: 0

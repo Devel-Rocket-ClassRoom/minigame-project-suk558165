@@ -73,6 +73,16 @@ public class AudioManager : MonoBehaviour
             sfxSource.volume = value;
     }
 
+    public void PlayBGM(AudioClip clip)
+    {
+        if (bgmSource == null)
+            return;
+        bgmSource.Stop();
+        bgmSource.clip = clip;
+        if (clip != null)
+            bgmSource.Play();
+    }
+
     public void PlaySFX(AudioClip clip)
     {
         if (sfxSource != null && clip != null)

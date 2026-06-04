@@ -103,19 +103,29 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: -1, y: -2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 1
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {fileID: 11400000, guid: f500f71717bdccd4db1e3cb99ac52861, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {fileID: 21300000, guid: 93f93b48fa934fa40b9d9202fa742904, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data:
       e00: 1
       e01: 0
@@ -134,7 +144,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 1
+  - m_RefCount: 2
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -2579,6 +2589,8 @@ MonoBehaviour:
   spawnEffectPrefab: {fileID: 4005435086369086175, guid: ccb1995c047a4ef44843c60e0820146a, type: 3}
   spawnEffectDelay: 1
   spawnEffectYOffset: -0.5
+  bossBGM: {fileID: 8300000, guid: f5bbb50388094724ea375a32abf07ea9, type: 3}
+  afterBossBGM: {fileID: 8300000, guid: 7e2c660b2de25764e9ebf1344f30f7ab, type: 3}
   waves:
   - groups:
     - prefab: {fileID: 9078295822729669931, guid: badd7c01aa342364a82918c51faf48d2, type: 3}
@@ -2586,6 +2598,7 @@ MonoBehaviour:
       count: 1
       interval: 0.5
     delayBeforeSpawn: 1
+    instantSpawn: 0
     triggerZone: {fileID: 0}
 --- !u!114 &5550000000000000001
 MonoBehaviour:
@@ -2597,14 +2610,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 90f325f0bc8c08445a659c0833ff767c, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  bossName: "보스"
-  bossTitle: ""
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bossName: "\uBCF4\uC2A4"
+  bossTitle:
   zoomOutSize: 8
   zoomDuration: 0.8
+  spawnDelay: 0.2
+  spawnToNameDelay: 0.4
   nameDisplayDuration: 1.5
   bossNameUIPrefab: {fileID: 1000000000000000001, guid: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6, type: 3}
+  cameraTarget: {fileID: 2317746078933088667}
 --- !u!1 &7149492321709860382
 GameObject:
   m_ObjectHideFlags: 0

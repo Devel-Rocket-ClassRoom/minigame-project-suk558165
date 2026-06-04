@@ -19,6 +19,9 @@ public class TreasureChest : MonoBehaviour
     [Header("Interaction")]
     public float interactRange = 1.5f;
 
+    [Header("Audio")]
+    public AudioClip openSound;
+
     [Header("UI")]
     public GameObject hintObject;
 
@@ -69,6 +72,7 @@ public class TreasureChest : MonoBehaviour
         if (hintObject != null)
             hintObject.SetActive(false);
 
+        AudioManager.Instance?.PlaySFX(openSound);
         SpawnGoldCoins();
 
         if (animator != null)

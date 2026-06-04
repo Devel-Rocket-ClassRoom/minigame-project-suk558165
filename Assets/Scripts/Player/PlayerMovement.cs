@@ -205,12 +205,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void UpdateAnimatorAndFlip(bool isAttacking)
+    public void UpdateAnimatorAndFlip(bool isAttacking, bool flipAllowed = true)
     {
         animator.SetFloat(HashSpeed, Mathf.Abs(MoveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, IsGrounded || IsDashing);
 
-        if (!isAttacking)
+        if (!isAttacking || flipAllowed)
         {
             if (MoveInput > 0f)
                 Flip(false);

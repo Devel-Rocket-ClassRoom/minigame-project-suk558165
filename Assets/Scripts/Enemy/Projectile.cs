@@ -40,10 +40,9 @@ public class Projectile : MonoBehaviour
         this.spinSpeed = spinSpeed;
         var rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction.normalized * speed;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        rb.constraints = RigidbodyConstraints2D.None;
-        transform.rotation = Quaternion.Euler(0, 0, angle - 45f);
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+            sr.flipX = direction.x > 0f;
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
     }

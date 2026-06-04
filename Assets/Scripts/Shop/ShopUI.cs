@@ -38,6 +38,9 @@ public class ShopUI : MonoBehaviour
         closedFrame = -1;
     }
 
+    [SerializeField]
+    private AudioClip buySound;
+
     private Inventory inventory;
     private Coroutine noticeCoroutine;
 
@@ -130,6 +133,7 @@ public class ShopUI : MonoBehaviour
         }
 
         inventory.SpendGold(price);
+        AudioManager.Instance?.PlaySFX(buySound);
 
         if (goldText != null)
             goldText.text = $"골드: {inventory.Gold}";

@@ -108,8 +108,8 @@ Transform:
   m_GameObject: {fileID: 9078295822729669931}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0.2, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4455667788990011223}
@@ -271,7 +271,7 @@ MonoBehaviour:
   slamFallSpeed: 20
   slamRadius: 3
   slamWarningPrefab: {fileID: 6945726611966360431, guid: 0e5b478e60def2d4e8569fa9f9fc34a0, type: 3}
-  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  projectilePrefab: {fileID: 3402575793163392766, guid: 8043f9e2e6bdf11429c19cd68f943929, type: 3}
   projectileCount: 3
   projectileSpeed: 8
   projectileSpread: 30
