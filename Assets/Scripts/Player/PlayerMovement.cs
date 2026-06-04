@@ -256,9 +256,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // 아랫점프 중이면 FixedUpdate에서 속도를 강제 적용 (코루틴에서 설정한 속도가 물리 보정에 덮어써지는 문제 방지)
-            float yVel = isDropping ? Mathf.Min(rb.linearVelocity.y, -10f) : rb.linearVelocity.y;
-            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, yVel);
+            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, rb.linearVelocity.y);
 
             if (rb.linearVelocity.y < 0f)
                 rb.linearVelocity +=
@@ -267,10 +265,6 @@ public class PlayerMovement : MonoBehaviour
                     * (fallGravityMultiplier - 1f)
                     * Time.fixedDeltaTime;
         }
-
-        // 점프 상승 중엔 플랫폼 충돌 제외 (아랫점프는 DropDown에서 콜라이더를 직접 끔)
-        if (mainCollider != null)
-            mainCollider.excludeLayers = rb.linearVelocity.y > 0.5f ? platformLayer : (LayerMask)0;
 
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
@@ -294,20 +288,17 @@ public class PlayerMovement : MonoBehaviour
         if (isDropping)
             yield break;
 
-        // 발 아래 platformLayer 콜라이더 찾기
         Collider2D platformCol = Physics2D.OverlapCircle(groundCheck.position, 0.5f, platformLayer);
         if (platformCol == null)
             yield break;
 
         isDropping = true;
-        platformCol.enabled = false;
+        Physics2D.IgnoreCollision(mainCollider, platformCol, true);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -10f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        if (platformCol != null)
-            platformCol.enabled = true;
-
+        Physics2D.IgnoreCollision(mainCollider, platformCol, false);
         isDropping = false;
     }
 }
