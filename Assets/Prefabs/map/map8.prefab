@@ -4659,6 +4659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2977815661554610607}
   - component: {fileID: 8128810840653742690}
+  - component: {fileID: 7777771801801801801}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -4711,7 +4712,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -5246,7 +5247,7 @@ MonoBehaviour:
       count: 3
       interval: 0.4
     delayBeforeSpawn: 2
-    triggerZone: {fileID: 0}
+    triggerZone: {fileID: 8128810840653742690}
 --- !u!1 &5912749791875171746
 GameObject:
   m_ObjectHideFlags: 0
@@ -8135,3 +8136,16 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
+--- !u!114 &7777771801801801801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218297697804358803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 7588163228990406135}

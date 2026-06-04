@@ -8,6 +8,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour, IDamageable
 {
     public static readonly List<EnemyController> Instances = new List<EnemyController>();
+
     [Header("Stats")]
     public float maxHp = 50f;
     public float moveSpeed = 2f;
@@ -44,6 +45,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [Header("Audio")]
     public AudioClip attackSound;
+    public AudioClip deathSound;
 
     [Header("Melee")]
     public Collider2D meleeHitbox;
@@ -100,6 +102,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     }
 
     void OnEnable() => Instances.Add(this);
+
     void OnDisable() => Instances.Remove(this);
 
     void Start()
@@ -372,6 +375,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        AudioManager.Instance?.PlaySFX(deathSound);
         healthBar?.SetHealth(0, maxHp);
         StopAllCoroutines();
         sr.color = Color.white;

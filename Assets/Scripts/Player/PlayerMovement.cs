@@ -92,6 +92,8 @@ public class PlayerMovement : MonoBehaviour
 
     private DashGhostEffect dashGhost;
     private Collider2D mainCollider;
+    private readonly Collider2D[] platformBuffer = new Collider2D[8];
+    private bool passingThroughPlatform;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -205,12 +207,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void UpdateAnimatorAndFlip(bool isAttacking)
+    public void UpdateAnimatorAndFlip(bool isAttacking, bool flipAllowed = false)
     {
         animator.SetFloat(HashSpeed, Mathf.Abs(MoveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, IsGrounded || IsDashing);
 
-        if (!isAttacking)
+        if (!isAttacking || flipAllowed)
         {
             if (MoveInput > 0f)
                 Flip(false);
@@ -272,19 +274,54 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
-        // 점프 상승 중엔 플랫폼 충돌 제외 (아랫점프는 DropDown에서 콜라이더를 직접 끔)
-        // 점프 정점에서 플레이어가 플랫폼 내부에 있으면 끼임이 발생하므로, 겹치는 동안에는 계속 제외 유지
+        // ── 원웨이 플랫폼 통과 판정 ──────────────────────────────────────────────
+        // passingThroughPlatform 플래그로 "아래서 점프해 진입" 상태를 명시 추적.
+        // 자연 낙하(걷다가 떨어짐)는 이 플래그가 켜지지 않으므로 아래 플랫폼에 정상 착지.
+        // 이전 방식(속도·중심 임계값)은 낙하 중 이미 지나온 윗 플랫폼을 오탐해 층 건너뜀 버그 유발.
         if (mainCollider != null)
         {
-            bool overlappingPlatform = Physics2D.OverlapBox(
+            float playerFeetY = mainCollider.bounds.min.y;
+            bool goingUp = rb.linearVelocity.y > 0.5f;
+
+            int hitCount = Physics2D.OverlapBoxNonAlloc(
                 mainCollider.bounds.center,
-                mainCollider.bounds.size * 0.95f,
+                mainCollider.bounds.size * 1.1f,
                 0f,
+                platformBuffer,
                 platformLayer
             );
-            bool goingUp = rb.linearVelocity.y > 0.5f;
-            mainCollider.excludeLayers =
-                (goingUp || overlappingPlatform) ? platformLayer : (LayerMask)0;
+
+            // ① 상승 중 발이 플랫폼 상단 아래로 들어갈 때 통과 시작
+            //    (0.05f 여유: 플랫폼 위에 서있다가 점프하는 경우 오트리거 방지)
+            if (goingUp && !passingThroughPlatform)
+            {
+                for (int i = 0; i < hitCount; i++)
+                {
+                    if (playerFeetY < platformBuffer[i].bounds.max.y - 0.05f)
+                    {
+                        passingThroughPlatform = true;
+                        break;
+                    }
+                }
+            }
+
+            // ② 발이 모든 감지된 플랫폼 상단을 완전히 벗어나면 통과 해제
+            if (passingThroughPlatform)
+            {
+                bool stillInside = false;
+                for (int i = 0; i < hitCount; i++)
+                {
+                    if (playerFeetY < platformBuffer[i].bounds.max.y - 0.05f)
+                    {
+                        stillInside = true;
+                        break;
+                    }
+                }
+                if (!stillInside)
+                    passingThroughPlatform = false;
+            }
+
+            mainCollider.excludeLayers = passingThroughPlatform ? platformLayer : (LayerMask)0;
         }
 
         Vector2 checkPos = groundCheck.position;
@@ -296,6 +333,8 @@ public class PlayerMovement : MonoBehaviour
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
+        if (IsGrounded)
+            passingThroughPlatform = false;
 
         // 속도 조건 없이 순수 overlap — groundLayer·platformLayer 모두 체크해 아랫점프 입력 수신에 사용
         IsOnPlatform =

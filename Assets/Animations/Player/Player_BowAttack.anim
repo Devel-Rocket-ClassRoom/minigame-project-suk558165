@@ -125,15 +125,15 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 1668595965, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+      value: {fileID: -2017153972, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
     - time: 0.083333336
-      value: {fileID: -2054197275, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+      value: {fileID: -1319400395, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
     - time: 0.16666667
-      value: {fileID: -643981428, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+      value: {fileID: 1251416672, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
     - time: 0.25
-      value: {fileID: 1192441045, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+      value: {fileID: 1712020772, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
     - time: 0.33333334
-      value: {fileID: -1401925474, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+      value: {fileID: -571558619, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -174,11 +174,11 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 1668595965, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
-    - {fileID: -2054197275, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
-    - {fileID: -643981428, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
-    - {fileID: 1192441045, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
-    - {fileID: -1401925474, guid: 35dee01f8e192ac41b1b3afc42d7dd83, type: 3}
+    - {fileID: -2017153972, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
+    - {fileID: -1319400395, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
+    - {fileID: 1251416672, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
+    - {fileID: 1712020772, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
+    - {fileID: -571558619, guid: ec6a91a520b648f4c9ffc127b2e53f1f, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -584,14 +584,14 @@ AnimationClip:
   m_Events:
   - time: 0.16666667
     functionName: OnRangedFire
-    data:
+    data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.4
     functionName: OnAttackEnd
-    data:
+    data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0

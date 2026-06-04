@@ -25,6 +25,7 @@ public class PlayerCombat : MonoBehaviour
 
     private const string SwordAttackState = "SwordAttack";
     private const string BowAttackState = "BowAttack";
+    private const string MagicAttackState = "MagicAttack";
     private const string SwordOverrideClip = "Player_SwordAttack";
     private const string BowOverrideClip = "Player_BowAttack";
     private const string IdleOverrideClip = "Player_Idle";
@@ -74,7 +75,10 @@ public class PlayerCombat : MonoBehaviour
         if (IsAttacking)
         {
             var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            bool inAttack = stateInfo.IsName(SwordAttackState) || stateInfo.IsName(BowAttackState);
+            bool inAttack =
+                stateInfo.IsName(SwordAttackState)
+                || stateInfo.IsName(BowAttackState)
+                || stateInfo.IsName(MagicAttackState);
             if (!inAttack)
             {
                 IsAttacking = false;
@@ -107,14 +111,21 @@ public class PlayerCombat : MonoBehaviour
             animator.Play(SwordAttackState, 0, 0f);
             AudioManager.Instance?.PlaySFX(currentWeapon.attackSound);
         }
-        else if ((currentWeapon.weaponType == WeaponType.Ranged || currentWeapon.weaponType == WeaponType.Magic)
-                 && projectilePrefab != null)
+        else if (
+            (
+                currentWeapon.weaponType == WeaponType.Ranged
+                || currentWeapon.weaponType == WeaponType.Magic
+            )
+            && projectilePrefab != null
+        )
         {
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             weapon?.Show();
-            animator.Play(BowAttackState, 0, 0f);
+            string attackState =
+                currentWeapon.weaponType == WeaponType.Magic ? MagicAttackState : BowAttackState;
+            animator.Play(attackState, 0, 0f);
             pendingRangedDir = attackDir;
             pendingRangedDamage = currentWeapon.damage;
             pendingRangedBonus = bonus;
@@ -193,21 +204,21 @@ public class PlayerCombat : MonoBehaviour
 
     void ApplyWeapon(WeaponData data)
     {
-        AnimationClip attackClip = data.weaponType switch
+        // Magic은 컨트롤러에 MagicAttack 상태로 직접 배치돼 있어 override 불필요.
+        if (data.weaponType != WeaponType.Magic)
         {
-            WeaponType.Magic => magicAttackClip,
-            WeaponType.Ranged => rangedAttackClip,
-            _ => meleeAttackClip,
-        };
+            AnimationClip attackClip = data.weaponType switch
+            {
+                WeaponType.Ranged => rangedAttackClip,
+                _ => meleeAttackClip,
+            };
 
-        bool useBowState = data.weaponType == WeaponType.Ranged || data.weaponType == WeaponType.Magic;
-
-        if (attackClip != null)
-        {
-            if (useBowState)
-                overrideController[BowOverrideClip] = attackClip;
-            else
-                overrideController[SwordOverrideClip] = attackClip;
+            if (attackClip != null)
+            {
+                string overrideKey =
+                    data.weaponType == WeaponType.Ranged ? BowOverrideClip : SwordOverrideClip;
+                overrideController[overrideKey] = attackClip;
+            }
         }
 
         if (weapon != null)

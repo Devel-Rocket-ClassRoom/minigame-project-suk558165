@@ -36,7 +36,7 @@ MonoBehaviour:
   price: 220
   damage: 20
   attackCooldown: 1
-  attackSound: {fileID: 8300000, guid: f8cb64146b4d3ea4794e300e3b77da58, type: 3}
+  attackSound: {fileID: 8300000, guid: 2e613ef3a69195c43b4bcc08896be9b1, type: 3}
   spriteScale: 2
   swingAngle: 0
   swingDuration: 0

@@ -4,6 +4,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 {
     public float maxHp = 100f;
 
+    [Header("Audio")]
+    public AudioClip deathSound;
+
     private float hp;
     private Inventory inventory;
 
@@ -41,7 +44,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         RunStats.Instance?.AddDamageTaken(finalDamage);
         ScreenHitEffect.Instance?.Flash();
         if (IsDead)
+        {
             RunStats.Instance?.AddDeath();
+            AudioManager.Instance?.PlaySFX(deathSound);
+        }
     }
 
     public void Heal(float amount)

@@ -37,6 +37,9 @@ public class WeaponData : ScriptableObject
     public float swingAngle = 120f;
     public float swingDuration = 0.5f;
 
+    [Tooltip("공격 중에도 방향 전환 허용 (건틀릿 등 연타 무기)")]
+    public bool flipDuringAttack = false;
+
     [Header("Ranged")]
     public float projectileSpeed = 12f;
 }

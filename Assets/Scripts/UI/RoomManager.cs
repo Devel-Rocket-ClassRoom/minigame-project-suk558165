@@ -39,9 +39,6 @@ public class RoomManager : MonoBehaviour
     [SerializeField]
     private Transform player;
 
-    [SerializeField]
-    private GameClearUI gameClearUI;
-
     public int CurrentRoomNumber { get; private set; }
     public RoomType CurrentRoomType { get; private set; }
 
@@ -271,12 +268,7 @@ public class RoomManager : MonoBehaviour
     void OnGameClear()
     {
         ResetPlayerInventory();
-
-        if (gameClearUI == null)
-            gameClearUI = GameClearUI.Instance;
-
-        if (gameClearUI != null)
-            gameClearUI.Show();
+        GameClearUI.Instance?.Show();
     }
 
     void ResetPlayerInventory()

@@ -48,7 +48,14 @@ public class GameClearUI : MonoBehaviour
         triggered = true;
         RunStats.Instance?.StopTimer();
         Time.timeScale = 0f;
-        gameObject.SetActive(true);
+
+        // 부모 체인이 비활성이면 코루틴 시작이 실패하므로 자기 자신부터 루트까지 활성화.
+        for (var t = transform; t != null; t = t.parent)
+        {
+            if (!t.gameObject.activeSelf)
+                t.gameObject.SetActive(true);
+        }
+
         StartCoroutine(ShowRoutine());
     }
 

@@ -183,7 +183,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2.5, y: 2.5}
+    oldSize: {x: 2.56, y: 2.56}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -217,15 +217,16 @@ MonoBehaviour:
   chaseYThreshold: 1.2
   isRanged: 1
   aimAtPlayer: 0
-  projectilePrefab: {fileID: 890269536779844890, guid: 9b0ad16b3f86c394093ce0da91d0aebf, type: 3}
+  projectilePrefab: {fileID: 7683480936549367447, guid: 0a3191e238d6f48489100bb1ab69e001, type: 3}
   firePoint: {fileID: 5546412685052367543}
   projectileSpeed: 8
   safeDistance: 3
-  projectileSpinSpeed: 0
+  projectileSpinSpeed: 360
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
-  attackSound: {fileID: 8300000, guid: a7b5af98318064c40a1393425cf1729a, type: 3}
+  attackSound: {fileID: 8300000, guid: d936ed9354f06534f83f6296fbab71e6, type: 3}
+  deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
   meleeHitbox: {fileID: 0}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3

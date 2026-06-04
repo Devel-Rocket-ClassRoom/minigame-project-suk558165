@@ -57,7 +57,9 @@ public class SpawnManager : MonoBehaviour
 
     private int currentWaveIndex;
     private int aliveCount;
+    private int pendingSpawnCount;
     private bool waitingForTrigger;
+    private bool allWavesCleared;
 
     void Start()
     {
@@ -69,7 +71,17 @@ public class SpawnManager : MonoBehaviour
         {
             if (wave.triggerZone != null)
             {
-                wave.triggerZone.isTrigger = true;
+                // 같은 GameObject의 모든 Collider2D를 트리거로 강제 — 플레이어가 충돌로 막히지 않게.
+                foreach (var col in wave.triggerZone.GetComponents<Collider2D>())
+                    col.isTrigger = true;
+
+                // 트리거 이벤트는 콜라이더가 붙은 GameObject에서만 발생하므로 포워더 부착.
+                if (wave.triggerZone.GetComponent<WaveTriggerForwarder>() == null)
+                {
+                    var fwd = wave.triggerZone.gameObject.AddComponent<WaveTriggerForwarder>();
+                    fwd.target = this;
+                }
+
                 wave.triggerZone.gameObject.SetActive(false);
             }
         }
@@ -79,15 +91,37 @@ public class SpawnManager : MonoBehaviour
 
         var bossIntro = GetComponentInChildren<BossIntro>();
         if (bossIntro != null)
-            bossIntro.Play(() => StartCoroutine(SpawnWave(waves[0])));
-        else
+        {
+            // 인트로와 첫 웨이브 스폰을 병렬로 시작 — 보스가 스폰되는 모습을 카메라가 잡도록.
+            bossIntro.Play(null);
             StartCoroutine(SpawnWave(waves[0]));
+        }
+        else
+        {
+            StartCoroutine(SpawnWave(waves[0]));
+        }
     }
 
     IEnumerator SpawnWave(Wave wave)
     {
         if (wave.delayBeforeSpawn > 0f)
             yield return new WaitForSeconds(wave.delayBeforeSpawn);
+
+        // 이 웨이브가 스폰할 총 적 수를 미리 더해서, 스폰이 다 끝나기 전엔 클리어 판정이 안 나도록.
+        int totalPending = 0;
+        foreach (var group in wave.groups)
+        {
+            if (
+                group.prefab != null
+                && group.spawnPointIndex >= 0
+                && group.spawnPointIndex < spawnPoints.Length
+                && spawnPoints[group.spawnPointIndex] != null
+            )
+            {
+                totalPending += group.count;
+            }
+        }
+        pendingSpawnCount += totalPending;
 
         foreach (var group in wave.groups)
             StartCoroutine(SpawnGroupItems(group));
@@ -106,6 +140,12 @@ public class SpawnManager : MonoBehaviour
 
         for (int i = 0; i < group.count; i++)
         {
+            // 이미 웨이브 진행 자체가 끝났으면 남은 스폰 취소 (트리거 기반 다음 웨이브 진입 등).
+            if (allWavesCleared)
+            {
+                pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - (group.count - i));
+                yield break;
+            }
             yield return SpawnEnemyWithEffect(group.prefab, point.position);
             if (i < group.count - 1 && group.interval > 0f)
                 yield return new WaitForSeconds(group.interval);
@@ -125,6 +165,7 @@ public class SpawnManager : MonoBehaviour
 
         var go = Instantiate(prefab, position, Quaternion.identity);
         aliveCount++;
+        pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - 1);
 
         var enemy = go.GetComponent<EnemyController>();
         if (enemy != null)
@@ -152,6 +193,10 @@ public class SpawnManager : MonoBehaviour
         if (aliveCount > 0)
             return;
 
+        // 이번 웨이브가 아직 스폰 중이면 클리어 판정 보류.
+        if (pendingSpawnCount > 0)
+            return;
+
         AdvanceWave();
     }
 
@@ -161,6 +206,7 @@ public class SpawnManager : MonoBehaviour
 
         if (currentWaveIndex >= waves.Count)
         {
+            allWavesCleared = true;
             onAllEnemiesDead?.Invoke();
             return;
         }
@@ -179,7 +225,13 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    // SpawnManager 자체 GameObject에 콜라이더가 있을 때를 위한 fallback.
+    void OnTriggerEnter2D(Collider2D other) => HandleTrigger(other);
+
+    // WaveTriggerForwarder에서 호출됨.
+    public void NotifyWaveTrigger(Collider2D other) => HandleTrigger(other);
+
+    void HandleTrigger(Collider2D other)
     {
         if (!waitingForTrigger)
             return;

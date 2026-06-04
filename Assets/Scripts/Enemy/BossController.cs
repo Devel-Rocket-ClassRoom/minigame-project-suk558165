@@ -7,6 +7,7 @@ using UnityEngine;
 public class BossController : MonoBehaviour, IDamageable
 {
     public static readonly List<BossController> Instances = new List<BossController>();
+
     [Header("Stats")]
     [SerializeField]
     private float maxHp = 500f;
@@ -106,6 +107,10 @@ public class BossController : MonoBehaviour, IDamageable
     [SerializeField]
     private LayerMask groundLayer;
 
+    [Header("Audio")]
+    [SerializeField]
+    private AudioClip deathSound;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Collider2D col;
@@ -119,7 +124,16 @@ public class BossController : MonoBehaviour, IDamageable
 
     private Transform player;
     private Color originalColor;
-    private EnemyHealthBar healthBar;
+
+    [Header("UI")]
+    [SerializeField]
+    private string bossDisplayName = "BOSS";
+
+    [SerializeField]
+    private GameObject bossHealthBarUIPrefab;
+
+    private BossHealthBarUI healthBarUI;
+    private Animator animator;
 
     public System.Action onDeath;
 
@@ -128,16 +142,34 @@ public class BossController : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
         hp = maxHp;
         originalColor = sr.color;
-        healthBar = gameObject.AddComponent<EnemyHealthBar>();
-        healthBar.Init(new Vector3(0f, -0.6f, 0f), 2f);
+
+        // BossHealthBarUI 인스턴스 확보: 씬에 없으면 프리팹/스크립트로 생성
+        healthBarUI = BossHealthBarUI.Instance;
+        if (healthBarUI == null)
+        {
+            if (bossHealthBarUIPrefab != null)
+            {
+                var go = Instantiate(bossHealthBarUIPrefab);
+                healthBarUI = go.GetComponent<BossHealthBarUI>();
+            }
+            else
+            {
+                var go = new GameObject("BossHealthBarUI");
+                healthBarUI = go.AddComponent<BossHealthBarUI>();
+            }
+        }
+        healthBarUI.Show(bossDisplayName);
+        healthBarUI.SetHealth(hp, maxHp);
 
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
     }
 
     void OnEnable() => Instances.Add(this);
+
     void OnDisable() => Instances.Remove(this);
 
     void Start()
@@ -153,6 +185,13 @@ public class BossController : MonoBehaviour, IDamageable
     {
         if (isDead || player == null)
             return;
+
+        // 보스 인트로 연출 중에는 행동 금지.
+        if (BossIntro.IsPlaying)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
 
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist > detectionRange)
@@ -221,6 +260,8 @@ public class BossController : MonoBehaviour, IDamageable
         }
 
         isActing = false;
+        if (animator != null && !isDead)
+            animator.Play("Base", 0, 0f);
     }
 
     // ── 텔 (예고 연출) ──
@@ -256,6 +297,8 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator ChargeAttack()
     {
+        if (animator != null)
+            animator.Play("Dash", 0, 0f);
         yield return TellFlash(Color.red);
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
@@ -279,6 +322,8 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator SlamAttack()
     {
+        if (animator != null)
+            animator.Play("Slam", 0, 0f);
         yield return TellShake();
 
         // 점프
@@ -318,6 +363,8 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator ProjectileAttack()
     {
+        if (animator != null)
+            animator.Play("Charge", 0, 0f);
         yield return TellFlash(new Color(1f, 0.5f, 0f));
 
         if (projectilePrefab == null || player == null)
@@ -425,7 +472,7 @@ public class BossController : MonoBehaviour, IDamageable
             StartCoroutine(Phase2Flash());
         }
 
-        healthBar?.SetHealth(hp, maxHp);
+        healthBarUI?.SetHealth(hp, maxHp);
 
         if (hp <= 0f)
         {
@@ -477,9 +524,13 @@ public class BossController : MonoBehaviour, IDamageable
     void Die()
     {
         isDead = true;
+        AudioManager.Instance?.PlaySFX(deathSound);
         StopAllCoroutines();
+        if (animator != null)
+            animator.enabled = false;
         sr.color = originalColor;
-        healthBar?.SetHealth(0, maxHp);
+        healthBarUI?.SetHealth(0, maxHp);
+        healthBarUI?.Hide();
         if (meleeHitbox != null)
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;

@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class BossIntro : MonoBehaviour
 {
+    public static bool IsPlaying { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => IsPlaying = false;
+
     [Header("보스 정보")]
     [SerializeField]
     private string bossName = "보스";
@@ -27,6 +32,11 @@ public class BossIntro : MonoBehaviour
     [SerializeField]
     private GameObject bossNameUIPrefab;
 
+    [Header("카메라 타겟")]
+    [Tooltip("인트로 중 카메라가 비출 위치. 보통 보스 스폰 포인트 Transform을 할당.")]
+    [SerializeField]
+    private Transform cameraTarget;
+
     public void Play(System.Action onComplete)
     {
         StartCoroutine(IntroSequence(onComplete));
@@ -34,6 +44,7 @@ public class BossIntro : MonoBehaviour
 
     IEnumerator IntroSequence(System.Action onComplete)
     {
+        IsPlaying = true;
         var cam = CameraFollow.Instance;
         var playerController = PlayerRef.Controller;
 
@@ -42,13 +53,14 @@ public class BossIntro : MonoBehaviour
 
         Transform originalTarget = null;
         float originalLensSize = 0f;
+        Transform focusTarget = cameraTarget != null ? cameraTarget : transform;
 
         if (cam != null)
         {
             originalTarget = cam.target;
             originalLensSize = cam.OrthographicSize;
 
-            cam.SetFollowTarget(transform);
+            cam.SetFollowTarget(focusTarget);
             yield return cam.LerpOrthographicSize(originalLensSize, zoomOutSize, zoomDuration);
         }
 
@@ -70,6 +82,7 @@ public class BossIntro : MonoBehaviour
         if (playerController != null)
             playerController.InputLocked = false;
 
+        IsPlaying = false;
         onComplete?.Invoke();
     }
 }

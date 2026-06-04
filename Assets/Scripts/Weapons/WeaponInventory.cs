@@ -12,6 +12,20 @@ public class WeaponInventory : MonoBehaviour
 
     public event System.Action<WeaponData> OnWeaponChanged;
 
+    private List<WeaponData> defaultWeapons;
+
+    void Awake()
+    {
+        defaultWeapons = new List<WeaponData>(weapons);
+    }
+
+    public void ResetToDefault()
+    {
+        weapons = new List<WeaponData>(defaultWeapons);
+        currentIndex = 0;
+        NotifyWeaponChanged();
+    }
+
     void Update()
     {
         if (weapons.Count < 2 || InventoryUI.IsOpen)

@@ -14,6 +14,9 @@ public class MapTestManager : MonoBehaviour
     {
         public string label;
         public GameObject prefab;
+
+        [Tooltip("체크하면 클리어 시 GameClearUI 팝업을 띄웁니다 (보스 방 전용)")]
+        public bool isBossRoom;
     }
 
     [Header("테스트할 맵 목록")]
@@ -213,6 +216,10 @@ public class MapTestManager : MonoBehaviour
         state = State.Cleared;
         statusMsg = "CLEARED!";
         Debug.Log("[MapTest] Room Cleared!");
+
+        var entry = (maps.Count > 0 && selectedIndex < maps.Count) ? maps[selectedIndex] : null;
+        if (entry != null && entry.isBossRoom)
+            GameClearUI.Instance?.Show();
     }
 
     void DestroyRoom()

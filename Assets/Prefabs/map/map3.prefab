@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1209061801612148151}
   - component: {fileID: 9180139556571705962}
+  - component: {fileID: 7777771301301301301}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -62,7 +63,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -8988,3 +8989,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7727724040862882933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7777771301301301301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153432212972525607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 3019549813711137346}
