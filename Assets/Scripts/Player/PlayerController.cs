@@ -65,10 +65,6 @@ public class PlayerController : MonoBehaviour
         movement.FixedUpdateMovement();
     }
 
-    /// <summary>
-    /// 마을 귀환 시 죽음 상태를 완전히 초기화합니다.
-    /// HP 복구 + 물리/애니메이터 상태 복원
-    /// </summary>
     public void Knockback(Vector2 velocity)
     {
         if (health == null || health.IsDead)
@@ -76,6 +72,10 @@ public class PlayerController : MonoBehaviour
         movement.ApplyKnockback(velocity);
     }
 
+    /// <summary>
+    /// 마을 귀환 시 죽음 상태를 완전히 초기화합니다.
+    /// HP 복구 + 물리/애니메이터 상태 복원
+    /// </summary>
     public void Revive()
     {
         health?.Revive();

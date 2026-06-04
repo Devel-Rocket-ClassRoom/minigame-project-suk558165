@@ -90,6 +90,12 @@ public class OptionsMenu : MonoBehaviour
         languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
     }
 
+    void OnDisable()
+    {
+        if (languageDropdown != null)
+            languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged);
+    }
+
     void OnLanguageChanged(int index)
     {
         LanguageManager.Instance?.SetLanguage(index);

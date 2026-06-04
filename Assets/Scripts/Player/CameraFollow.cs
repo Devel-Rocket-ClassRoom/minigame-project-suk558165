@@ -201,9 +201,18 @@ public class CameraFollow : MonoBehaviour
 
     void TryAutoDetectBoundsFromTilemap(Transform root = null)
     {
-        var tilemaps = root != null
-            ? root.GetComponentsInChildren<Tilemap>()
-            : FindObjectsByType<Tilemap>(FindObjectsSortMode.None);
+        Tilemap[] tilemaps;
+        if (root != null)
+        {
+            tilemaps = root.GetComponentsInChildren<Tilemap>();
+        }
+        else
+        {
+            var list = new System.Collections.Generic.List<Tilemap>();
+            foreach (var go in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+                list.AddRange(go.GetComponentsInChildren<Tilemap>());
+            tilemaps = list.ToArray();
+        }
         if (tilemaps.Length == 0)
             return;
 

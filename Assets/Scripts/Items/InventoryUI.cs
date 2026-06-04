@@ -310,7 +310,7 @@ public class InventoryUI : MonoBehaviour
 
     void InsertBackpack(int index, ScriptableObject item)
     {
-        inventory.AddToBackpack(item);
+        inventory.InsertToBackpack(index, item);
     }
 
     void SwapEquipSlots(InventorySlotUI a, InventorySlotUI b)

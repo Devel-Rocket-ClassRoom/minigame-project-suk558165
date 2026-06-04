@@ -19,6 +19,9 @@ public class Shop : MonoBehaviour
     private ShopUI shopUI;
 
     [SerializeField]
+    private Canvas parentCanvas;
+
+    [SerializeField]
     private float shopScale = 1.5f;
 
     [SerializeField]
@@ -86,8 +89,7 @@ public class Shop : MonoBehaviour
 
         if (!shopUI.gameObject.scene.IsValid())
         {
-            var canvas = FindFirstObjectByType<Canvas>();
-            shopUI = Instantiate(shopUI, canvas != null ? canvas.transform : null);
+            shopUI = Instantiate(shopUI, parentCanvas != null ? parentCanvas.transform : null);
 
             var shopCanvas = shopUI.GetComponent<Canvas>();
             if (shopCanvas == null)

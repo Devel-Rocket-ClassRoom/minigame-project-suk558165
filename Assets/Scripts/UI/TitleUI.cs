@@ -48,7 +48,7 @@ public class TitleUI : MonoBehaviour
         SetHUD(false);
 
         // 세이브 데이터가 없으면 컨티뉴 버튼 비활성화
-        if (continueButton != null)
+        if (continueButton != null && GameFlowController.Instance != null)
             continueButton.interactable = GameFlowController.Instance.HasSaveData();
     }
 
@@ -69,6 +69,9 @@ public class TitleUI : MonoBehaviour
 
     public void OnNewGame()
     {
+        if (GameFlowController.Instance == null)
+            return;
+
         if (GameFlowController.Instance.HasSaveData() && newGameConfirmPanel != null)
         {
             newGameConfirmPanel.SetActive(true);
@@ -83,7 +86,7 @@ public class TitleUI : MonoBehaviour
         if (newGameConfirmPanel != null)
             newGameConfirmPanel.SetActive(false);
 
-        GameFlowController.Instance.StartNewGame();
+        GameFlowController.Instance?.StartNewGame();
     }
 
     public void OnNewGameCancel()
@@ -92,7 +95,7 @@ public class TitleUI : MonoBehaviour
             newGameConfirmPanel.SetActive(false);
     }
 
-    public void OnContinue() => GameFlowController.Instance.ContinueGame();
+    public void OnContinue() => GameFlowController.Instance?.ContinueGame();
 
     public void OnOptions()
     {

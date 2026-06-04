@@ -75,6 +75,16 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
+    public bool InsertToBackpack(int index, ScriptableObject item)
+    {
+        if (backpack.Count >= MaxBackpack)
+            return false;
+        index = Mathf.Clamp(index, 0, backpack.Count);
+        backpack.Insert(index, item);
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
     public ScriptableObject RemoveFromBackpack(int index)
     {
         if (index < 0 || index >= backpack.Count)
