@@ -79,6 +79,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &7777771301301301301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153432212972525607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 3019549813711137346}
 --- !u!1 &428300503839331472
 GameObject:
   m_ObjectHideFlags: 0
@@ -5383,6 +5396,7 @@ MonoBehaviour:
       count: 1
       interval: 0.5
     delayBeforeSpawn: 1
+    instantSpawn: 0
     triggerZone: {fileID: 0}
   - groups:
     - prefab: {fileID: 3225806718886043462, guid: b0bca7b7648a3ca40870698abb282fcd, type: 3}
@@ -5398,6 +5412,7 @@ MonoBehaviour:
       count: 1
       interval: 0.5
     delayBeforeSpawn: 2
+    instantSpawn: 0
     triggerZone: {fileID: 9180139556571705962}
 --- !u!1 &8351848940754165467
 GameObject:
@@ -8989,16 +9004,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7727724040862882933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7777771301301301301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 153432212972525607}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 3019549813711137346}

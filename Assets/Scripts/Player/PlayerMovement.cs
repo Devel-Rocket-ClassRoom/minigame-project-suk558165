@@ -348,21 +348,29 @@ public class PlayerMovement : MonoBehaviour
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
         LayerMask combinedLayer = groundLayer | platformLayer;
-        // passingThroughPlatform 중엔 platformLayer를 지면 판정에서 제외:
-        // OverlapCircle은 excludeLayers를 무시하므로, 플랫폼 통과 중 IsGrounded가
-        // 잘못 true가 되어 pass-through 상태를 조기 해제하는 버그 방지.
-        LayerMask groundCheckLayer = passingThroughPlatform ? groundLayer : combinedLayer;
-        bool hit =
-            Physics2D.OverlapCircle(checkPos, 0.15f, groundCheckLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, groundCheckLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, groundCheckLayer);
+        // groundLayer와 platformLayer를 분리 체크:
+        // passingThroughPlatform 중에는 OverlapCircle이 platformLayer를 감지해
+        // IsGrounded가 잘못 true가 되는 버그 방지 (OverlapCircle은 excludeLayers 무시).
+        // groundLayer는 항상 체크하고, platformLayer는 통과 중이 아닐 때만 체크.
+        bool hitGround =
+            Physics2D.OverlapCircle(checkPos, 0.15f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, groundLayer);
+        bool hitPlatform =
+            !passingThroughPlatform
+            && (
+                Physics2D.OverlapCircle(checkPos, 0.15f, platformLayer)
+                || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, platformLayer)
+                || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, platformLayer)
+            );
+        bool hit = hitGround || hitPlatform;
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
 
         // 착지 확인 후 즉시 점프 플래그 해제 및 충돌 복구
-        // passingThroughPlatform이 true이면 아직 플랫폼 내부에 있으므로 해제 금지
-        if (IsGrounded && isJumping && !passingThroughPlatform)
+        if (IsGrounded && isJumping)
         {
             isJumping = false;
+            passingThroughPlatform = false;
             passThroughPlatformTopY = float.MinValue;
             if (mainCollider != null)
                 mainCollider.excludeLayers = 0;
