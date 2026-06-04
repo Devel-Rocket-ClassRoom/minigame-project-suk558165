@@ -47,10 +47,22 @@ public class Inventory : MonoBehaviour
 
     public event Action OnInventoryChanged;
 
+    public static Inventory Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     void Awake()
     {
+        Instance = this;
         if (weaponInventory == null)
             weaponInventory = GetComponent<WeaponInventory>();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public bool AddToBackpack(ScriptableObject item)
@@ -88,6 +100,7 @@ public class Inventory : MonoBehaviour
         weaponInventory.weapons[slotIndex] = weapon;
         OnInventoryChanged?.Invoke();
         SaveEquippedWeapons();
+        NotifyIfCurrentSlotChanged(slotIndex);
         return old;
     }
 
@@ -102,7 +115,18 @@ public class Inventory : MonoBehaviour
         weaponInventory.weapons[slotIndex] = null;
         OnInventoryChanged?.Invoke();
         SaveEquippedWeapons();
+        NotifyIfCurrentSlotChanged(slotIndex);
         return old;
+    }
+
+    /// <summary>변경된 슬롯이 현재 활성 슬롯이면 PlayerCombat 등 구독자에게 무기 변경을 알린다.</summary>
+    void NotifyIfCurrentSlotChanged(int slotIndex)
+    {
+        if (weaponInventory == null)
+            return;
+        if (slotIndex != weaponInventory.currentIndex)
+            return;
+        weaponInventory.NotifyWeaponChanged();
     }
 
     void SaveEquippedWeapons()

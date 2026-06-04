@@ -13,10 +13,22 @@ public class TutorialStepUI : MonoBehaviour
     [SerializeField]
     private float fadeDuration = 0.3f;
 
+    public static TutorialStepUI Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     void Awake()
     {
+        Instance = this;
         if (canvasGroup != null)
             canvasGroup.alpha = 0f;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public void Show(string message)

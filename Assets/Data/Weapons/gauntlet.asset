@@ -40,6 +40,7 @@ MonoBehaviour:
   spriteScale: 2
   swingAngle: 70
   swingDuration: 0.2
+  flipDuringAttack: 1
   projectileSpeed: 0
   references:
     version: 2

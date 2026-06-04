@@ -182,8 +182,8 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0.6518813}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.16, y: 1.4}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 1.1328125, y: 1.3671875}
     newSize: {x: 1.16, y: 1.4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -221,10 +221,12 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  projectileSpinSpeed: 0
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15
-  attackSound: {fileID: 8300000, guid: 09c93c76924684c4b9650a5e8032b5b7, type: 3}
+  attackSound: {fileID: 8300000, guid: d936ed9354f06534f83f6296fbab71e6, type: 3}
+  deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
   meleeHitbox: {fileID: 1002739566803246385}
   goldDropPrefab: {fileID: 5989661564655741517, guid: 03b4c7e6075cc50478996617d47a47b3, type: 3}
   goldDropMin: 3
@@ -264,7 +266,7 @@ Transform:
   m_GameObject: {fileID: 5281891531134171487}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.82, y: 0, z: 0}
+  m_LocalPosition: {x: 1.49, y: 1.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -304,7 +306,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.36185095, y: 0}
+  m_Offset: {x: -0.5290836, y: -0.15608385}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -314,7 +316,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.47629815, y: 0.6}
+  m_Size: {x: 0.8553586, y: 0.9121677}
   m_EdgeRadius: 0
 --- !u!114 &7983547642425598409
 MonoBehaviour:

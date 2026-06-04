@@ -14,6 +14,9 @@ public class MapTestManager : MonoBehaviour
     {
         public string label;
         public GameObject prefab;
+
+        [Tooltip("체크하면 클리어 시 GameClearUI 팝업을 띄웁니다 (보스 방 전용)")]
+        public bool isBossRoom;
     }
 
     [Header("테스트할 맵 목록")]
@@ -194,11 +197,11 @@ public class MapTestManager : MonoBehaviour
     void ForceClear()
     {
         // 씬에 살아있는 모든 EnemyController / BossController / MiniBossController 제거
-        foreach (var e in FindObjectsByType<EnemyController>(FindObjectsSortMode.None))
+        foreach (var e in EnemyController.Instances.ToArray())
             e.gameObject.SetActive(false);
-        foreach (var b in FindObjectsByType<BossController>(FindObjectsSortMode.None))
+        foreach (var b in BossController.Instances.ToArray())
             b.gameObject.SetActive(false);
-        foreach (var m in FindObjectsByType<MiniBossController>(FindObjectsSortMode.None))
+        foreach (var m in MiniBossController.Instances.ToArray())
             m.gameObject.SetActive(false);
 
         // SpawnManager가 있으면 콜백 직접 호출 (aliveCount 우회)
@@ -213,6 +216,10 @@ public class MapTestManager : MonoBehaviour
         state = State.Cleared;
         statusMsg = "CLEARED!";
         Debug.Log("[MapTest] Room Cleared!");
+
+        var entry = (maps.Count > 0 && selectedIndex < maps.Count) ? maps[selectedIndex] : null;
+        if (entry != null && entry.isBossRoom)
+            GameClearUI.Instance?.Show();
     }
 
     void DestroyRoom()

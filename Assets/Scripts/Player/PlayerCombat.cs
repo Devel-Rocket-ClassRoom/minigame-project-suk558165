@@ -11,30 +11,23 @@ public class PlayerCombat : MonoBehaviour
     public Transform firePoint;
     public float projectileSpeed = 12f;
 
-    [Header("Type-based Clips")]
+    [Header("Attack Clips")]
     [SerializeField]
     private AnimationClip meleeAttackClip;
-
-    [SerializeField]
-    private AnimationClip meleeIdleClip;
-
-    [SerializeField]
-    private AnimationClip meleeWalkClip;
 
     [SerializeField]
     private AnimationClip rangedAttackClip;
 
     [SerializeField]
-    private AnimationClip rangedIdleClip;
-
-    [SerializeField]
-    private AnimationClip rangedWalkClip;
+    private AnimationClip magicAttackClip;
 
     public bool IsAttacking { get; private set; }
 
     private const string SwordAttackState = "SwordAttack";
     private const string BowAttackState = "BowAttack";
+    private const string MagicAttackState = "MagicAttack";
     private const string SwordOverrideClip = "Player_SwordAttack";
+    private const string BowOverrideClip = "Player_BowAttack";
     private const string IdleOverrideClip = "Player_Idle";
     private const string WalkOverrideClip = "Player_Walk";
 
@@ -78,7 +71,20 @@ public class PlayerCombat : MonoBehaviour
     public void HandleInput()
     {
         attackTimer -= Time.deltaTime;
-        IsAttacking = false;
+
+        if (IsAttacking)
+        {
+            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            bool inAttack =
+                stateInfo.IsName(SwordAttackState)
+                || stateInfo.IsName(BowAttackState)
+                || stateInfo.IsName(MagicAttackState);
+            if (!inAttack)
+            {
+                IsAttacking = false;
+                weapon?.Hide();
+            }
+        }
 
         if (InventoryUI.IsOpen || ShopUI.IsOpen || PauseMenu.IsPaused)
             return;
@@ -101,16 +107,25 @@ public class PlayerCombat : MonoBehaviour
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
+            weapon.Show();
             animator.Play(SwordAttackState, 0, 0f);
             AudioManager.Instance?.PlaySFX(currentWeapon.attackSound);
         }
-        else if (currentWeapon.weaponType == WeaponType.Ranged && projectilePrefab != null)
+        else if (
+            (
+                currentWeapon.weaponType == WeaponType.Ranged
+                || currentWeapon.weaponType == WeaponType.Magic
+            )
+            && projectilePrefab != null
+        )
         {
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
-            animator.Play(BowAttackState, 0, 0f);
-            // 발사는 BowAttack 애니메이션 이벤트(OnRangedFire)에서 실행
+            weapon?.Show();
+            string attackState =
+                currentWeapon.weaponType == WeaponType.Magic ? MagicAttackState : BowAttackState;
+            animator.Play(attackState, 0, 0f);
             pendingRangedDir = attackDir;
             pendingRangedDamage = currentWeapon.damage;
             pendingRangedBonus = bonus;
@@ -170,6 +185,12 @@ public class PlayerCombat : MonoBehaviour
         weapon?.OnHitFrame();
     }
 
+    // Animation Event — 공격 애니메이션 마지막 프레임에서 호출
+    public void OnAttackEnd()
+    {
+        weapon?.Hide();
+    }
+
     // Animation Event — Player_BowAttack 발사 프레임 (frame 2, time 0.166s)
     public void OnRangedFire()
     {
@@ -183,29 +204,21 @@ public class PlayerCombat : MonoBehaviour
 
     void ApplyWeapon(WeaponData data)
     {
-        bool isRanged = data.weaponType == WeaponType.Ranged;
-
-        AnimationClip attackClip = isRanged ? rangedAttackClip : meleeAttackClip;
-        AnimationClip idleClip = isRanged ? rangedIdleClip : meleeIdleClip;
-        AnimationClip walkClip = isRanged ? rangedWalkClip : meleeWalkClip;
-
-        if (attackClip != null)
-            overrideController[SwordOverrideClip] = attackClip;
-
-        if (idleClip != null)
+        // Magic은 컨트롤러에 MagicAttack 상태로 직접 배치돼 있어 override 불필요.
+        if (data.weaponType != WeaponType.Magic)
         {
-            overrideController[IdleOverrideClip] = idleClip;
-            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName("Idle"))
-                animator.Play("Idle", 0, stateInfo.normalizedTime);
-        }
+            AnimationClip attackClip = data.weaponType switch
+            {
+                WeaponType.Ranged => rangedAttackClip,
+                _ => meleeAttackClip,
+            };
 
-        if (walkClip != null)
-        {
-            overrideController[WalkOverrideClip] = walkClip;
-            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName("Walk"))
-                animator.Play("Walk", 0, stateInfo.normalizedTime);
+            if (attackClip != null)
+            {
+                string overrideKey =
+                    data.weaponType == WeaponType.Ranged ? BowOverrideClip : SwordOverrideClip;
+                overrideController[overrideKey] = attackClip;
+            }
         }
 
         if (weapon != null)

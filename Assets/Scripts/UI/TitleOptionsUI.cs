@@ -9,6 +9,10 @@ public class TitleOptionsUI : MonoBehaviour
     public Slider bgmSlider;
     public Slider sfxSlider;
 
+    [Header("언어")]
+    [Tooltip("언어 선택 드롭다운 (옵션). 항목 순서: English, 한국어")]
+    public TMP_Dropdown languageDropdown;
+
     [Header("키 바인딩 레이블 (액션 설명 텍스트에 연결)")]
     public TextMeshProUGUI dashKeyText;
     public TextMeshProUGUI attackKeyText;
@@ -63,6 +67,12 @@ public class TitleOptionsUI : MonoBehaviour
         if (sfxSlider != null)
             sfxSlider.onValueChanged.AddListener(OnSFXChanged);
 
+        if (languageDropdown != null)
+        {
+            SetupLanguageDropdown();
+            languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+        }
+
         RefreshVolume();
         RefreshKeyLabels();
     }
@@ -75,6 +85,9 @@ public class TitleOptionsUI : MonoBehaviour
             bgmSlider.onValueChanged.RemoveListener(OnBGMChanged);
         if (sfxSlider != null)
             sfxSlider.onValueChanged.RemoveListener(OnSFXChanged);
+
+        if (languageDropdown != null)
+            languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged);
     }
 
     void Update()
@@ -154,6 +167,34 @@ public class TitleOptionsUI : MonoBehaviour
         if (SaveManager.Instance != null)
             SaveManager.Instance.Data.volumeSFX = v;
         SaveManager.Instance?.Save();
+    }
+
+    // ── 언어 ──────────────────────────────────────────────
+
+    void SetupLanguageDropdown()
+    {
+        if (languageDropdown == null)
+            return;
+
+        // 항목이 비어있으면 기본값으로 채워줌
+        if (languageDropdown.options == null || languageDropdown.options.Count == 0)
+        {
+            languageDropdown.options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>
+            {
+                new TMP_Dropdown.OptionData("English"),
+                new TMP_Dropdown.OptionData("한국어"),
+            };
+        }
+
+        // onValueChanged 발화 없이 현재 값만 설정
+        int current = LanguageManager.Instance != null ? LanguageManager.Instance.CurrentIndex : 0;
+        languageDropdown.SetValueWithoutNotify(current);
+        languageDropdown.RefreshShownValue();
+    }
+
+    public void OnLanguageChanged(int index)
+    {
+        LanguageManager.Instance?.SetLanguage(index);
     }
 
     // ── 키 바인딩 ─────────────────────────────────────────

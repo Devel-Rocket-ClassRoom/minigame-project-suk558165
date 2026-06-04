@@ -92,6 +92,10 @@ public class PlayerMovement : MonoBehaviour
 
     private DashGhostEffect dashGhost;
     private Collider2D mainCollider;
+    private readonly Collider2D[] platformBuffer = new Collider2D[8];
+    private bool passingThroughPlatform;
+    private float passThroughPlatformTopY = float.MinValue;
+    private bool isJumping;
 
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashIsGrounded = Animator.StringToHash("IsGrounded");
@@ -159,6 +163,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, EffectiveJumpForce);
             jumpCharges--;
+            isJumping = true;
             AudioManager.Instance?.PlaySFX(jumpSound);
         }
     }
@@ -205,12 +210,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void UpdateAnimatorAndFlip(bool isAttacking)
+    public void UpdateAnimatorAndFlip(bool isAttacking, bool flipAllowed = false)
     {
         animator.SetFloat(HashSpeed, Mathf.Abs(MoveInput) > 0f ? 1f : 0f);
         animator.SetBool(HashIsGrounded, IsGrounded || IsDashing);
 
-        if (!isAttacking)
+        if (!isAttacking || flipAllowed)
         {
             if (MoveInput > 0f)
                 Flip(false);
@@ -257,7 +262,11 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             // 아랫점프 중이면 FixedUpdate에서 속도를 강제 적용 (코루틴에서 설정한 속도가 물리 보정에 덮어써지는 문제 방지)
-            float yVel = isDropping ? Mathf.Min(rb.linearVelocity.y, -10f) : rb.linearVelocity.y;
+            // 단, 이미 다른 플랫폼/지면에 착지했다면 강제 속도를 풀어서 통과해 버리는 문제 방지
+            float yVel =
+                (isDropping && !IsGrounded)
+                    ? Mathf.Min(rb.linearVelocity.y, -10f)
+                    : rb.linearVelocity.y;
             rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, yVel);
 
             if (rb.linearVelocity.y < 0f)
@@ -268,19 +277,104 @@ public class PlayerMovement : MonoBehaviour
                     * Time.fixedDeltaTime;
         }
 
-        // 점프 상승 중엔 플랫폼 충돌 제외 (아랫점프는 DropDown에서 콜라이더를 직접 끔)
+        // ── 원웨이 플랫폼 통과 판정 ──────────────────────────────────────────────
+        // isJumping: 점프 입력 시 ON, 착지 시 OFF.
+        // - 상승 중 또는 (점프 중 + 아직 빠르게 낙하 안 한 구간): 무조건 제외,
+        //   passingThroughPlatform = true 로 낙하 구간에 상태 인계.
+        // - 낙하 구간(velocity < -0.5): OverlapBox 로 플랫폼과 겹치는 한 계속 제외.
+        //   겹침이 완전히 없어진 시점에만 해제 → 발 위치 기반이 아닌 overlap 기반이므로
+        //   방향키로 측면 진입해도 끼임 없이 통과.
         if (mainCollider != null)
-            mainCollider.excludeLayers = rb.linearVelocity.y > 0.5f ? platformLayer : (LayerMask)0;
+        {
+            bool goingUp = rb.linearVelocity.y > 0.5f;
+            bool goingDown = rb.linearVelocity.y < -0.5f;
+
+            if (goingUp || (isJumping && !goingDown))
+            {
+                if (!passingThroughPlatform)
+                    passThroughPlatformTopY = float.MinValue;
+
+                // 상승 중 통과하는 플랫폼의 상단 Y를 추적
+                if (goingUp)
+                {
+                    int pHits = Physics2D.OverlapBox(
+                        mainCollider.bounds.center,
+                        mainCollider.bounds.size * 1.1f,
+                        0f,
+                        new ContactFilter2D { layerMask = platformLayer, useLayerMask = true },
+                        platformBuffer
+                    );
+                    for (int i = 0; i < pHits; i++)
+                        if (platformBuffer[i] != null)
+                            passThroughPlatformTopY = Mathf.Max(
+                                passThroughPlatformTopY,
+                                platformBuffer[i].bounds.max.y
+                            );
+                }
+
+                mainCollider.excludeLayers = platformLayer;
+                passingThroughPlatform = true;
+            }
+            else
+            {
+                if (passingThroughPlatform)
+                {
+                    bool canClear;
+                    if (passThroughPlatformTopY > float.MinValue)
+                    {
+                        // 수평 이동으로 OverlapBox에서 벗어나도 발이 플랫폼 상단 이상일 때만 해제
+                        canClear = groundCheck.position.y >= passThroughPlatformTopY;
+                    }
+                    else
+                    {
+                        int hitCount = Physics2D.OverlapBox(
+                            mainCollider.bounds.center,
+                            mainCollider.bounds.size * 1.1f,
+                            0f,
+                            new ContactFilter2D { layerMask = platformLayer, useLayerMask = true },
+                            platformBuffer
+                        );
+                        canClear = hitCount == 0;
+                    }
+                    if (canClear)
+                        passingThroughPlatform = false;
+                }
+
+                mainCollider.excludeLayers = passingThroughPlatform ? platformLayer : (LayerMask)0;
+            }
+        }
 
         Vector2 checkPos = groundCheck.position;
         bool falling = rb.linearVelocity.y < -0.5f;
         float halfW = falling ? groundCheckSize.x * 0.5f : groundCheckSize.x * 0.27f;
         LayerMask combinedLayer = groundLayer | platformLayer;
-        bool hit =
-            Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
+        // groundLayer와 platformLayer를 분리 체크:
+        // passingThroughPlatform 중에는 OverlapCircle이 platformLayer를 감지해
+        // IsGrounded가 잘못 true가 되는 버그 방지 (OverlapCircle은 excludeLayers 무시).
+        // groundLayer는 항상 체크하고, platformLayer는 통과 중이 아닐 때만 체크.
+        bool hitGround =
+            Physics2D.OverlapCircle(checkPos, 0.15f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, groundLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, groundLayer);
+        bool hitPlatform =
+            !passingThroughPlatform
+            && (
+                Physics2D.OverlapCircle(checkPos, 0.15f, platformLayer)
+                || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, platformLayer)
+                || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, platformLayer)
+            );
+        bool hit = hitGround || hitPlatform;
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
+
+        // 착지 확인 후 즉시 점프 플래그 해제 및 충돌 복구
+        if (IsGrounded && isJumping)
+        {
+            isJumping = false;
+            passingThroughPlatform = false;
+            passThroughPlatformTopY = float.MinValue;
+            if (mainCollider != null)
+                mainCollider.excludeLayers = 0;
+        }
 
         // 속도 조건 없이 순수 overlap — groundLayer·platformLayer 모두 체크해 아랫점프 입력 수신에 사용
         IsOnPlatform =

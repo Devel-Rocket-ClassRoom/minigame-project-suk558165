@@ -22,7 +22,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  sprite: {fileID: 21300000, guid: b476fd35dc0cf9445aad750372f343ae, type: 3}
+  sprite: {fileID: 21300000, guid: 4ba68227bbccbb5469b62d685b30acb2, type: 3}
   weaponType: 0
   description:
     m_TableReference:
@@ -33,10 +33,13 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  spriteScale: 2
   price: 140
   damage: 16
   attackCooldown: 0.5
+  attackSound: {fileID: 8300000, guid: a7b5af98318064c40a1393425cf1729a, type: 3}
+  spriteScale: 2
+  spriteOffset: {x: 0, y: 0}
+  spriteRotation: 0
   swingAngle: 160
   swingDuration: 0.45
   projectileSpeed: 0

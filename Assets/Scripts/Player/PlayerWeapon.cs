@@ -22,6 +22,22 @@ public class PlayerWeapon : MonoBehaviour
 
         if (enemyLayer == 0)
             enemyLayer = LayerMask.GetMask("Enemy");
+
+        // 기본 상태에서 무기 숨김 (공격 시에만 표시)
+        if (weaponSr != null)
+            weaponSr.enabled = false;
+    }
+
+    public void Show()
+    {
+        if (weaponSr != null)
+            weaponSr.enabled = true;
+    }
+
+    public void Hide()
+    {
+        if (weaponSr != null)
+            weaponSr.enabled = false;
     }
 
     public void ApplyWeaponData(WeaponData data)
@@ -53,10 +69,10 @@ public class PlayerWeapon : MonoBehaviour
         var hits = Physics2D.OverlapCircleAll(center, hitRadius, enemyLayer);
         foreach (var hit in hits)
         {
-            var enemy = hit.GetComponent<EnemyController>();
-            if (enemy == null)
+            var damageable = hit.GetComponent<IDamageable>();
+            if (damageable == null)
                 continue;
-            enemy.TakeDamage(effectiveDamage);
+            damageable.TakeDamage(effectiveDamage);
             RunStats.Instance?.AddDamageDealt(effectiveDamage);
         }
     }
