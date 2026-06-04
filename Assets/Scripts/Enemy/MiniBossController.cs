@@ -25,6 +25,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private float waveSpeed = 6f;
 
+    [SerializeField]
+    private float waveSpawnOffsetY = 0.5f;
+
     [Header("도약 베기")]
     [SerializeField]
     private float leapJumpForce = 18f;
@@ -241,7 +244,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         if (wavePrefab != null)
         {
-            Vector3 origin = transform.position;
+            Vector3 origin = transform.position + Vector3.up * waveSpawnOffsetY;
 
             var left = Instantiate(wavePrefab, origin, Quaternion.identity);
             left.GetComponent<Projectile>()?.Init(Vector2.left, waveSpeed, damage, gameObject);
@@ -297,9 +300,13 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     IEnumerator MultiDash()
     {
-        if (animator != null)
+        if (animator != null && animator.HasState(0, Animator.StringToHash("MultiDash")))
             animator.Play("MultiDash", 0, 0f);
         yield return TellFlash(Color.cyan);
+
+        bool prevRootMotion = animator != null && animator.applyRootMotion;
+        if (animator != null)
+            animator.applyRootMotion = false;
 
         for (int i = 0; i < dashCount; i++)
         {
@@ -327,6 +334,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
             if (i < dashCount - 1)
                 yield return new WaitForSeconds(dashInterval);
         }
+
+        if (animator != null)
+            animator.applyRootMotion = prevRootMotion;
 
         // 스턴
         rb.linearVelocity = Vector2.zero;
