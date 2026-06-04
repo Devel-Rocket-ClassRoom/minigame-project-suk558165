@@ -53,6 +53,7 @@ public class GameOverUI : MonoBehaviour
             {
                 triggered = true;
                 RunStats.Instance?.StopTimer();
+                AudioManager.Instance?.PlaySFX(gameOverSound);
                 Time.timeScale = 0f;
                 StartCoroutine(ShowRoutine());
             }
@@ -65,7 +66,6 @@ public class GameOverUI : MonoBehaviour
 
     IEnumerator ShowRoutine()
     {
-        AudioManager.Instance?.PlaySFX(gameOverSound);
         PopulateStats();
 
         float elapsed = 0f;

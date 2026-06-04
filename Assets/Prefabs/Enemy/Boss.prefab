@@ -109,7 +109,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4455667788990011223}
@@ -270,7 +270,7 @@ MonoBehaviour:
   slamJumpForce: 15
   slamFallSpeed: 20
   slamRadius: 3
-  slamWarningPrefab: {fileID: 0}
+  slamWarningPrefab: {fileID: 6945726611966360431, guid: 0e5b478e60def2d4e8569fa9f9fc34a0, type: 3}
   projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   projectileCount: 3
   projectileSpeed: 8
@@ -291,7 +291,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 576
   deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
-  bossDisplayName: BOSS
+  bossDisplayName: King
   bossHealthBarUIPrefab: {fileID: 0}
 --- !u!95 &4455667788990022334
 Animator:

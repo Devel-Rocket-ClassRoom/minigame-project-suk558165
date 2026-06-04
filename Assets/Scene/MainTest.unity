@@ -184,7 +184,6 @@ MonoBehaviour:
   tutorialRoomPrefab: {fileID: 2926933431237095319, guid: 9a75018149bfd5941b28e033f417bdbe, type: 3}
   itemDatabase: {fileID: 11400000, guid: b3729aac221931249a72f1b27908e7ad, type: 2}
   roomManager: {fileID: 2085237427}
-  cinemachineCamera: {fileID: 0}
 --- !u!1 &582639439
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,8 +658,6 @@ MonoBehaviour:
   bossRoomPrefab: {fileID: 203403302495070545, guid: 25fe004c5c21f0c409c614a5e5ad0ee3, type: 3}
   chestPrefab: {fileID: 3457266472583827726, guid: 95a9e2965e2d69941b4a689cacaa96f6, type: 3}
   player: {fileID: 400000, guid: 3c7f8a2b1d4e5f690a1b2c3d4e5f6780, type: 3}
-  confiner: {fileID: 0}
-  gameClearUI: {fileID: 1121891927430353267, guid: 3fc961b017e5c0b46b220e8c3d0fea10, type: 3}
 --- !u!4 &2085237428
 Transform:
   m_ObjectHideFlags: 0

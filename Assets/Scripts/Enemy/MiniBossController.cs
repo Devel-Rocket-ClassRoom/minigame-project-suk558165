@@ -51,6 +51,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private float dashInterval = 0.3f;
 
+    [SerializeField]
+    private float dashHitRadius = 1.3f;
+
     [Header("패턴 공통")]
     [SerializeField]
     private float patternCooldown = 2.5f;
@@ -195,7 +198,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         isActing = false;
         if (animator != null && !isDead)
-            animator.Play("Base", 0, 0f);
+            animator.Play("Idle", 0, 0f);
     }
 
     // ── 텔 연출 ──────────────────────────────────────
@@ -283,17 +286,8 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         rb.linearVelocity = Vector2.zero;
 
-        // 착지 충격 — 멜레이 히트박스 순간 활성
-        if (meleeHitbox != null)
-        {
-            meleeHitbox.enabled = true;
-            yield return new WaitForSeconds(0.1f);
-            meleeHitbox.enabled = false;
-        }
-        else
-        {
-            DealAreaDamage(transform.position, leapRadius);
-        }
+        // 착지 충격 — IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
+        DealAreaDamage(transform.position, leapRadius);
 
         yield return new WaitForSeconds(0.4f);
     }
@@ -322,7 +316,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
                 rb.linearVelocity = new Vector2(dir * dashSpeed, rb.linearVelocity.y);
 
                 if (!dashHitThisSegment)
-                    DealAreaDamage(transform.position, 0.9f);
+                    DealAreaDamage(transform.position, dashHitRadius);
 
                 elapsed += Time.deltaTime;
                 yield return null;

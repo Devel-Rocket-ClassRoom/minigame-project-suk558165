@@ -25,7 +25,10 @@ public class SpawnManager : MonoBehaviour
         public List<SpawnGroup> groups = new List<SpawnGroup>();
 
         [Tooltip("이 웨이브 스폰 전 대기 시간")]
-        public float delayBeforeSpawn = 1f;
+        public float delayBeforeSpawn = 0f;
+
+        [Tooltip("true이면 그룹 내 interval 무시하고 모든 적 동시 스폰")]
+        public bool instantSpawn = false;
 
         [Tooltip(
             "비어있으면 전멸 시 바로 다음 웨이브. 지정하면 전멸 후 이 존에 진입해야 다음 웨이브"
@@ -43,7 +46,7 @@ public class SpawnManager : MonoBehaviour
 
     [Tooltip("이펙트 재생 후 몬스터가 나타나기까지 대기 시간")]
     [SerializeField]
-    private float spawnEffectDelay = 0.5f;
+    private float spawnEffectDelay = 0f;
 
     [Tooltip("이펙트 생성 Y 오프셋 (음수 = 아래)")]
     [SerializeField]
@@ -124,10 +127,10 @@ public class SpawnManager : MonoBehaviour
         pendingSpawnCount += totalPending;
 
         foreach (var group in wave.groups)
-            StartCoroutine(SpawnGroupItems(group));
+            StartCoroutine(SpawnGroupItems(group, wave.instantSpawn));
     }
 
-    IEnumerator SpawnGroupItems(SpawnGroup group)
+    IEnumerator SpawnGroupItems(SpawnGroup group, bool instant = false)
     {
         if (group.prefab == null)
             yield break;
@@ -140,14 +143,13 @@ public class SpawnManager : MonoBehaviour
 
         for (int i = 0; i < group.count; i++)
         {
-            // 이미 웨이브 진행 자체가 끝났으면 남은 스폰 취소 (트리거 기반 다음 웨이브 진입 등).
             if (allWavesCleared)
             {
                 pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - (group.count - i));
                 yield break;
             }
             yield return SpawnEnemyWithEffect(group.prefab, point.position);
-            if (i < group.count - 1 && group.interval > 0f)
+            if (!instant && i < group.count - 1 && group.interval > 0f)
                 yield return new WaitForSeconds(group.interval);
         }
     }

@@ -261,7 +261,7 @@ public class BossController : MonoBehaviour, IDamageable
 
         isActing = false;
         if (animator != null && !isDead)
-            animator.Play("Base", 0, 0f);
+            animator.Play("Idle", 0, 0f);
     }
 
     // ── 텔 (예고 연출) ──
@@ -297,16 +297,25 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator ChargeAttack()
     {
+        yield return TellFlash(Color.red);
+
         if (animator != null)
             animator.Play("Dash", 0, 0f);
-        yield return TellFlash(Color.red);
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
+        bool hitPlayer = false;
 
         while (elapsed < chargeDuration)
         {
             rb.linearVelocity = new Vector2(dir * chargeSpeed, rb.linearVelocity.y);
+
+            if (!hitPlayer && Vector2.Distance(transform.position, player.position) <= 1.2f)
+            {
+                DealAreaDamage(transform.position, 1.2f);
+                hitPlayer = true;
+            }
+
             elapsed += Time.deltaTime;
             yield return null;
         }
@@ -322,9 +331,10 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator SlamAttack()
     {
+        yield return TellShake();
+
         if (animator != null)
             animator.Play("Slam", 0, 0f);
-        yield return TellShake();
 
         // 점프
         rb.linearVelocity = new Vector2(0f, slamJumpForce);
@@ -363,9 +373,10 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator ProjectileAttack()
     {
+        yield return TellFlash(new Color(1f, 0.5f, 0f));
+
         if (animator != null)
             animator.Play("Charge", 0, 0f);
-        yield return TellFlash(new Color(1f, 0.5f, 0f));
 
         if (projectilePrefab == null || player == null)
             yield break;
@@ -405,16 +416,8 @@ public class BossController : MonoBehaviour, IDamageable
         {
             FlipToPlayer();
 
-            if (meleeHitbox != null)
-            {
-                meleeHitbox.enabled = true;
-                yield return new WaitForSeconds(0.1f);
-                meleeHitbox.enabled = false;
-            }
-            else
-            {
-                DealAreaDamage(transform.position, comboRange);
-            }
+            // IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
+            DealAreaDamage(transform.position, comboRange);
 
             if (i < comboHitCount - 1)
                 yield return new WaitForSeconds(comboInterval);
