@@ -221,6 +221,7 @@ MonoBehaviour:
   firePoint: {fileID: 8311547963635048009}
   projectileSpeed: 8
   safeDistance: 3
+  rangedCooldownMultiplier: 1.8
   rangedYThreshold: 6
   projectileSpinSpeed: 0
   hpBarOffset: {x: 0, y: -0.6, z: 0}
@@ -239,6 +240,7 @@ MonoBehaviour:
   platformLayer:
     serializedVersion: 2
     m_Bits: 512
+  spriteFacesLeft: 1
   attackDamageDelay: 0.65
 --- !u!1 &4131957091312311877
 GameObject:

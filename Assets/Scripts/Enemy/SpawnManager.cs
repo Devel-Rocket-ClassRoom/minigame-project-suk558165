@@ -71,6 +71,7 @@ public class SpawnManager : MonoBehaviour
     private int pendingSpawnCount;
     private bool waitingForTrigger;
     private bool allWavesCleared;
+    private readonly List<GameObject> spawnedEnemies = new List<GameObject>();
 
     void Start()
     {
@@ -177,6 +178,8 @@ public class SpawnManager : MonoBehaviour
         }
 
         var go = Instantiate(prefab, position, Quaternion.identity);
+        go.transform.SetParent(transform.root, worldPositionStays: true);
+        spawnedEnemies.Add(go);
         aliveCount++;
         pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - 1);
 
@@ -203,6 +206,15 @@ public class SpawnManager : MonoBehaviour
 
         // 알 수 없는 컴포넌트 — onDeath 연결 불가, aliveCount 즉시 보정
         aliveCount = Mathf.Max(0, aliveCount - 1);
+    }
+
+    public void CleanupAll()
+    {
+        StopAllCoroutines();
+        foreach (var go in spawnedEnemies)
+            if (go != null)
+                Destroy(go);
+        spawnedEnemies.Clear();
     }
 
     void OnEnemyDied()

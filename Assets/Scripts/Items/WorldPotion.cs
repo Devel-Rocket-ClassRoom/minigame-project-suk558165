@@ -32,15 +32,18 @@ public class WorldPotion : MonoBehaviour
 
     void Start()
     {
-        // 플레이어와 물리 충돌 무시
+        // 포션 자체 콜라이더는 트리거로 — 플레이어 외 어떤 것도 막지 않게
+        foreach (var col in GetComponents<Collider2D>())
+            col.isTrigger = true;
+
+        // 플레이어의 모든 콜라이더(자식 포함)와 충돌 무시
         if (PlayerRef.Exists)
         {
-            var playerCol = PlayerRef.GameObject.GetComponent<Collider2D>();
-            if (playerCol != null)
-            {
-                foreach (var col in GetComponents<Collider2D>())
-                    Physics2D.IgnoreCollision(col, playerCol, true);
-            }
+            var playerCols = PlayerRef.GameObject.GetComponentsInChildren<Collider2D>(true);
+            foreach (var myCol in GetComponents<Collider2D>())
+            foreach (var pc in playerCols)
+                if (pc != null)
+                    Physics2D.IgnoreCollision(myCol, pc, true);
         }
 
         if (!launched)

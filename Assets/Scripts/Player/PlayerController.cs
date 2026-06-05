@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -19,6 +20,9 @@ public class PlayerController : MonoBehaviour
     private WeaponInventory weaponInventory;
     private Inventory inventory;
     private bool deathHandled;
+    private SortingGroup sortingGroup;
+    private const int DefaultSortingOrder = 32000;
+    private const int BehindShopSortingOrder = -100;
 
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
 
@@ -31,10 +35,21 @@ public class PlayerController : MonoBehaviour
         health = GetComponent<PlayerHealth>();
         weaponInventory = GetComponentInChildren<WeaponInventory>();
         inventory = GetComponent<Inventory>();
+
+        sortingGroup = GetComponent<SortingGroup>();
+        if (sortingGroup == null)
+            sortingGroup = gameObject.AddComponent<SortingGroup>();
+        sortingGroup.sortingLayerName = "Default";
+        sortingGroup.sortingOrder = DefaultSortingOrder;
     }
 
     void Update()
     {
+        if (sortingGroup != null)
+            sortingGroup.sortingOrder = ShopUI.IsOpen
+                ? BehindShopSortingOrder
+                : DefaultSortingOrder;
+
         bool dead = (health != null && health.IsDead) || previewDeath;
         if (dead)
         {
@@ -48,7 +63,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (InputLocked)
+        if (InputLocked || DialogueUI.IsOpen)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             movement.UpdateAnimatorAndFlip(false);

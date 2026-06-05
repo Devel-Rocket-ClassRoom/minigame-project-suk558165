@@ -70,6 +70,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float edgeCheckDepth = 1.5f;
     public LayerMask platformLayer;
 
+    [Header("Sprite")]
+    [Tooltip("원본 스프라이트가 왼쪽을 보고 있으면 체크")]
+    public bool spriteFacesLeft = false;
+
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
@@ -200,7 +204,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             }
 
             // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
-            sr.flipX = player.position.x < transform.position.x;
+            bool playerOnLeft = player.position.x < transform.position.x;
+            sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
 
             if (attackTimer <= 0f)
             {
@@ -227,7 +232,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (aimAtPlayer)
             dir = ((Vector2)player.position - (Vector2)origin).normalized;
         else
-            dir = sr.flipX ? Vector2.left : Vector2.right;
+        {
+            bool facingLeft = spriteFacesLeft ? !sr.flipX : sr.flipX;
+            dir = facingLeft ? Vector2.left : Vector2.right;
+        }
 
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
@@ -294,9 +302,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.SetFloat(HashSpeed, Mathf.Abs(dir));
 
         if (dir > 0f)
-            sr.flipX = false;
+            sr.flipX = spriteFacesLeft;
         else if (dir < 0f)
-            sr.flipX = true;
+            sr.flipX = !spriteFacesLeft;
     }
 
     public void EnableHitbox()

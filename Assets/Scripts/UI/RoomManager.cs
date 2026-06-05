@@ -80,9 +80,12 @@ public class RoomManager : MonoBehaviour
         StopAllCoroutines();
         if (currentRoom != null)
         {
+            currentRoom.GetComponentInChildren<SpawnManager>()?.CleanupAll();
+            currentRoom.SetActive(false);
             Destroy(currentRoom);
             currentRoom = null;
         }
+
         CurrentRoomNumber = 0;
         player = null;
     }
