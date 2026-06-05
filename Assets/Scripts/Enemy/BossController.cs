@@ -78,7 +78,7 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Header("패턴 공통")]
     [SerializeField]
-    private float patternCooldown = 2f;
+    private float patternCooldown = 1.2f;
 
     [SerializeField]
     private float tellDuration = 0.6f;

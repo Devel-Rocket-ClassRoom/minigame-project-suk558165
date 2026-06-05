@@ -1,7 +1,6 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
     public float lifetime = 5f;
@@ -21,7 +20,10 @@ public class Projectile : MonoBehaviour
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        GetComponent<CircleCollider2D>().isTrigger = true;
+
+        // 모든 콜라이더를 트리거로 설정 (이전 RequireComponent로 남은 콜라이더 대응)
+        foreach (var col in GetComponents<Collider2D>())
+            col.isTrigger = true;
     }
 
     public void Init(

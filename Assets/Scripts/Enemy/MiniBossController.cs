@@ -59,7 +59,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     [Header("패턴 공통")]
     [SerializeField]
-    private float patternCooldown = 2.5f;
+    private float patternCooldown = 1.5f;
 
     [SerializeField]
     private float tellDuration = 0.5f;
