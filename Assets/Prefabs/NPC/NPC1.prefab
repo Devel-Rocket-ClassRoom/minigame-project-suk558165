@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 5375414866278479081}
   - component: {fileID: 7637689212787782784}
   - component: {fileID: 7628934606691430976}
+  - component: {fileID: -5333847863919084864}
   m_Layer: 0
   m_Name: NPC1
   m_TagString: Untagged
@@ -377,4 +378,19 @@ MonoBehaviour:
   randomizeOnStart: 1
   restockOnReopen: 0
   shopUI: {fileID: 2467148238469472193, guid: 555d00e321181e14ba8979c76ba9c820, type: 3}
+  shopScale: 1.5
   interactPrompt: {fileID: 838351071443937049}
+--- !u!114 &-5333847863919084864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7357540415165956293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0

@@ -1078,6 +1078,7 @@ MonoBehaviour:
       count: 2
       interval: 0.5
     delayBeforeSpawn: 1
+    instantSpawn: 0
     triggerZone: {fileID: 0}
   - groups:
     - prefab: {fileID: 5673119980097987662, guid: f11f116f904c68841a699156638bc453, type: 3}
@@ -1093,7 +1094,10 @@ MonoBehaviour:
       count: 2
       interval: 0.5
     delayBeforeSpawn: 2
+    instantSpawn: 0
     triggerZone: {fileID: 0}
+  bossBGM: {fileID: 0}
+  afterBossBGM: {fileID: 0}
 --- !u!1 &3077576465851252102
 GameObject:
   m_ObjectHideFlags: 0

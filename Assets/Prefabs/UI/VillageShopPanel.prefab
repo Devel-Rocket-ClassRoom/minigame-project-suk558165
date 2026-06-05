@@ -1534,7 +1534,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB9E4\uC9C4"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: d55e1f7e2cb833a4d8aa7db5a1d5dcf5, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1601,7 +1601,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &3370406468050902040
@@ -3965,6 +3965,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4588559202013496467}
   - component: {fileID: 2467148238469472193}
+  - component: {fileID: 7584578782488953340}
   m_Layer: 0
   m_Name: VillageShopPanel
   m_TagString: Untagged
@@ -4014,6 +4015,20 @@ MonoBehaviour:
   closeButton: {fileID: 3140819758977508556}
   noticeText: {fileID: 0}
   buySound: {fileID: 8300000, guid: 91d787c28919cf443989f45e7c3cfbd2, type: 3}
+--- !u!114 &7584578782488953340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7743773397652379694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0
 --- !u!1 &8022584438583201257
 GameObject:
   m_ObjectHideFlags: 0

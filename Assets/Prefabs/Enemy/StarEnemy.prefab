@@ -221,7 +221,7 @@ MonoBehaviour:
   firePoint: {fileID: 6857617571038101239}
   projectileSpeed: 8
   safeDistance: 3
-  projectileSpinSpeed: 0
+  projectileSpinSpeed: 720
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
   knockbackDuration: 0.15

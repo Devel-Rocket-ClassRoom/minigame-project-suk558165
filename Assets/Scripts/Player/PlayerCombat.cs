@@ -154,7 +154,7 @@ public class PlayerCombat : MonoBehaviour
                 ? effectiveDamage * bonus.arrowDamageMult
                 : effectiveDamage;
 
-        float spreadAngle = 15f;
+        float spreadAngle = 30f;
         for (int i = 0; i < totalArrows; i++)
         {
             float offset = totalArrows > 1 ? (i - (totalArrows - 1) * 0.5f) * spreadAngle : 0f;
@@ -164,7 +164,17 @@ public class PlayerCombat : MonoBehaviour
 
     void SpawnProjectile(Vector2 dir, float damage, int pierce)
     {
-        Vector3 origin = firePoint != null ? firePoint.position : transform.position;
+        Vector3 origin = transform.position;
+        if (firePoint != null)
+        {
+            origin = firePoint.position;
+            // firePoint가 Visuals 계층 밖에 있으면 좌향 시 X가 반전되지 않으므로 보정
+            float xDiff = firePoint.position.x - transform.position.x;
+            bool facingLeft = dir.x < 0f;
+            bool firePointOnRight = xDiff > 0.001f;
+            if (facingLeft == firePointOnRight)
+                origin.x = transform.position.x - xDiff;
+        }
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
@@ -204,6 +214,9 @@ public class PlayerCombat : MonoBehaviour
 
     void ApplyWeapon(WeaponData data)
     {
+        if (data == null)
+            return;
+
         // Magic은 컨트롤러에 MagicAttack 상태로 직접 배치돼 있어 override 불필요.
         if (data.weaponType != WeaponType.Magic)
         {

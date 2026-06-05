@@ -196,7 +196,13 @@ public class SpawnManager : MonoBehaviour
 
         var miniBoss = go.GetComponent<MiniBossController>();
         if (miniBoss != null)
+        {
             miniBoss.onDeath += OnEnemyDied;
+            yield break;
+        }
+
+        // 알 수 없는 컴포넌트 — onDeath 연결 불가, aliveCount 즉시 보정
+        aliveCount = Mathf.Max(0, aliveCount - 1);
     }
 
     void OnEnemyDied()

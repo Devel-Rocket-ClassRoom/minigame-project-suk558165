@@ -33,6 +33,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Tooltip("원거리 적의 공격 쿨다운에 곱해지는 배수 — 회피 시간 확보용")]
+    public float rangedCooldownMultiplier = 1.8f;
+
+    [Tooltip("원거리 적의 Y축 추적/공격 허용 범위 — 이 값 이내일 때만 공격 (일직선 체크)")]
+    public float rangedYThreshold = 0.8f;
+
     [Tooltip("발사체 회전 속도 (도/초). 0이면 회전 없음")]
     public float projectileSpinSpeed = 0f;
 
@@ -178,7 +184,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             Patrol();
             return;
         }
-        if (dist <= detectionRange)
+        bool sameLine = Mathf.Abs(player.position.y - transform.position.y) <= rangedYThreshold;
+        if (dist <= detectionRange && sameLine)
         {
             if (dist < safeDistance)
             {
@@ -195,7 +202,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
             if (attackTimer <= 0f)
             {
-                attackTimer = attackCooldown;
+                attackTimer = attackCooldown * Mathf.Max(1f, rangedCooldownMultiplier);
                 animator.SetTrigger(HashAttack);
                 AudioManager.Instance?.PlaySFX(attackSound);
                 StartCoroutine(ShootAfterDelay(attackDamageDelay));
@@ -302,15 +309,6 @@ public class EnemyController : MonoBehaviour, IDamageable
             meleeHitbox.enabled = false;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (isDead || meleeHitbox == null || !meleeHitbox.enabled)
-            return;
-        if (!other.CompareTag("Player"))
-            return;
-        other.GetComponent<IDamageable>()?.TakeDamage(damage);
-    }
-
     IEnumerator ShootAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -386,7 +384,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
-        GetComponent<Collider2D>().enabled = false;
+        if (col != null)
+            col.enabled = false;
         onDeath?.Invoke();
         onDeath = null;
         RunStats.Instance?.AddKill();

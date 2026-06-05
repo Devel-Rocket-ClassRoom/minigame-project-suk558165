@@ -808,6 +808,7 @@ GameObject:
   - component: {fileID: 3470839572239567292}
   - component: {fileID: 3714082454453245983}
   - component: {fileID: 1121891927430353267}
+  - component: {fileID: 8375035453052212407}
   m_Layer: 0
   m_Name: GameClearPanel
   m_TagString: Untagged
@@ -917,6 +918,20 @@ MonoBehaviour:
   itemsGainedText: {fileID: 0}
   returnHintText: {fileID: 0}
   returnKey: 120
+--- !u!114 &8375035453052212407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3963543955133023724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0
 --- !u!1 &3979637298888141695
 GameObject:
   m_ObjectHideFlags: 0

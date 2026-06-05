@@ -2397,6 +2397,7 @@ GameObject:
   - component: {fileID: 956797245947654211}
   - component: {fileID: 1912482605136309807}
   - component: {fileID: 6683160771605683206}
+  - component: {fileID: 7627858641234402561}
   m_Layer: 0
   m_Name: GameOverPanel
   m_TagString: Untagged
@@ -2466,9 +2467,9 @@ MonoBehaviour:
   damageDealtText: {fileID: 6500000004}
   damageTakenText: {fileID: 6600000004}
   itemsGainedText: {fileID: 6700000004}
+  gameOverSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
   returnHintText: {fileID: 6800000004}
   returnKey: 120
-  gameOverSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
 --- !u!114 &6683160771605683206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2495,6 +2496,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &7627858641234402561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8047141114989795189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0
 --- !u!1 &8109012753920615292
 GameObject:
   m_ObjectHideFlags: 0

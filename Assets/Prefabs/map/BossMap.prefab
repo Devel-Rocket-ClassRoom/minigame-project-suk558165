@@ -2589,8 +2589,6 @@ MonoBehaviour:
   spawnEffectPrefab: {fileID: 4005435086369086175, guid: ccb1995c047a4ef44843c60e0820146a, type: 3}
   spawnEffectDelay: 1
   spawnEffectYOffset: -0.5
-  bossBGM: {fileID: 8300000, guid: f5bbb50388094724ea375a32abf07ea9, type: 3}
-  afterBossBGM: {fileID: 8300000, guid: 7e2c660b2de25764e9ebf1344f30f7ab, type: 3}
   waves:
   - groups:
     - prefab: {fileID: 9078295822729669931, guid: badd7c01aa342364a82918c51faf48d2, type: 3}
@@ -2600,6 +2598,8 @@ MonoBehaviour:
     delayBeforeSpawn: 1
     instantSpawn: 0
     triggerZone: {fileID: 0}
+  bossBGM: {fileID: 8300000, guid: f5bbb50388094724ea375a32abf07ea9, type: 3}
+  afterBossBGM: {fileID: 8300000, guid: 7e2c660b2de25764e9ebf1344f30f7ab, type: 3}
 --- !u!114 &5550000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2613,7 +2613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossName: "\uBCF4\uC2A4"
-  bossTitle:
+  bossTitle: 
   zoomOutSize: 8
   zoomDuration: 0.8
   spawnDelay: 0.2

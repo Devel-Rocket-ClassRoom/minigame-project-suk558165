@@ -215,7 +215,6 @@ public class MapTestManager : MonoBehaviour
     {
         state = State.Cleared;
         statusMsg = "CLEARED!";
-        Debug.Log("[MapTest] Room Cleared!");
 
         var entry = (maps.Count > 0 && selectedIndex < maps.Count) ? maps[selectedIndex] : null;
         if (entry != null && entry.isBossRoom)

@@ -8922,6 +8922,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 6.079068, y: 5.0097923}
   m_EdgeRadius: 0
+--- !u!114 &7777771401401401401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4502419685604890423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 4807350824254135983}
 --- !u!1 &4593616781526751215
 GameObject:
   m_ObjectHideFlags: 0
@@ -9069,6 +9082,7 @@ MonoBehaviour:
       count: 2
       interval: 0.5
     delayBeforeSpawn: 1
+    instantSpawn: 0
     triggerZone: {fileID: 0}
   - groups:
     - prefab: {fileID: 5891291522686172914, guid: e0a709c5c0a83e94dbb4088c9b99957a, type: 3}
@@ -9084,7 +9098,10 @@ MonoBehaviour:
       count: 2
       interval: 0.5
     delayBeforeSpawn: 2
+    instantSpawn: 0
     triggerZone: {fileID: 2508286242790084429}
+  bossBGM: {fileID: 0}
+  afterBossBGM: {fileID: 0}
 --- !u!1 &5673144623520710028
 GameObject:
   m_ObjectHideFlags: 0
@@ -13845,16 +13862,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5013220594731568815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7777771401401401401
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4502419685604890423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 4807350824254135983}

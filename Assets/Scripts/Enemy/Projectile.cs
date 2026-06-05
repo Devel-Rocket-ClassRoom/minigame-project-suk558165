@@ -13,10 +13,11 @@ public class Projectile : MonoBehaviour
     private int pierceRemaining;
     private float spinSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
+    private Rigidbody2D rb;
 
     void Awake()
     {
-        var rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -38,7 +39,6 @@ public class Projectile : MonoBehaviour
         this.shooter = shooter;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
-        var rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction.normalized * speed;
         var sr = GetComponent<SpriteRenderer>();
         if (sr != null)
@@ -95,7 +95,7 @@ public class Projectile : MonoBehaviour
                 var playerCtrl = other.GetComponentInParent<PlayerController>();
                 if (playerCtrl != null)
                 {
-                    Vector2 dir = GetComponent<Rigidbody2D>().linearVelocity.normalized;
+                    Vector2 dir = rb.linearVelocity.normalized;
                     playerCtrl.Knockback(new Vector2(dir.x, 0.3f).normalized * knockbackForce);
                 }
             }

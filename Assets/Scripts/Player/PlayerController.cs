@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private PlayerMovement movement;
     private PlayerCombat combat;
     private WeaponInventory weaponInventory;
+    private Inventory inventory;
     private bool deathHandled;
 
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour
         combat = GetComponent<PlayerCombat>();
         health = GetComponent<PlayerHealth>();
         weaponInventory = GetComponentInChildren<WeaponInventory>();
+        inventory = GetComponent<Inventory>();
     }
 
     void Update()
@@ -80,6 +82,7 @@ public class PlayerController : MonoBehaviour
     {
         health?.Revive();
         weaponInventory?.ResetToDefault();
+        inventory?.ResetOnDeath();
 
         deathHandled = false;
         rb.bodyType = RigidbodyType2D.Dynamic;

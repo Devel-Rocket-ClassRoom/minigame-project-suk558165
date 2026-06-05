@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7251378786276565600}
   - component: {fileID: 1201907218538323062}
   - component: {fileID: 300402402262904418}
+  - component: {fileID: 7287569126167715015}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -123,6 +124,20 @@ MonoBehaviour:
   optionsPanel: {fileID: 1104939646057373939, guid: 0d363e96ee02735429dc52386812370b, type: 3}
   newGameConfirmPanel: {fileID: 1100000000000000001}
   quitConfirmPanel: {fileID: 2100000000000000001}
+--- !u!114 &7287569126167715015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 48144096924919366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0
 --- !u!1 &869053360730921769
 GameObject:
   m_ObjectHideFlags: 0
