@@ -48,8 +48,9 @@ public class TitleUI : MonoBehaviour
         SetHUD(false);
 
         // 세이브 데이터가 없으면 컨티뉴 버튼 비활성화
-        if (continueButton != null && GameFlowController.Instance != null)
-            continueButton.interactable = GameFlowController.Instance.HasSaveData();
+        if (continueButton != null)
+            continueButton.interactable =
+                GameFlowController.Instance != null && GameFlowController.Instance.HasSaveData();
     }
 
     void OnDisable()

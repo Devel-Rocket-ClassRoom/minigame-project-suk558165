@@ -17,6 +17,10 @@ public class PlayerMovement : MonoBehaviour
     public float gravityScale = 4f;
     public float fallGravityMultiplier = 2.5f;
 
+    [Header("Air Control")]
+    [Tooltip("공중에서 목표 속도에 도달하는 가속 (값이 클수록 즉각 반응, 작을수록 관성 유지)")]
+    public float airAcceleration = 40f;
+
     [Header("Knockback")]
     public float knockbackDuration = 0.15f;
 
@@ -256,7 +260,23 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector2(MoveInput * EffectiveWalkSpeed, rb.linearVelocity.y);
+            float targetX = MoveInput * EffectiveWalkSpeed;
+            float newX;
+            if (IsGrounded)
+            {
+                // 지상에서는 즉시 반응 (걷기 느낌 유지)
+                newX = targetX;
+            }
+            else
+            {
+                // 공중에서는 가속도 기반으로 천천히 변화 → 관성 유지, "막힌 느낌" 제거
+                newX = Mathf.MoveTowards(
+                    rb.linearVelocity.x,
+                    targetX,
+                    airAcceleration * Time.fixedDeltaTime
+                );
+            }
+            rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
 
             if (rb.linearVelocity.y < 0f)
                 rb.linearVelocity +=
@@ -276,11 +296,7 @@ public class PlayerMovement : MonoBehaviour
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
 
-        // 속도 조건 없이 순수 overlap — groundLayer·platformLayer 모두 체크해 아랫점프 입력 수신에 사용
-        IsOnPlatform =
-            Physics2D.OverlapCircle(checkPos, 0.15f, combinedLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, combinedLayer)
-            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
+        IsOnPlatform = hit;
     }
 
     IEnumerator DropDown()
@@ -288,17 +304,32 @@ public class PlayerMovement : MonoBehaviour
         if (isDropping)
             yield break;
 
-        Collider2D platformCol = Physics2D.OverlapCircle(groundCheck.position, 0.5f, platformLayer);
-        if (platformCol == null)
+        // 발 근처의 플랫폼 중, 플레이어 발보다 위로 살짝이라도 솟아있지 않은 — 즉 발이 올라타 있는 — 플랫폼만 통과시킨다.
+        // 발 아래 멀리 있는 다른 플랫폼(중간층)은 통과 대상에서 제외해야 아랫점프 후 그 위에 착지할 수 있다.
+        float feetY = mainCollider != null ? mainCollider.bounds.min.y : groundCheck.position.y;
+        var hits = Physics2D.OverlapCircleAll(groundCheck.position, 0.3f, platformLayer);
+        var toIgnore = new System.Collections.Generic.List<Collider2D>();
+        foreach (var h in hits)
+        {
+            if (h == null)
+                continue;
+            // 플랫폼 상단이 발 높이보다 약간 위/같은 높이일 때만 — 즉 현재 올라타 있는 플랫폼만 통과
+            if (h.bounds.max.y <= feetY + 0.2f)
+                toIgnore.Add(h);
+        }
+        if (toIgnore.Count == 0)
             yield break;
 
         isDropping = true;
-        Physics2D.IgnoreCollision(mainCollider, platformCol, true);
+        foreach (var p in toIgnore)
+            Physics2D.IgnoreCollision(mainCollider, p, true);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -10f);
 
         yield return new WaitForSeconds(dropDownDuration);
 
-        Physics2D.IgnoreCollision(mainCollider, platformCol, false);
+        foreach (var p in toIgnore)
+            if (p != null)
+                Physics2D.IgnoreCollision(mainCollider, p, false);
         isDropping = false;
     }
 }

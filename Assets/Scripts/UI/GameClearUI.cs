@@ -1,6 +1,8 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 
 public class GameClearUI : MonoBehaviour
 {
@@ -39,6 +41,22 @@ public class GameClearUI : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
+    }
+
+    void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+    }
+
+    void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    void OnLocaleChanged(Locale _)
+    {
+        if (triggered)
+            PopulateStats();
     }
 
     public void Show()
@@ -82,7 +100,11 @@ public class GameClearUI : MonoBehaviour
         canReturn = true;
 
         if (returnHintText != null)
-            returnHintText.text = $"[ {returnKey} ] 마을로 돌아가기";
+            returnHintText.text = L10n.Format(
+                "ui.return_village",
+                "[ {0} ] 마을로 돌아가기",
+                returnKey
+            );
     }
 
     void Update()
@@ -98,13 +120,26 @@ public class GameClearUI : MonoBehaviour
             return;
 
         int sec = Mathf.FloorToInt(s.PlayTime);
-        SetText(playTimeText, $"플레이 타임  {sec / 3600:D2}:{(sec % 3600) / 60:D2}:{sec % 60:D2}");
-        SetText(deathCountText, $"사망 횟수  {s.Deaths}");
-        SetText(killCountText, $"처치 수  {s.Kills}");
-        SetText(goldEarnedText, $"획득 골드  {s.GoldEarned}");
-        SetText(damageDealtText, $"총 딜량  {Mathf.RoundToInt(s.DamageDealt)}");
-        SetText(damageTakenText, $"받은 피해  {Mathf.RoundToInt(s.DamageTaken)}");
-        SetText(itemsGainedText, $"획득 아이템  {s.ItemsGained}");
+        string time = $"{sec / 3600:D2}:{(sec % 3600) / 60:D2}:{sec % 60:D2}";
+        SetText(playTimeText, L10n.Format("ui.stats.playtime", "플레이 타임  {0}", time));
+        SetText(deathCountText, L10n.Format("ui.stats.deaths", "사망 횟수  {0}", s.Deaths));
+        SetText(killCountText, L10n.Format("ui.stats.kills", "처치 수  {0}", s.Kills));
+        SetText(
+            goldEarnedText,
+            L10n.Format("ui.stats.gold_earned", "획득 골드  {0}", s.GoldEarned)
+        );
+        SetText(
+            damageDealtText,
+            L10n.Format("ui.stats.damage_dealt", "총 딜량  {0}", Mathf.RoundToInt(s.DamageDealt))
+        );
+        SetText(
+            damageTakenText,
+            L10n.Format("ui.stats.damage_taken", "받은 피해  {0}", Mathf.RoundToInt(s.DamageTaken))
+        );
+        SetText(
+            itemsGainedText,
+            L10n.Format("ui.stats.items_gained", "획득 아이템  {0}", s.ItemsGained)
+        );
     }
 
     void SetText(TextMeshProUGUI label, string value)

@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7320bb17f2992243ba93838d76530d0, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  id: sowrd
+  id: sword
   weaponName:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: Items
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: 
+      m_Key: weapon_sword_name
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -26,10 +26,10 @@ MonoBehaviour:
   weaponType: 0
   description:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: Items
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: 
+      m_Key: weapon_sword_desc
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

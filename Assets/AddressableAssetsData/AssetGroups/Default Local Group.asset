@@ -20,16 +20,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3b7f2eb65bd0b7645934ceeb51d6947b
-    m_Address: Assets/Data/ItemNumericData.xlsx
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 797ea0afd88ee6043973f5615848092c
-    m_Address: Assets/Data/ItemStringData.xlsx
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: cccc1c308dd9eb9419ae3083485b5799, type: 2}
   m_SchemaSet:

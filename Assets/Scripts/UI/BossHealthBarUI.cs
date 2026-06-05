@@ -43,10 +43,8 @@ public class BossHealthBarUI : MonoBehaviour
         var canvas = rootGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 100;
-        rootGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler
-            .ScaleMode
-            .ScaleWithScreenSize;
-        var scaler = rootGo.GetComponent<CanvasScaler>();
+        var scaler = rootGo.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
         rootGo.AddComponent<GraphicRaycaster>();

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -307,15 +308,25 @@ public class GameFlowController : MonoBehaviour
 
     public void ReturnToVillage()
     {
+        StartCoroutine(ReturnToVillageRoutine());
+    }
+
+    IEnumerator ReturnToVillageRoutine()
+    {
+        if (ScreenFader.Instance != null)
+            yield return ScreenFader.Instance.FadeOut();
+
         roomManager.ResetDungeon();
         GameClearUI.Instance?.ResetUI();
         GameOverUI.Instance?.ResetUI();
 
-        // 사망 후 귀환 시 플레이어 전체 상태 복구 (HP + 물리 + 애니메이터)
         if (playerInstance != null)
             playerInstance.GetComponent<PlayerController>()?.Revive();
 
         GoToVillage();
+
+        if (ScreenFader.Instance != null)
+            yield return ScreenFader.Instance.FadeIn();
     }
 
     public void EnterDungeon()

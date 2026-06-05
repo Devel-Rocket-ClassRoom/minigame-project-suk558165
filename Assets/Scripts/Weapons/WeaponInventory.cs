@@ -8,7 +8,8 @@ public class WeaponInventory : MonoBehaviour
     public List<WeaponData> weapons = new List<WeaponData>();
     public int currentIndex = 0;
 
-    public WeaponData Current => currentIndex >= 0 && currentIndex < weapons.Count ? weapons[currentIndex] : null;
+    public WeaponData Current =>
+        weapons.Count > 0 && currentIndex < weapons.Count ? weapons[currentIndex] : null;
 
     public event System.Action<WeaponData> OnWeaponChanged;
 

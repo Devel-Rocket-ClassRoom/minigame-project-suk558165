@@ -80,9 +80,12 @@ public class RoomManager : MonoBehaviour
         StopAllCoroutines();
         if (currentRoom != null)
         {
+            currentRoom.GetComponentInChildren<SpawnManager>()?.CleanupAll();
+            currentRoom.SetActive(false);
             Destroy(currentRoom);
             currentRoom = null;
         }
+
         CurrentRoomNumber = 0;
         player = null;
     }
@@ -100,6 +103,12 @@ public class RoomManager : MonoBehaviour
         {
             normalRoomOrder = new List<int>(data.savedRoomOrder);
             normalRoomCursor = data.savedRoomCursor;
+
+            // PickNormalRoomIndex는 호출 시마다 cursor++ 하므로,
+            // 마지막에 일반 방이었다면 cursor가 이미 다음 방을 가리키고 있다.
+            // 컨티뉴는 같은 방을 다시 로드하므로 커서를 1 되돌려 동일 프리팹을 재사용한다.
+            if (GetRoomType(roomNumber) == RoomType.Normal && normalRoomCursor > 0)
+                normalRoomCursor--;
         }
         else
         {
@@ -138,9 +147,9 @@ public class RoomManager : MonoBehaviour
         if (normalRoomCursor >= normalRoomOrder.Count)
             ShuffleNormalRooms();
 
-        // 증가 전에 저장 — 컨티뉴 시 이 방을 다시 로드할 때 동일한 인덱스를 집어오기 위해
+        int idx = normalRoomOrder[normalRoomCursor++];
         SaveRoomLayout();
-        return normalRoomOrder[normalRoomCursor++];
+        return idx;
     }
 
     RoomType GetRoomType(int roomNumber)

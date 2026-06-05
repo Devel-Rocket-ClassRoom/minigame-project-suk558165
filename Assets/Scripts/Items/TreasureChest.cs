@@ -48,6 +48,17 @@ public class TreasureChest : MonoBehaviour
 
         if (hintObject != null)
             hintObject.SetActive(false);
+
+        // 플레이어와 물리 충돌 무시
+        if (PlayerRef.Exists)
+        {
+            var playerCol = PlayerRef.GameObject.GetComponent<Collider2D>();
+            if (playerCol != null)
+            {
+                foreach (var col in GetComponents<Collider2D>())
+                    Physics2D.IgnoreCollision(col, playerCol, true);
+            }
+        }
     }
 
     void Update()

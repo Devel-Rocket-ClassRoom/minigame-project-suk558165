@@ -10,6 +10,7 @@ public class SaveManager : MonoBehaviour
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics() => Instance = null;
+
     public const int CurrentVersion = 1;
 
     public SaveData Data { get; private set; }
@@ -66,14 +67,12 @@ public class SaveManager : MonoBehaviour
         // 구버전(15바이트 IV) 세이브 호환 복호화
         if (TryDecrypt(encrypted, LegacyIV, out json))
         {
-            Debug.Log("[SaveManager] 구버전 세이브 감지 → 새 형식으로 재저장");
             Data = JsonUtility.FromJson<SaveData>(json);
             Save(); // 새 IV로 덮어쓰기
             Migrate();
             return;
         }
 
-        Debug.LogWarning("[SaveManager] 세이브 복호화 실패, 새 데이터 생성");
         Data = new SaveData();
     }
 
@@ -100,7 +99,6 @@ public class SaveManager : MonoBehaviour
 
         Data.version = CurrentVersion;
         Save();
-        Debug.Log($"[SaveManager] 세이브 마이그레이션 완료 → v{CurrentVersion}");
     }
 
     // ── AES-256 암호화 ──

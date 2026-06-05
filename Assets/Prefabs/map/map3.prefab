@@ -5414,6 +5414,8 @@ MonoBehaviour:
     delayBeforeSpawn: 2
     instantSpawn: 0
     triggerZone: {fileID: 9180139556571705962}
+  bossBGM: {fileID: 0}
+  afterBossBGM: {fileID: 0}
 --- !u!1 &8351848940754165467
 GameObject:
   m_ObjectHideFlags: 0

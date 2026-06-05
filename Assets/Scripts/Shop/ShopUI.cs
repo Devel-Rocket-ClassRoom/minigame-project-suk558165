@@ -63,7 +63,7 @@ public class ShopUI : MonoBehaviour
             return;
 
         if (goldText != null && inventory != null)
-            goldText.text = $"골드: {inventory.Gold}";
+            goldText.text = L10n.Format("ui.shop.gold", "골드: {0}", inventory.Gold);
 
         RefreshButtonStates();
     }
@@ -98,7 +98,7 @@ public class ShopUI : MonoBehaviour
         }
 
         if (goldText != null && inventory != null)
-            goldText.text = $"골드: {inventory.Gold}";
+            goldText.text = L10n.Format("ui.shop.gold", "골드: {0}", inventory.Gold);
 
         frame.SetActive(true);
         openCount++;
@@ -122,13 +122,13 @@ public class ShopUI : MonoBehaviour
     {
         if (inventory == null || inventory.Gold < price)
         {
-            ShowNotice("골드가 부족합니다.");
+            ShowNotice(L10n.Get("ui.shop.not_enough_gold", "골드가 부족합니다."));
             return false;
         }
 
         if (!inventory.AddToBackpack(item))
         {
-            ShowNotice("인벤토리가 가득 찼습니다.");
+            ShowNotice(L10n.Get("ui.shop.inventory_full", "인벤토리가 가득 찼습니다."));
             return false;
         }
 
@@ -136,7 +136,7 @@ public class ShopUI : MonoBehaviour
         AudioManager.Instance?.PlaySFX(buySound);
 
         if (goldText != null)
-            goldText.text = $"골드: {inventory.Gold}";
+            goldText.text = L10n.Format("ui.shop.gold", "골드: {0}", inventory.Gold);
 
         OnItemSold?.Invoke(item);
         return true;

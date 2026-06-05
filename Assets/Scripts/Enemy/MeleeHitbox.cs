@@ -8,6 +8,8 @@ public class MeleeHitbox : MonoBehaviour
 
     private Collider2D col;
     private EnemyController owner;
+    private bool hasHitThisActivation;
+    private bool wasEnabled;
 
     void Awake()
     {
@@ -17,9 +19,18 @@ public class MeleeHitbox : MonoBehaviour
         owner = GetComponentInParent<EnemyController>();
     }
 
+    void LateUpdate()
+    {
+        // EnemyController.EnableHitbox 같은 외부 토글도 감지해서 활성화 시 1회 발동 잠금 리셋
+        if (col.enabled && !wasEnabled)
+            hasHitThisActivation = false;
+        wasEnabled = col.enabled;
+    }
+
     public void Activate(float duration)
     {
         col.enabled = true;
+        hasHitThisActivation = false;
         Invoke(nameof(Deactivate), duration);
     }
 
@@ -33,12 +44,13 @@ public class MeleeHitbox : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!col.enabled)
+        if (!col.enabled || hasHitThisActivation)
             return;
         if (!other.CompareTag("Player"))
             return;
         if (owner != null && owner.IsDead)
             return;
+        hasHitThisActivation = true;
         other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
 
         var playerCtrl = other.GetComponentInParent<PlayerController>();

@@ -35,8 +35,10 @@ public class InventorySlotUI
     public int slotIndex;
 
     private bool isEmpty = true;
+    private ScriptableObject currentItem;
 
     public bool IsEmpty => isEmpty;
+    public ScriptableObject CurrentItem => currentItem;
 
     public static InventorySlotUI DragSource { get; private set; }
     public static event Action<InventorySlotUI, InventorySlotUI> OnSlotDropped;
@@ -62,9 +64,15 @@ public class InventorySlotUI
 
     public void SetItem(Sprite itemIcon)
     {
+        SetItem(null, itemIcon);
+    }
+
+    public void SetItem(ScriptableObject item, Sprite itemIcon)
+    {
         if (icon == null)
             return;
         isEmpty = false;
+        currentItem = item;
         icon.sprite = itemIcon;
         icon.enabled = true;
         icon.color = Color.white;
@@ -78,6 +86,7 @@ public class InventorySlotUI
     public void Clear()
     {
         isEmpty = true;
+        currentItem = null;
         if (icon == null)
             return;
         icon.sprite = null;
@@ -88,12 +97,15 @@ public class InventorySlotUI
     {
         if (highlight != null)
             highlight.enabled = true;
+        if (!isEmpty && currentItem != null)
+            ItemTooltip.GetOrCreate()?.Show(currentItem);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (highlight != null)
             highlight.enabled = false;
+        ItemTooltip.Instance?.Hide();
     }
 
     public void OnBeginDrag(PointerEventData eventData)

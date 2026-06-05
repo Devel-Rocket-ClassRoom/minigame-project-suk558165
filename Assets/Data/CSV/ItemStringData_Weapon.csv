@@ -1,6 +1,8 @@
 ﻿id,Key,한국어,English
 knife,weapon_knife_name,칼,Knife
 knife,weapon_knife_desc,빠르고 가벼운 근접 무기.,A fast and light melee weapon.
+sword,weapon_sword_name,검,Sword
+sword,weapon_sword_desc,균형 잡힌 기본 근접 무기.,A balanced basic melee weapon.
 bow,weapon_bow_name,활,Bow
 bow,weapon_bow_desc,원거리 화살을 발사하는 활.,A bow that fires arrows from a distance.
 crossbow,weapon_crossbow_name,석궁,Crossbow
