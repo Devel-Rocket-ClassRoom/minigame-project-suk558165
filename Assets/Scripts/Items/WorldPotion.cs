@@ -27,10 +27,22 @@ public class WorldPotion : MonoBehaviour
     }
 
     void OnEnable() => Instances.Add(this);
+
     void OnDisable() => Instances.Remove(this);
 
     void Start()
     {
+        // 플레이어와 물리 충돌 무시
+        if (PlayerRef.Exists)
+        {
+            var playerCol = PlayerRef.GameObject.GetComponent<Collider2D>();
+            if (playerCol != null)
+            {
+                foreach (var col in GetComponents<Collider2D>())
+                    Physics2D.IgnoreCollision(col, playerCol, true);
+            }
+        }
+
         if (!launched)
             SnapToGround();
     }
