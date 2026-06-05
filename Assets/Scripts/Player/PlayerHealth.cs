@@ -9,6 +9,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     private float hp;
     private Inventory inventory;
+    private PlayerMovement movement;
 
     public bool IsDead => hp <= 0f;
     public float CurrentHp => hp;
@@ -18,6 +19,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     void Awake()
     {
         inventory = GetComponent<Inventory>();
+        movement = GetComponent<PlayerMovement>();
         hp = maxHp;
         PlayerRef.Register(this);
     }
@@ -30,6 +32,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         if (IsDead)
+            return;
+
+        // 대쉬 중 무적
+        if (movement != null && movement.IsDashing)
             return;
 
         var bonus = inventory?.GetTotalStatBonus() ?? default;

@@ -48,12 +48,23 @@ public class PlayerWeapon : MonoBehaviour
 
         float s = data.spriteScale > 0f ? data.spriteScale : 1f;
         transform.localScale = new Vector3(s, s, 1f);
-        transform.localPosition = new Vector3(
-            data.spriteOffset.x,
-            data.spriteOffset.y,
-            transform.localPosition.z
-        );
-        transform.localEulerAngles = new Vector3(0f, 0f, data.spriteRotation);
+
+        if (data.weaponType == WeaponType.Magic)
+        {
+            // Magic은 애니메이션 클립에서 position/rotation을 키프레임으로 직접 제어
+            // 코드에서 덮어쓰지 않도록 (0,0,0)으로 초기화만 해둠
+            transform.localPosition = new Vector3(0f, 0f, transform.localPosition.z);
+            transform.localEulerAngles = Vector3.zero;
+        }
+        else
+        {
+            transform.localPosition = new Vector3(
+                data.spriteOffset.x,
+                data.spriteOffset.y,
+                transform.localPosition.z
+            );
+            transform.localEulerAngles = new Vector3(0f, 0f, data.spriteRotation);
+        }
     }
 
     public void OnHitFrame()

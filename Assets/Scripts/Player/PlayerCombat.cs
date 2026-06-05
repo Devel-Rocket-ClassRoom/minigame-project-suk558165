@@ -7,7 +7,8 @@ public class PlayerCombat : MonoBehaviour
     public WeaponInventory weaponInventory;
 
     [Header("Ranged")]
-    public GameObject projectilePrefab;
+    public GameObject arrowProjectilePrefab;
+    public GameObject magicProjectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 12f;
 
@@ -41,6 +42,7 @@ public class PlayerCombat : MonoBehaviour
     private Vector2 pendingRangedDir;
     private float pendingRangedDamage;
     private StatBonus pendingRangedBonus;
+    private WeaponType pendingWeaponType;
     private bool hasPendingRanged;
 
     void Awake()
@@ -111,24 +113,30 @@ public class PlayerCombat : MonoBehaviour
             animator.Play(SwordAttackState, 0, 0f);
             AudioManager.Instance?.PlaySFX(currentWeapon.attackSound);
         }
-        else if (
-            (
-                currentWeapon.weaponType == WeaponType.Ranged
-                || currentWeapon.weaponType == WeaponType.Magic
-            )
-            && projectilePrefab != null
-        )
+        else if (currentWeapon.weaponType == WeaponType.Ranged && arrowProjectilePrefab != null)
         {
             if (!movement.IsGrounded)
                 movement.AirAttackUsed = true;
             IsAttacking = true;
             weapon?.Show();
-            string attackState =
-                currentWeapon.weaponType == WeaponType.Magic ? MagicAttackState : BowAttackState;
-            animator.Play(attackState, 0, 0f);
+            animator.Play(BowAttackState, 0, 0f);
             pendingRangedDir = attackDir;
             pendingRangedDamage = currentWeapon.damage;
             pendingRangedBonus = bonus;
+            pendingWeaponType = WeaponType.Ranged;
+            hasPendingRanged = true;
+        }
+        else if (currentWeapon.weaponType == WeaponType.Magic && magicProjectilePrefab != null)
+        {
+            if (!movement.IsGrounded)
+                movement.AirAttackUsed = true;
+            IsAttacking = true;
+            weapon?.Show();
+            animator.Play(MagicAttackState, 0, 0f);
+            pendingRangedDir = attackDir;
+            pendingRangedDamage = currentWeapon.damage;
+            pendingRangedBonus = bonus;
+            pendingWeaponType = WeaponType.Magic;
             hasPendingRanged = true;
         }
     }
@@ -142,28 +150,36 @@ public class PlayerCombat : MonoBehaviour
         return facingLeft ? Vector2.left : Vector2.right;
     }
 
-    void ShootInDirection(Vector2 dir, float baseDamage, StatBonus bonus)
+    void ShootInDirection(Vector2 dir, float baseDamage, StatBonus bonus, WeaponType weaponType)
     {
         float effectiveDamage = (baseDamage + bonus.damage) * (1f + bonus.damageDealtMult);
         if (bonus.criticalChance > 0f && Random.value < bonus.criticalChance)
             effectiveDamage *= 1f + bonus.criticalDamage;
 
-        int totalArrows = bonus.arrowCount >= 2 ? bonus.arrowCount : 1;
+        // 트리플 화살 아이템은 활(Ranged)에만 적용
+        int totalArrows =
+            (weaponType == WeaponType.Ranged && bonus.arrowCount >= 2) ? bonus.arrowCount : 1;
         float perArrowDmg =
             totalArrows > 1 && bonus.arrowDamageMult > 0f
                 ? effectiveDamage * bonus.arrowDamageMult
                 : effectiveDamage;
 
+        GameObject prefab =
+            weaponType == WeaponType.Magic ? magicProjectilePrefab : arrowProjectilePrefab;
+
         float spreadAngle = 30f;
         for (int i = 0; i < totalArrows; i++)
         {
             float offset = totalArrows > 1 ? (i - (totalArrows - 1) * 0.5f) * spreadAngle : 0f;
-            SpawnProjectile(RotateVector(dir, offset), perArrowDmg, bonus.penetration);
+            SpawnProjectile(prefab, RotateVector(dir, offset), perArrowDmg, bonus.penetration);
         }
     }
 
-    void SpawnProjectile(Vector2 dir, float damage, int pierce)
+    void SpawnProjectile(GameObject prefab, Vector2 dir, float damage, int pierce)
     {
+        if (prefab == null)
+            return;
+
         Vector3 origin = transform.position;
         if (firePoint != null)
         {
@@ -175,7 +191,7 @@ public class PlayerCombat : MonoBehaviour
             if (facingLeft == firePointOnRight)
                 origin.x = transform.position.x - xDiff;
         }
-        var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
+        var proj = Instantiate(prefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
             projComp.Init(dir, projectileSpeed, damage, gameObject, pierce: pierce);
@@ -208,7 +224,12 @@ public class PlayerCombat : MonoBehaviour
             return;
         hasPendingRanged = false;
         var currentWeapon = weaponInventory?.Current;
-        ShootInDirection(pendingRangedDir, pendingRangedDamage, pendingRangedBonus);
+        ShootInDirection(
+            pendingRangedDir,
+            pendingRangedDamage,
+            pendingRangedBonus,
+            pendingWeaponType
+        );
         AudioManager.Instance?.PlaySFX(currentWeapon?.attackSound);
     }
 

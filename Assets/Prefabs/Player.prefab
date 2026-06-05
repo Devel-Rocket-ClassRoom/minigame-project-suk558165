@@ -291,7 +291,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
   weapon: {fileID: 1274484273918966404}
   weaponInventory: {fileID: 7740948866993071214}
-  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  arrowProjectilePrefab: {fileID: 890269536779844890, guid: bd171f3684cf9f54abd5dbe3167fa2a8, type: 3}
+  magicProjectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
   firePoint: {fileID: 4200001}
   projectileSpeed: 12
   meleeAttackClip: {fileID: 7400000, guid: f62aa5797bd692747be04424a25a113c, type: 2}
@@ -484,7 +485,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b456e78037784b247ae99417c5e84105, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 435be392ed25e2646a4799dbee9af123, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

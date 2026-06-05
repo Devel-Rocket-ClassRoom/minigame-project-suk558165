@@ -119,6 +119,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
         spawnDelayTimer = spawnDelay;
+        // 스폰 직후 즉시 공격 방지 — 첫 공격도 쿨다운 후에 발동
+        attackTimer = attackCooldown;
     }
 
     void Update()
@@ -299,13 +301,24 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void EnableHitbox()
     {
-        if (meleeHitbox != null)
+        if (meleeHitbox == null)
+            return;
+        var hitboxComp = meleeHitbox.GetComponent<MeleeHitbox>();
+        if (hitboxComp != null)
+            // 공격 지속 시간만큼만 활성화 → 이벤트 누락돼도 자동 비활성화
+            hitboxComp.Activate(attackCooldown * 0.4f);
+        else
             meleeHitbox.enabled = true;
     }
 
     public void DisableHitbox()
     {
-        if (meleeHitbox != null)
+        if (meleeHitbox == null)
+            return;
+        var hitboxComp = meleeHitbox.GetComponent<MeleeHitbox>();
+        if (hitboxComp != null)
+            hitboxComp.ForceDeactivate();
+        else
             meleeHitbox.enabled = false;
     }
 
