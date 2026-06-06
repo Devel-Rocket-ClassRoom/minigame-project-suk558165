@@ -51,38 +51,17 @@ public class PlayerMovement : MonoBehaviour
     private int baseDashCharges;
     private float baseDashDuration;
 
-    float EffectiveWalkSpeed
+    private StatBonus cachedBonus;
+
+    void RefreshStatBonus()
     {
-        get
-        {
-            var b = inventory?.GetTotalStatBonus() ?? default;
-            return baseWalkSpeed * (1f + b.speed);
-        }
+        cachedBonus = inventory?.GetTotalStatBonus() ?? default;
     }
-    float EffectiveJumpForce
-    {
-        get
-        {
-            var b = inventory?.GetTotalStatBonus() ?? default;
-            return baseJumpForce * (1f + b.jump);
-        }
-    }
-    int EffectiveDashCharges
-    {
-        get
-        {
-            var b = inventory?.GetTotalStatBonus() ?? default;
-            return baseDashCharges + b.dashCount;
-        }
-    }
-    float EffectiveDashDuration
-    {
-        get
-        {
-            var b = inventory?.GetTotalStatBonus() ?? default;
-            return baseDashDuration * (1f + b.dashRange);
-        }
-    }
+
+    float EffectiveWalkSpeed => baseWalkSpeed * (1f + cachedBonus.speed);
+    float EffectiveJumpForce => baseJumpForce * (1f + cachedBonus.jump);
+    int EffectiveDashCharges => baseDashCharges + cachedBonus.dashCount;
+    float EffectiveDashDuration => baseDashDuration * (1f + cachedBonus.dashRange);
 
     private int jumpCharges;
     private bool wasGrounded;
@@ -125,6 +104,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleInput()
     {
+        RefreshStatBonus();
+
         if (InventoryUI.IsOpen || ShopUI.IsOpen || PauseMenu.IsPaused)
         {
             MoveInput = 0f;
@@ -296,7 +277,10 @@ public class PlayerMovement : MonoBehaviour
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, combinedLayer);
         IsGrounded = hit && rb.linearVelocity.y <= 1.0f;
 
-        IsOnPlatform = hit;
+        IsOnPlatform =
+            Physics2D.OverlapCircle(checkPos, 0.15f, platformLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, platformLayer)
+            || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, platformLayer);
     }
 
     IEnumerator DropDown()
@@ -304,18 +288,21 @@ public class PlayerMovement : MonoBehaviour
         if (isDropping)
             yield break;
 
-        // 발 근처의 플랫폼 중, 플레이어 발보다 위로 살짝이라도 솟아있지 않은 — 즉 발이 올라타 있는 — 플랫폼만 통과시킨다.
-        // 발 아래 멀리 있는 다른 플랫폼(중간층)은 통과 대상에서 제외해야 아랫점프 후 그 위에 착지할 수 있다.
         float feetY = mainCollider != null ? mainCollider.bounds.min.y : groundCheck.position.y;
-        var hits = Physics2D.OverlapCircleAll(groundCheck.position, 0.3f, platformLayer);
+        var hits = Physics2D.OverlapCircleAll(groundCheck.position, 0.5f, platformLayer);
         var toIgnore = new System.Collections.Generic.List<Collider2D>();
+        float surfaceMax = float.NegativeInfinity;
         foreach (var h in hits)
         {
             if (h == null)
                 continue;
-            // 플랫폼 상단이 발 높이보다 약간 위/같은 높이일 때만 — 즉 현재 올라타 있는 플랫폼만 통과
-            if (h.bounds.max.y <= feetY + 0.2f)
+            float surfaceY = h.ClosestPoint(groundCheck.position).y;
+            if (surfaceY <= feetY + 0.3f)
+            {
                 toIgnore.Add(h);
+                if (surfaceY > surfaceMax)
+                    surfaceMax = surfaceY;
+            }
         }
         if (toIgnore.Count == 0)
             yield break;
@@ -325,7 +312,17 @@ public class PlayerMovement : MonoBehaviour
             Physics2D.IgnoreCollision(mainCollider, p, true);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -10f);
 
-        yield return new WaitForSeconds(dropDownDuration);
+        // 발이 플랫폼 표면 아래로 충분히 내려갈 때까지만 충돌 무시
+        float clearY = surfaceMax - (mainCollider != null ? mainCollider.bounds.size.y : 1f) - 0.15f;
+        float elapsed = 0f;
+        while (elapsed < 0.5f)
+        {
+            yield return null;
+            elapsed += Time.deltaTime;
+            float currentFeetY = mainCollider != null ? mainCollider.bounds.min.y : transform.position.y;
+            if (currentFeetY < clearY)
+                break;
+        }
 
         foreach (var p in toIgnore)
             if (p != null)

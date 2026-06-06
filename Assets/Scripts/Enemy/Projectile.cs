@@ -42,6 +42,8 @@ public class Projectile : MonoBehaviour
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
         rb.linearVelocity = direction.normalized * speed;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
         var sr = GetComponent<SpriteRenderer>();
         if (sr != null)
             sr.flipX = direction.x > 0f;
@@ -74,9 +76,9 @@ public class Projectile : MonoBehaviour
         if (shooter != null)
         {
             bool shooterIsEnemy = shooterLayer == enemyLayer;
-            // 히트 대상의 루트 오브젝트 레이어로 팀 판별 (자식 콜라이더 레이어 불일치 대응)
-            int rootLayer = other.transform.root.gameObject.layer;
-            bool targetIsEnemy = rootLayer == enemyLayer;
+            var targetBody = other.attachedRigidbody;
+            int targetLayer = targetBody != null ? targetBody.gameObject.layer : other.gameObject.layer;
+            bool targetIsEnemy = targetLayer == enemyLayer;
 
             if (shooterIsEnemy && targetIsEnemy)
                 return; // 적 → 적 무시

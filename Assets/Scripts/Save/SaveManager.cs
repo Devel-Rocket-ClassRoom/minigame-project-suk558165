@@ -90,13 +90,6 @@ public class SaveManager : MonoBehaviour
         if (Data.version >= CurrentVersion)
             return;
 
-        // 예시: version 1 → 2 마이그레이션이 필요할 때
-        // if (Data.version < 2)
-        // {
-        //     Data.newField = defaultValue;
-        //     Data.version = 2;
-        // }
-
         Data.version = CurrentVersion;
         Save();
     }

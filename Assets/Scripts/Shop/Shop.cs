@@ -91,6 +91,12 @@ public class Shop : MonoBehaviour
         {
             shopUI = Instantiate(shopUI, parentCanvas != null ? parentCanvas.transform : null);
 
+            var rt = shopUI.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+
             var shopCanvas = shopUI.GetComponent<Canvas>();
             if (shopCanvas == null)
                 shopCanvas = shopUI.gameObject.AddComponent<Canvas>();

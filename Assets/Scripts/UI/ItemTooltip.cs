@@ -63,21 +63,20 @@ public class ItemTooltip : MonoBehaviour
     }
 
     /// <summary>씬에 인스턴스가 없으면 캔버스를 찾아 코드로 툴팁 GameObject를 만들고 반환.</summary>
-    public static ItemTooltip GetOrCreate()
+    public static ItemTooltip GetOrCreate(Canvas canvas = null)
     {
         if (Instance != null)
             return Instance;
 
-        var canvas = FindAnyObjectByType<Canvas>();
         if (canvas == null)
             return null;
 
         var rootCanvas = canvas.rootCanvas;
 
-        // 씬의 기존 TMP 텍스트에서 폰트/머티리얼을 빌려와 같은 룩앤필 유지
+        // 루트 캔버스 하위의 기존 TMP 텍스트에서 폰트/머티리얼을 빌려와 같은 룩앤필 유지
         TMP_FontAsset borrowedFont = null;
         Material borrowedMat = null;
-        var sceneTmps = FindObjectsByType<TextMeshProUGUI>(FindObjectsSortMode.None);
+        var sceneTmps = rootCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
         foreach (var t in sceneTmps)
         {
             if (t == null || t.font == null)

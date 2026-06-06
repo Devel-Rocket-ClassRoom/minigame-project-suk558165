@@ -909,14 +909,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameClearUI
   canvasGroup: {fileID: 456764503503589425}
   fadeInDuration: 0.8
-  playTimeText: {fileID: 0}
-  deathCountText: {fileID: 0}
-  killCountText: {fileID: 0}
-  goldEarnedText: {fileID: 0}
-  damageDealtText: {fileID: 0}
-  damageTakenText: {fileID: 0}
-  itemsGainedText: {fileID: 0}
-  returnHintText: {fileID: 0}
+  playTimeText: {fileID: 3535086171389264096}
+  deathCountText: {fileID: 4323684456158845084}
+  killCountText: {fileID: 6012817810352851209}
+  goldEarnedText: {fileID: 3856347776911163299}
+  damageDealtText: {fileID: 5042665095956904595}
+  damageTakenText: {fileID: 6292097425895885418}
+  itemsGainedText: {fileID: 9171860095449188033}
+  returnHintText: {fileID: 882019282745302193}
   returnKey: 120
 --- !u!114 &8375035453052212407
 MonoBehaviour:

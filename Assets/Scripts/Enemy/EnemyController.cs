@@ -419,27 +419,12 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        float floorY = transform.position.y;
-        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
-        if (groundHit.collider != null)
-            floorY = groundHit.point.y;
-        Vector3 pos = transform.position + Vector3.up * 0.3f;
-
-        if (goldDropPrefab != null)
-        {
-            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
-            var worldGold = gold.GetComponent<WorldGold>();
-            if (worldGold != null)
-            {
-                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
-                float angle = Random.Range(50f, 130f) * Mathf.Deg2Rad;
-                float force = Random.Range(3f, 5f);
-                worldGold.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
-            }
-        }
+        EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 1, goldDropMin, goldDropMax, 50f, 130f);
 
         if (potionDropPrefab != null && Random.value < potionDropChance)
         {
+            float floorY = EnemyUtils.FindFloorY(transform.position, groundLayer);
+            Vector3 pos = transform.position + Vector3.up * 0.3f;
             var potion = Instantiate(potionDropPrefab, pos, Quaternion.identity);
             var worldPotion = potion.GetComponent<WorldPotion>();
             if (worldPotion != null)

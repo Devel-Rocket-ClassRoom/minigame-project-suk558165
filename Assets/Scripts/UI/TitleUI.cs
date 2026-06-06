@@ -19,8 +19,14 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject quitConfirmPanel;
 
+    [Header("HUD (타이틀 진입 시 숨길 오브젝트)")]
+    [SerializeField]
     private GameObject hpBar;
+
+    [SerializeField]
     private GameObject controls;
+
+    [SerializeField]
     private GameObject goldDisplay;
 
     void Start()
@@ -42,9 +48,6 @@ public class TitleUI : MonoBehaviour
 
     void OnEnable()
     {
-        hpBar = GameObject.Find("HpBar_Frame");
-        controls = GameObject.Find("ControlsPanel");
-        goldDisplay = GameObject.Find("GoldDisplay");
         SetHUD(false);
 
         // 세이브 데이터가 없으면 컨티뉴 버튼 비활성화

@@ -25,7 +25,7 @@ public class CameraFollow : MonoBehaviour
     public float lookAheadSpeed = 3f;
 
     [Header("Camera")]
-    public float orthographicSize = 6f;
+    public float orthographicSize = 7f;
     public float cameraZ = -10f;
 
     [Header("Bounds (선택)")]
@@ -255,8 +255,21 @@ public class CameraFollow : MonoBehaviour
             return pos;
         float halfH = _cam != null ? _cam.orthographicSize : orthographicSize;
         float halfW = halfH * (_cam != null ? _cam.aspect : 16f / 9f);
-        pos.x = Mathf.Clamp(pos.x, minX + halfW, maxX - halfW);
-        pos.y = Mathf.Clamp(pos.y, minY + halfH, maxY - halfH);
+
+        float roomW = maxX - minX;
+        float roomH = maxY - minY;
+
+        // 방이 카메라 뷰보다 작으면 해당 축을 방 중앙에 고정
+        if (roomW <= halfW * 2f)
+            pos.x = (minX + maxX) * 0.5f;
+        else
+            pos.x = Mathf.Clamp(pos.x, minX + halfW, maxX - halfW);
+
+        if (roomH <= halfH * 2f)
+            pos.y = (minY + maxY) * 0.5f;
+        else
+            pos.y = Mathf.Clamp(pos.y, minY + halfH, maxY - halfH);
+
         return pos;
     }
 

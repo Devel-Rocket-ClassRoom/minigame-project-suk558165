@@ -98,7 +98,7 @@ public class InventorySlotUI
         if (highlight != null)
             highlight.enabled = true;
         if (!isEmpty && currentItem != null)
-            ItemTooltip.GetOrCreate()?.Show(currentItem);
+            ItemTooltip.GetOrCreate(GetComponentInParent<Canvas>())?.Show(currentItem);
     }
 
     public void OnPointerExit(PointerEventData eventData)
