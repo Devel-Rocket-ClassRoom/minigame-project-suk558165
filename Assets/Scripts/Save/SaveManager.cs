@@ -51,6 +51,7 @@ public class SaveManager : MonoBehaviour
         if (!File.Exists(FilePath))
         {
             Data = new SaveData();
+            ApplyPlayerPrefsVolume();
             return;
         }
 
@@ -79,9 +80,40 @@ public class SaveManager : MonoBehaviour
     // ── 세이브 초기화 ──
     public void DeleteSave()
     {
+        // 사용자 설정은 보존
+        float master = Data.volumeMaster;
+        float bgm = Data.volumeBGM;
+        float sfx = Data.volumeSFX;
+        string lang = Data.languageCode;
+        KeyBindingSaveData keys = Data.keyBindings;
+        int resW = Data.resolutionWidth;
+        int resH = Data.resolutionHeight;
+        int refresh = Data.refreshRate;
+        int fullscreen = Data.fullscreenMode;
+
         if (File.Exists(FilePath))
             File.Delete(FilePath);
+
         Data = new SaveData();
+        Data.volumeMaster = master;
+        Data.volumeBGM = bgm;
+        Data.volumeSFX = sfx;
+        Data.languageCode = lang;
+        Data.keyBindings = keys;
+        Data.resolutionWidth = resW;
+        Data.resolutionHeight = resH;
+        Data.refreshRate = refresh;
+        Data.fullscreenMode = fullscreen;
+    }
+
+    void ApplyPlayerPrefsVolume()
+    {
+        if (PlayerPrefs.HasKey("Vol_Master"))
+            Data.volumeMaster = PlayerPrefs.GetFloat("Vol_Master");
+        if (PlayerPrefs.HasKey("Vol_BGM"))
+            Data.volumeBGM = PlayerPrefs.GetFloat("Vol_BGM");
+        if (PlayerPrefs.HasKey("Vol_SFX"))
+            Data.volumeSFX = PlayerPrefs.GetFloat("Vol_SFX");
     }
 
     // ── 마이그레이션 ──

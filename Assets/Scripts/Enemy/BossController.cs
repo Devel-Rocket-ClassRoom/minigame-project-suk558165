@@ -10,7 +10,7 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Header("Stats")]
     [SerializeField]
-    private float maxHp = 500f;
+    private float maxHp = 1000f;
 
     [SerializeField]
     private float moveSpeed = 3f;
@@ -107,6 +107,18 @@ public class BossController : MonoBehaviour, IDamageable
     [Header("Audio")]
     [SerializeField]
     private AudioClip deathSound;
+
+    [SerializeField]
+    private AudioClip slamSound;
+
+    [SerializeField]
+    private AudioClip comboSound;
+
+    [SerializeField]
+    private AudioClip projectileSound;
+
+    [SerializeField]
+    private AudioClip dashSound;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -268,8 +280,13 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellFlash(Color.red);
 
+        AudioManager.Instance?.PlaySFX(dashSound);
+        bool prevRootMotion = animator != null && animator.applyRootMotion;
         if (animator != null)
+        {
+            animator.applyRootMotion = false;
             animator.Play("Dash", 0, 0f);
+        }
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
@@ -277,7 +294,7 @@ public class BossController : MonoBehaviour, IDamageable
 
         while (elapsed < chargeDuration)
         {
-            rb.linearVelocity = new Vector2(dir * chargeSpeed, rb.linearVelocity.y);
+            transform.position += new Vector3(dir * chargeSpeed * Time.deltaTime, 0f, 0f);
 
             if (!hitPlayer && Vector2.Distance(transform.position, player.position) <= 1.2f)
             {
@@ -288,6 +305,9 @@ public class BossController : MonoBehaviour, IDamageable
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        if (animator != null)
+            animator.applyRootMotion = prevRootMotion;
 
         // 스턴 (반격 타이밍)
         rb.linearVelocity = Vector2.zero;
@@ -336,6 +356,7 @@ public class BossController : MonoBehaviour, IDamageable
             Destroy(warning);
 
         // 착지 데미지 — 바닥 위 플레이어를 OverlapBox로 탐지
+        AudioManager.Instance?.PlaySFX(slamSound);
         SlamGroundDamage();
 
         yield return new WaitForSeconds(0.25f);
@@ -353,6 +374,7 @@ public class BossController : MonoBehaviour, IDamageable
         if (projectilePrefab == null || player == null)
             yield break;
 
+        AudioManager.Instance?.PlaySFX(projectileSound);
         Vector2 baseDir = ((Vector2)player.position - (Vector2)transform.position).normalized;
         float baseAngle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
 
@@ -384,6 +406,7 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellShake();
 
+        AudioManager.Instance?.PlaySFX(comboSound);
         if (animator != null)
             animator.Play("Combo", 0, 0f);
 
@@ -425,19 +448,14 @@ public class BossController : MonoBehaviour, IDamageable
             return;
 
         float footY = col != null ? col.bounds.min.y : transform.position.y;
-        Vector2 boxCenter = new Vector2(transform.position.x, footY + 0.5f);
-        Vector2 boxSize = new Vector2(100f, 1.5f);
+        float playerY = player.position.y;
 
-        var hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f);
-        foreach (var hit in hits)
+        if (Mathf.Abs(playerY - footY) <= 2f)
         {
-            if (!hit.CompareTag("Player"))
-                continue;
-            hit.GetComponent<IDamageable>()?.TakeDamage(damage);
-            var playerCtrl = hit.GetComponent<PlayerController>();
+            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+            var playerCtrl = player.GetComponent<PlayerController>();
             if (playerCtrl != null)
                 playerCtrl.Knockback(Vector2.up * 8f);
-            break;
         }
     }
 

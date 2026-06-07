@@ -378,7 +378,7 @@ MonoBehaviour:
   randomizeOnStart: 1
   restockOnReopen: 0
   shopUI: {fileID: 2467148238469472193, guid: 555d00e321181e14ba8979c76ba9c820, type: 3}
-  shopScale: 1.5
+  shopScale: 1
   interactPrompt: {fileID: 838351071443937049}
 --- !u!114 &-5333847863919084864
 MonoBehaviour:

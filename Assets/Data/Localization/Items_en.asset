@@ -406,6 +406,22 @@ MonoBehaviour:
     m_Localized: A balanced basic melee weapon.
     m_Metadata:
       m_Items: []
+  - m_Id: 2522484877496321
+    m_Localized: Take 30% more damage but deal 50% more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496322
+    m_Localized: Fires 3 arrows, but each deals reduced damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496323
+    m_Localized: Arrows pierce through 2 enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496324
+    m_Localized: A precious metal that can be sold for a high price.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

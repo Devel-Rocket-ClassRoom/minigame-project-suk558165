@@ -134,6 +134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   lifetime: 5
+  spriteAngleOffset: 180
 --- !u!61 &745340775909709866
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -6388,15 +6388,15 @@ MonoBehaviour:
   - groups:
     - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
       spawnPointIndex: 1
-      count: 1
+      count: 2
       interval: 0.5
     - prefab: {fileID: 1584048139411613313, guid: 616422b06d1d11142b89eae3c1310fe0, type: 3}
       spawnPointIndex: 2
-      count: 1
+      count: 2
       interval: 0.5
     - prefab: {fileID: 3518194442939202087, guid: 3db89fba64992cd4c9aaacc7f972e48a, type: 3}
       spawnPointIndex: 0
-      count: 2
+      count: 3
       interval: 0.5
     delayBeforeSpawn: 1
     instantSpawn: 0
@@ -6404,15 +6404,15 @@ MonoBehaviour:
   - groups:
     - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
       spawnPointIndex: 1
-      count: 1
+      count: 2
       interval: 0.5
     - prefab: {fileID: 6174295281681821268, guid: 33c60e8d2162a4b47b568204a5b57ca8, type: 3}
       spawnPointIndex: 2
-      count: 1
+      count: 2
       interval: 0.5
     - prefab: {fileID: 158985392655263534, guid: 3041fca45b6c4204cb0b416182049260, type: 3}
       spawnPointIndex: 0
-      count: 2
+      count: 3
       interval: 0.5
     delayBeforeSpawn: 2
     instantSpawn: 0

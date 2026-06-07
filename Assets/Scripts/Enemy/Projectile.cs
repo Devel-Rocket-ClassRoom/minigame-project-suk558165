@@ -4,6 +4,8 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     public float lifetime = 5f;
+    [Tooltip("원본 스프라이트가 향하는 각도 (오른쪽=0, 왼쪽=180)")]
+    public float spriteAngleOffset;
 
     private float damage;
     private float knockbackForce;
@@ -43,10 +45,7 @@ public class Projectile : MonoBehaviour
         this.spinSpeed = spinSpeed;
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-        var sr = GetComponent<SpriteRenderer>();
-        if (sr != null)
-            sr.flipX = direction.x > 0f;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
     }

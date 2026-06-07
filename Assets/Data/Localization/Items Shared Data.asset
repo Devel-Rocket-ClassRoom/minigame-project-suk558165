@@ -403,6 +403,22 @@ MonoBehaviour:
     m_Key: weapon_sword_desc
     m_Metadata:
       m_Items: []
+  - m_Id: 2522484877496321
+    m_Key: acc_risk_reward_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496322
+    m_Key: acc_triple_arrow_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496323
+    m_Key: acc_penetration_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496324
+    m_Key: acc_sell_item_desc
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

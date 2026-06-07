@@ -199,41 +199,71 @@ public class TitleOptionsUI : MonoBehaviour
 
     // ── 볼륨 ──────────────────────────────────────────────
 
+    const string PrefKeyMaster = "Vol_Master";
+    const string PrefKeyBGM = "Vol_BGM";
+    const string PrefKeySFX = "Vol_SFX";
+
     void RefreshVolume()
     {
-        if (SaveManager.Instance == null)
-            return;
-        var d = SaveManager.Instance.Data;
+        float master, bgm, sfx;
+
+        if (SaveManager.Instance != null)
+        {
+            var d = SaveManager.Instance.Data;
+            master = d.volumeMaster;
+            bgm = d.volumeBGM;
+            sfx = d.volumeSFX;
+        }
+        else
+        {
+            master = PlayerPrefs.GetFloat(PrefKeyMaster, 1f);
+            bgm = PlayerPrefs.GetFloat(PrefKeyBGM, 1f);
+            sfx = PlayerPrefs.GetFloat(PrefKeySFX, 1f);
+        }
+
         if (masterSlider != null)
-            masterSlider.value = d.volumeMaster;
+            masterSlider.SetValueWithoutNotify(master);
         if (bgmSlider != null)
-            bgmSlider.value = d.volumeBGM;
+            bgmSlider.SetValueWithoutNotify(bgm);
         if (sfxSlider != null)
-            sfxSlider.value = d.volumeSFX;
+            sfxSlider.SetValueWithoutNotify(sfx);
+
+        AudioListener.volume = master;
+        AudioManager.Instance?.SetBGMVolume(bgm);
+        AudioManager.Instance?.SetSFXVolume(sfx);
     }
 
     public void OnMasterChanged(float v)
     {
         AudioListener.volume = v;
+        PlayerPrefs.SetFloat(PrefKeyMaster, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeMaster = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     public void OnBGMChanged(float v)
     {
         AudioManager.Instance?.SetBGMVolume(v);
+        PlayerPrefs.SetFloat(PrefKeyBGM, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeBGM = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     public void OnSFXChanged(float v)
     {
         AudioManager.Instance?.SetSFXVolume(v);
+        PlayerPrefs.SetFloat(PrefKeySFX, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeSFX = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     // ── 언어 ──────────────────────────────────────────────

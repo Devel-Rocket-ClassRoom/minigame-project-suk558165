@@ -35,11 +35,11 @@ public class OptionsMenu : MonoBehaviour
         }
 
         if (masterVolumeSlider != null)
-            masterVolumeSlider.value = master;
+            masterVolumeSlider.SetValueWithoutNotify(master);
         if (bgmVolumeSlider != null)
-            bgmVolumeSlider.value = bgm;
+            bgmVolumeSlider.SetValueWithoutNotify(bgm);
         if (sfxVolumeSlider != null)
-            sfxVolumeSlider.value = sfx;
+            sfxVolumeSlider.SetValueWithoutNotify(sfx);
 
         InitLanguageDropdown();
     }
@@ -49,25 +49,25 @@ public class OptionsMenu : MonoBehaviour
     public void OnMasterVolumeChanged(float value)
     {
         AudioListener.volume = value;
-        SaveVolume(KeyMaster, value);
         if (SaveManager.Instance != null)
             SaveManager.Instance.Data.volumeMaster = value;
+        SaveVolume(KeyMaster, value);
     }
 
     public void OnBGMVolumeChanged(float value)
     {
         AudioManager.Instance?.SetBGMVolume(value);
-        SaveVolume(KeyBGM, value);
         if (SaveManager.Instance != null)
             SaveManager.Instance.Data.volumeBGM = value;
+        SaveVolume(KeyBGM, value);
     }
 
     public void OnSFXVolumeChanged(float value)
     {
         AudioManager.Instance?.SetSFXVolume(value);
-        SaveVolume(KeySFX, value);
         if (SaveManager.Instance != null)
             SaveManager.Instance.Data.volumeSFX = value;
+        SaveVolume(KeySFX, value);
     }
 
     void SaveVolume(string key, float value)

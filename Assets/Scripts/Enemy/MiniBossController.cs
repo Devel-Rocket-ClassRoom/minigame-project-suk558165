@@ -85,6 +85,15 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private AudioClip deathSound;
 
+    [SerializeField]
+    private AudioClip groundWaveSound;
+
+    [SerializeField]
+    private AudioClip leapSlashSound;
+
+    [SerializeField]
+    private AudioClip dashSound;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Collider2D col;
@@ -216,6 +225,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         rb.linearVelocity = Vector2.zero;
 
+        AudioManager.Instance?.PlaySFX(groundWaveSound);
         if (wavePrefab != null)
         {
             Vector3 origin = transform.position + Vector3.up * waveSpawnOffsetY;
@@ -244,6 +254,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
             animator.Play("LeapSlash", 0, 0f);
         yield return TellFlash(Color.yellow);
 
+        AudioManager.Instance?.PlaySFX(leapSlashSound);
         rb.linearVelocity = new Vector2(0f, leapJumpForce);
         yield return new WaitForSeconds(0.2f);
 
@@ -278,6 +289,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
             animator.Play("MultiDash", 0, 0f);
         yield return TellFlash(Color.cyan);
 
+        AudioManager.Instance?.PlaySFX(dashSound);
         bool prevRootMotion = animator != null && animator.applyRootMotion;
         if (animator != null)
             animator.applyRootMotion = false;
