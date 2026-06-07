@@ -26,12 +26,6 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(
-            $"[AudioManager] bgmSource={bgmSource}  clip={bgmSource?.clip?.name}  "
-                + $"bgmVolume={bgmSource?.volume}  listenerVolume={AudioListener.volume}  "
-                + $"isPlaying={bgmSource?.isPlaying}"
-        );
-
         if (bgmSource != null && bgmSource.clip != null && !bgmSource.isPlaying)
             bgmSource.Play();
     }
@@ -71,6 +65,16 @@ public class AudioManager : MonoBehaviour
     {
         if (sfxSource != null)
             sfxSource.volume = value;
+    }
+
+    public void PlayBGM(AudioClip clip)
+    {
+        if (bgmSource == null)
+            return;
+        bgmSource.Stop();
+        bgmSource.clip = clip;
+        if (clip != null)
+            bgmSource.Play();
     }
 
     public void PlaySFX(AudioClip clip)

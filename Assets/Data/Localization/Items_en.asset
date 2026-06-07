@@ -1,0 +1,427 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Items_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: c37c45d5e8ed9d44cb302f3f6e238e81, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2487510228996096
+    m_Localized: Knife
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510249967616
+    m_Localized: A fast and light melee weapon.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510254161920
+    m_Localized: Bow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510254161921
+    m_Localized: A bow that fires arrows from a distance.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356224
+    m_Localized: Crossbow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356225
+    m_Localized: A powerful ranged weapon with a slow reload.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356226
+    m_Localized: Spear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356227
+    m_Localized: A thrusting melee weapon with long reach.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356228
+    m_Localized: Magic Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356229
+    m_Localized: A staff that fires magical energy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356230
+    m_Localized: Scythe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356231
+    m_Localized: A melee weapon that slashes in a wide arc.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356232
+    m_Localized: Gauntlet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356233
+    m_Localized: A weapon that strikes fast with bare fists.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356234
+    m_Localized: Hammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356235
+    m_Localized: A slow but devastatingly powerful weapon.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356236
+    m_Localized: Hoe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510258356237
+    m_Localized: A farming tool that works surprisingly well.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550528
+    m_Localized: Sprint Charm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550529
+    m_Localized: Greatly increases movement speed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550530
+    m_Localized: Wind Boots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550531
+    m_Localized: Increases movement speed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550532
+    m_Localized: Sharp Eye
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550533
+    m_Localized: Increases critical chance and damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550534
+    m_Localized: Quick Wrist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550535
+    m_Localized: Increases attack speed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550536
+    m_Localized: Sturdy Heart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550537
+    m_Localized: Increases maximum HP.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550538
+    m_Localized: Golden Hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550539
+    m_Localized: Enemies drop more gold on defeat.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550540
+    m_Localized: Iron Shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550541
+    m_Localized: Reduces incoming damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550542
+    m_Localized: Berserker's Resolve
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550543
+    m_Localized: Spring Boots
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550544
+    m_Localized: Enhances jump power.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550545
+    m_Localized: Blink Charm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550546
+    m_Localized: Grants one additional dash charge.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550547
+    m_Localized: Shadow Cloak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550548
+    m_Localized: Grants a chance to evade attacks.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550549
+    m_Localized: Triple Arrowhead
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550550
+    m_Localized: Gale Step
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550551
+    m_Localized: Increases dash travel distance.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550552
+    m_Localized: Piercing Arrowhead
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2487510262550553
+    m_Localized: Merchant's Gem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886313029632
+    m_Localized: Options
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806848
+    m_Localized: "\u25A0 Volume"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806849
+    m_Localized: Master
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806850
+    m_Localized: BGM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806851
+    m_Localized: SFX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806852
+    m_Localized: "\u25A0 Display"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806853
+    m_Localized: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806854
+    m_Localized: Screen Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806855
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806856
+    m_Localized: "\u25A0 Controls"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806857
+    m_Localized: Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806858
+    m_Localized: Attack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806859
+    m_Localized: Inventory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806860
+    m_Localized: Interact
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806861
+    m_Localized: Rebind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806862
+    m_Localized: X
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806863
+    m_Localized: Windowed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806864
+    m_Localized: Borderless
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806865
+    m_Localized: Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2488886329806866
+    m_Localized: Duplicate key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456173244416
+    m_Localized: Master Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021632
+    m_Localized: BGM Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021633
+    m_Localized: Equipment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021634
+    m_Localized: Bag
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021635
+    m_Localized: Weapon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021636
+    m_Localized: Armor & Accessory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021637
+    m_Localized: 'Close [A]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021638
+    m_Localized: TAB to close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021639
+    m_Localized: Shop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021640
+    m_Localized: Buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021641
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021642
+    m_Localized: Paused
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021643
+    m_Localized: Quit the game?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021644
+    m_Localized: Start a new run?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021645
+    m_Localized: Return to title?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021646
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021647
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021648
+    m_Localized: GAME OVER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021649
+    m_Localized: GAME CLEAR!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021650
+    m_Localized: Kills  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021651
+    m_Localized: Gold Earned  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021652
+    m_Localized: Items Gained  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021653
+    m_Localized: Damage Taken  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021654
+    m_Localized: Damage Dealt  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021655
+    m_Localized: Deaths  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021656
+    m_Localized: Play Time  {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2492456190021657
+    m_Localized: 'Gold: 0'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2493624282714112
+    m_Localized: 'Gold: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2493624299491328
+    m_Localized: Not enough gold.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2493624299491329
+    m_Localized: Inventory is full.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2499615258775552
+    m_Localized: '[ {0} ] Return to Village'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484860719104
+    m_Localized: Sword
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496320
+    m_Localized: A balanced basic melee weapon.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496321
+    m_Localized: Take 30% more damage but deal 50% more.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496322
+    m_Localized: Fires 3 arrows, but each deals reduced damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496323
+    m_Localized: Arrows pierce through 2 enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496324
+    m_Localized: A precious metal that can be sold for a high price.
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

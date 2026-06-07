@@ -14,6 +14,7 @@ public class ShieldController : MonoBehaviour
     private EnemyController _enemy;
     private SpriteRenderer _sr;
     private Transform _player;
+    private Coroutine _blockFlashCoroutine;
 
     void Awake()
     {
@@ -42,7 +43,9 @@ public class ShieldController : MonoBehaviour
 
         if (playerInFront)
         {
-            StartCoroutine(BlockFlash());
+            if (_blockFlashCoroutine != null)
+                StopCoroutine(_blockFlashCoroutine);
+            _blockFlashCoroutine = StartCoroutine(BlockFlash());
             AudioManager.Instance?.PlaySFX(blockSound);
             return true;
         }

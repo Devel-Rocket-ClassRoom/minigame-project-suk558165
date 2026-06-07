@@ -19,7 +19,10 @@ public class Shop : MonoBehaviour
     private ShopUI shopUI;
 
     [SerializeField]
-    private float shopScale = 1.5f;
+    private Canvas parentCanvas;
+
+    [SerializeField]
+    private float shopScale = 1f;
 
     [SerializeField]
     private GameObject interactPrompt;
@@ -86,8 +89,26 @@ public class Shop : MonoBehaviour
 
         if (!shopUI.gameObject.scene.IsValid())
         {
-            var canvas = FindFirstObjectByType<Canvas>();
-            shopUI = Instantiate(shopUI, canvas != null ? canvas.transform : null);
+            // Screen Space UICanvas를 찾아서 부모로 사용
+            Canvas uiCanvas = null;
+            foreach (var c in Canvas.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
+            {
+                if (c.renderMode == RenderMode.ScreenSpaceOverlay && c.GetComponent<UnityEngine.UI.CanvasScaler>() != null)
+                {
+                    uiCanvas = c;
+                    break;
+                }
+            }
+
+            Transform parent = uiCanvas != null ? uiCanvas.transform : (parentCanvas != null ? parentCanvas.transform : null);
+            shopUI = Instantiate(shopUI, parent);
+
+            var rt = shopUI.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.localScale = Vector3.one;
 
             var shopCanvas = shopUI.GetComponent<Canvas>();
             if (shopCanvas == null)
@@ -97,7 +118,6 @@ public class Shop : MonoBehaviour
             if (shopUI.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
                 shopUI.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
 
-            shopUI.transform.localScale = Vector3.one * shopScale;
             shopUI.OnItemSold = item => soldItems.Add(item);
         }
     }

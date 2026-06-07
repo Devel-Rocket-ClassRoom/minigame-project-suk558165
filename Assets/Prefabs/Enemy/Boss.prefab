@@ -108,8 +108,8 @@ Transform:
   m_GameObject: {fileID: 9078295822729669931}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0.2, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4455667788990011223}
@@ -259,7 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd277929dcd0a364a94ddab59e698c86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 500
+  maxHp: 1000
   moveSpeed: 3
   damage: 20
   phase2Threshold: 0.5
@@ -271,7 +271,7 @@ MonoBehaviour:
   slamFallSpeed: 20
   slamRadius: 3
   slamWarningPrefab: {fileID: 6945726611966360431, guid: 0e5b478e60def2d4e8569fa9f9fc34a0, type: 3}
-  projectilePrefab: {fileID: 7683480936549367447, guid: a0672cbbde2c7224d8d749c0d1b539c4, type: 3}
+  projectilePrefab: {fileID: 3402575793163392766, guid: 8043f9e2e6bdf11429c19cd68f943929, type: 3}
   projectileCount: 3
   projectileSpeed: 8
   projectileSpread: 30
@@ -291,6 +291,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 576
   deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
+  slamSound: {fileID: 8300000, guid: 08c688208e1aa16418313fc1c6829033, type: 3}
+  comboSound: {fileID: 8300000, guid: f8f1fed761395994d96ecc327264d507, type: 3}
+  projectileSound: {fileID: 8300000, guid: 511016029a83f38478bc4b6d45097048, type: 3}
+  dashSound: {fileID: 8300000, guid: 3f34edecaa132514fb8b4b06bf21fc6c, type: 3}
   bossDisplayName: King
   bossHealthBarUIPrefab: {fileID: 0}
 --- !u!95 &4455667788990022334

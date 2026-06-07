@@ -33,6 +33,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float projectileSpeed = 8f;
     public float safeDistance = 3f;
 
+    [Tooltip("원거리 적의 공격 쿨다운에 곱해지는 배수 — 회피 시간 확보용")]
+    public float rangedCooldownMultiplier = 1.8f;
+
+    [Tooltip("원거리 적의 Y축 추적/공격 허용 범위 — 이 값 이내일 때만 공격 (일직선 체크)")]
+    public float rangedYThreshold = 0.8f;
+
     [Tooltip("발사체 회전 속도 (도/초). 0이면 회전 없음")]
     public float projectileSpinSpeed = 0f;
 
@@ -63,6 +69,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Edge Detection")]
     public float edgeCheckDepth = 1.5f;
     public LayerMask platformLayer;
+
+    [Header("Sprite")]
+    [Tooltip("원본 스프라이트가 왼쪽을 보고 있으면 체크")]
+    public bool spriteFacesLeft = false;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -113,6 +123,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             Physics2D.IgnoreLayerCollision(gameObject.layer, PlayerRef.GameObject.layer, true);
         }
         spawnDelayTimer = spawnDelay;
+        // 스폰 직후 즉시 공격 방지 — 첫 공격도 쿨다운 후에 발동
+        attackTimer = attackCooldown;
     }
 
     void Update()
@@ -178,7 +190,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             Patrol();
             return;
         }
-        if (dist <= detectionRange)
+        bool sameLine = Mathf.Abs(player.position.y - transform.position.y) <= rangedYThreshold;
+        if (dist <= detectionRange && sameLine)
         {
             if (dist < safeDistance)
             {
@@ -191,11 +204,12 @@ public class EnemyController : MonoBehaviour, IDamageable
             }
 
             // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
-            sr.flipX = player.position.x < transform.position.x;
+            bool playerOnLeft = player.position.x < transform.position.x;
+            sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
 
             if (attackTimer <= 0f)
             {
-                attackTimer = attackCooldown;
+                attackTimer = attackCooldown * Mathf.Max(1f, rangedCooldownMultiplier);
                 animator.SetTrigger(HashAttack);
                 AudioManager.Instance?.PlaySFX(attackSound);
                 StartCoroutine(ShootAfterDelay(attackDamageDelay));
@@ -218,7 +232,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (aimAtPlayer)
             dir = ((Vector2)player.position - (Vector2)origin).normalized;
         else
-            dir = sr.flipX ? Vector2.left : Vector2.right;
+        {
+            bool facingLeft = spriteFacesLeft ? !sr.flipX : sr.flipX;
+            dir = facingLeft ? Vector2.left : Vector2.right;
+        }
 
         var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
@@ -285,30 +302,32 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.SetFloat(HashSpeed, Mathf.Abs(dir));
 
         if (dir > 0f)
-            sr.flipX = false;
+            sr.flipX = spriteFacesLeft;
         else if (dir < 0f)
-            sr.flipX = true;
+            sr.flipX = !spriteFacesLeft;
     }
 
     public void EnableHitbox()
     {
-        if (meleeHitbox != null)
+        if (meleeHitbox == null)
+            return;
+        var hitboxComp = meleeHitbox.GetComponent<MeleeHitbox>();
+        if (hitboxComp != null)
+            // 공격 지속 시간만큼만 활성화 → 이벤트 누락돼도 자동 비활성화
+            hitboxComp.Activate(attackCooldown * 0.4f);
+        else
             meleeHitbox.enabled = true;
     }
 
     public void DisableHitbox()
     {
-        if (meleeHitbox != null)
+        if (meleeHitbox == null)
+            return;
+        var hitboxComp = meleeHitbox.GetComponent<MeleeHitbox>();
+        if (hitboxComp != null)
+            hitboxComp.ForceDeactivate();
+        else
             meleeHitbox.enabled = false;
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (isDead || meleeHitbox == null || !meleeHitbox.enabled)
-            return;
-        if (!other.CompareTag("Player"))
-            return;
-        other.GetComponent<IDamageable>()?.TakeDamage(damage);
     }
 
     IEnumerator ShootAfterDelay(float delay)
@@ -386,7 +405,8 @@ public class EnemyController : MonoBehaviour, IDamageable
             meleeHitbox.enabled = false;
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
-        GetComponent<Collider2D>().enabled = false;
+        if (col != null)
+            col.enabled = false;
         onDeath?.Invoke();
         onDeath = null;
         RunStats.Instance?.AddKill();
@@ -399,27 +419,12 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        float floorY = transform.position.y;
-        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
-        if (groundHit.collider != null)
-            floorY = groundHit.point.y;
-        Vector3 pos = transform.position + Vector3.up * 0.3f;
-
-        if (goldDropPrefab != null)
-        {
-            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
-            var worldGold = gold.GetComponent<WorldGold>();
-            if (worldGold != null)
-            {
-                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
-                float angle = Random.Range(50f, 130f) * Mathf.Deg2Rad;
-                float force = Random.Range(3f, 5f);
-                worldGold.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
-            }
-        }
+        EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 1, goldDropMin, goldDropMax, 50f, 130f);
 
         if (potionDropPrefab != null && Random.value < potionDropChance)
         {
+            float floorY = EnemyUtils.FindFloorY(transform.position, groundLayer);
+            Vector3 pos = transform.position + Vector3.up * 0.3f;
             var potion = Instantiate(potionDropPrefab, pos, Quaternion.identity);
             var worldPotion = potion.GetComponent<WorldPotion>();
             if (worldPotion != null)

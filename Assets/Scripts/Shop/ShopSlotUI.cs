@@ -30,6 +30,27 @@ public class ShopSlotUI : MonoBehaviour
     void Awake()
     {
         buyButton?.onClick.AddListener(OnBuyClick);
+        CreateIconBackground();
+    }
+
+    void CreateIconBackground()
+    {
+        if (iconImage == null) return;
+
+        var bg = new GameObject("IconBG", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        bg.transform.SetParent(transform, false);
+        bg.transform.SetSiblingIndex(iconImage.transform.GetSiblingIndex());
+
+        var rt = bg.GetComponent<RectTransform>();
+        var iconRT = iconImage.rectTransform;
+        rt.anchorMin = iconRT.anchorMin;
+        rt.anchorMax = iconRT.anchorMax;
+        rt.anchoredPosition = iconRT.anchoredPosition;
+        rt.sizeDelta = iconRT.sizeDelta;
+
+        var img = bg.GetComponent<Image>();
+        img.color = new Color(0.15f, 0.15f, 0.22f, 1f);
+        img.raycastTarget = false;
     }
 
     void OnDisable()

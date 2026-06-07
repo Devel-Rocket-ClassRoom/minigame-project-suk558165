@@ -10,7 +10,7 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Header("Stats")]
     [SerializeField]
-    private float maxHp = 500f;
+    private float maxHp = 1000f;
 
     [SerializeField]
     private float moveSpeed = 3f;
@@ -25,7 +25,7 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Tooltip("Phase 2에서 패턴 간 쿨타임 배율 (1보다 작으면 빨라짐)")]
     [SerializeField]
-    private float phase2CooldownMult = 0.7f;
+    private float phase2CooldownMult = 0.5f;
 
     [Header("돌진 패턴")]
     [SerializeField]
@@ -35,7 +35,7 @@ public class BossController : MonoBehaviour, IDamageable
     private float chargeDuration = 0.5f;
 
     [SerializeField]
-    private float chargeStunDuration = 1f;
+    private float chargeStunDuration = 0.5f;
 
     [Header("내려찍기 패턴")]
     [SerializeField]
@@ -43,9 +43,6 @@ public class BossController : MonoBehaviour, IDamageable
 
     [SerializeField]
     private float slamFallSpeed = 20f;
-
-    [SerializeField]
-    private float slamRadius = 3f;
 
     [SerializeField]
     private GameObject slamWarningPrefab;
@@ -68,7 +65,7 @@ public class BossController : MonoBehaviour, IDamageable
     private int comboHitCount = 3;
 
     [SerializeField]
-    private float comboInterval = 0.3f;
+    private float comboInterval = 0.15f;
 
     [SerializeField]
     private float comboRange = 1.5f;
@@ -78,10 +75,10 @@ public class BossController : MonoBehaviour, IDamageable
 
     [Header("패턴 공통")]
     [SerializeField]
-    private float patternCooldown = 2f;
+    private float patternCooldown = 0.6f;
 
     [SerializeField]
-    private float tellDuration = 0.6f;
+    private float tellDuration = 0.35f;
 
     [SerializeField]
     private float detectionRange = 12f;
@@ -110,6 +107,18 @@ public class BossController : MonoBehaviour, IDamageable
     [Header("Audio")]
     [SerializeField]
     private AudioClip deathSound;
+
+    [SerializeField]
+    private AudioClip slamSound;
+
+    [SerializeField]
+    private AudioClip comboSound;
+
+    [SerializeField]
+    private AudioClip projectileSound;
+
+    [SerializeField]
+    private AudioClip dashSound;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -214,12 +223,7 @@ public class BossController : MonoBehaviour, IDamageable
         }
     }
 
-    void FlipToPlayer()
-    {
-        if (player == null)
-            return;
-        sr.flipX = player.position.x < transform.position.x;
-    }
+    void FlipToPlayer() => EnemyUtils.FlipToPlayer(sr, player, transform);
 
     void ChasePlayer()
     {
@@ -266,32 +270,9 @@ public class BossController : MonoBehaviour, IDamageable
 
     // ── 텔 (예고 연출) ──
 
-    IEnumerator TellFlash(Color color)
-    {
-        float elapsed = 0f;
-        while (elapsed < tellDuration)
-        {
-            float t = Mathf.PingPong(elapsed * 10f, 1f);
-            sr.color = Color.Lerp(originalColor, color, t);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        sr.color = originalColor;
-    }
+    IEnumerator TellFlash(Color color) => EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
 
-    IEnumerator TellShake()
-    {
-        Vector3 origin = transform.position;
-        float elapsed = 0f;
-        while (elapsed < tellDuration)
-        {
-            float offsetX = Random.Range(-0.05f, 0.05f);
-            transform.position = origin + new Vector3(offsetX, 0f, 0f);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        transform.position = origin;
-    }
+    IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
     // ── 패턴: 돌진 ──
 
@@ -299,8 +280,13 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellFlash(Color.red);
 
+        AudioManager.Instance?.PlaySFX(dashSound);
+        bool prevRootMotion = animator != null && animator.applyRootMotion;
         if (animator != null)
+        {
+            animator.applyRootMotion = false;
             animator.Play("Dash", 0, 0f);
+        }
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
@@ -308,7 +294,7 @@ public class BossController : MonoBehaviour, IDamageable
 
         while (elapsed < chargeDuration)
         {
-            rb.linearVelocity = new Vector2(dir * chargeSpeed, rb.linearVelocity.y);
+            transform.position += new Vector3(dir * chargeSpeed * Time.deltaTime, 0f, 0f);
 
             if (!hitPlayer && Vector2.Distance(transform.position, player.position) <= 1.2f)
             {
@@ -319,6 +305,9 @@ public class BossController : MonoBehaviour, IDamageable
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        if (animator != null)
+            animator.applyRootMotion = prevRootMotion;
 
         // 스턴 (반격 타이밍)
         rb.linearVelocity = Vector2.zero;
@@ -338,24 +327,27 @@ public class BossController : MonoBehaviour, IDamageable
 
         // 점프
         rb.linearVelocity = new Vector2(0f, slamJumpForce);
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.25f);
 
-        // 경고 표시
+        // 경고 표시 (바닥 전체)
         Vector3 targetPos = player.position;
         GameObject warning = null;
         if (slamWarningPrefab != null)
         {
             warning = Instantiate(slamWarningPrefab, targetPos, Quaternion.identity);
-            warning.transform.localScale = new Vector3(slamRadius * 2f, 0.3f, 1f);
+            warning.transform.localScale = new Vector3(100f, 0.3f, 1f);
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.15f);
 
         // 급강하
         transform.position = new Vector3(targetPos.x, transform.position.y, 0f);
-        while (!IsGrounded())
+        float fallTimeout = 3f;
+        float fallElapsed = 0f;
+        while (!IsGrounded() && fallElapsed < fallTimeout)
         {
             rb.linearVelocity = new Vector2(0f, -slamFallSpeed);
+            fallElapsed += Time.deltaTime;
             yield return null;
         }
         rb.linearVelocity = Vector2.zero;
@@ -363,10 +355,11 @@ public class BossController : MonoBehaviour, IDamageable
         if (warning != null)
             Destroy(warning);
 
-        // 착지 데미지
-        DealAreaDamage(transform.position, slamRadius);
+        // 착지 데미지 — 바닥 위 플레이어를 OverlapBox로 탐지
+        AudioManager.Instance?.PlaySFX(slamSound);
+        SlamGroundDamage();
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
     }
 
     // ── 패턴: 투사체 ──
@@ -381,6 +374,7 @@ public class BossController : MonoBehaviour, IDamageable
         if (projectilePrefab == null || player == null)
             yield break;
 
+        AudioManager.Instance?.PlaySFX(projectileSound);
         Vector2 baseDir = ((Vector2)player.position - (Vector2)transform.position).normalized;
         float baseAngle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg;
 
@@ -403,7 +397,7 @@ public class BossController : MonoBehaviour, IDamageable
                 projComp.Init(dir, projectileSpeed, damage, gameObject);
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
     }
 
     // ── 패턴: 연속 베기 ──
@@ -411,6 +405,10 @@ public class BossController : MonoBehaviour, IDamageable
     IEnumerator ComboAttack()
     {
         yield return TellShake();
+
+        AudioManager.Instance?.PlaySFX(comboSound);
+        if (animator != null)
+            animator.Play("Combo", 0, 0f);
 
         for (int i = 0; i < comboHitCount; i++)
         {
@@ -423,7 +421,7 @@ public class BossController : MonoBehaviour, IDamageable
                 yield return new WaitForSeconds(comboInterval);
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.15f);
     }
 
     // ── 범위 데미지 ──
@@ -444,12 +442,24 @@ public class BossController : MonoBehaviour, IDamageable
         }
     }
 
-    bool IsGrounded()
+    void SlamGroundDamage()
     {
+        if (player == null)
+            return;
+
         float footY = col != null ? col.bounds.min.y : transform.position.y;
-        Vector2 origin = new Vector2(transform.position.x, footY + 0.05f);
-        return Physics2D.Raycast(origin, Vector2.down, 0.2f, groundLayer).collider != null;
+        float playerY = player.position.y;
+
+        if (Mathf.Abs(playerY - footY) <= 2f)
+        {
+            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+            var playerCtrl = player.GetComponent<PlayerController>();
+            if (playerCtrl != null)
+                playerCtrl.Knockback(Vector2.up * 8f);
+        }
     }
+
+    bool IsGrounded() => EnemyUtils.IsGrounded(col, transform, groundLayer);
 
     // ── 피격 ──
 
@@ -491,13 +501,7 @@ public class BossController : MonoBehaviour, IDamageable
             StartCoroutine(Knockback((transform.position - player.position).normalized));
     }
 
-    IEnumerator HitFlash()
-    {
-        sr.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        if (!isDead)
-            sr.color = originalColor;
-    }
+    IEnumerator HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
 
     IEnumerator Phase2Flash()
     {
@@ -549,37 +553,12 @@ public class BossController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        if (goldDropPrefab == null)
-            return;
-
-        Vector3 pos = transform.position + Vector3.up * 0.3f;
-        float floorY = transform.position.y;
-        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
-        if (groundHit.collider != null)
-            floorY = groundHit.point.y;
-
-        for (int i = 0; i < 5; i++)
-        {
-            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
-            var worldGold = gold.GetComponent<WorldGold>();
-            if (worldGold != null)
-            {
-                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
-                float angle = Random.Range(30f, 150f) * Mathf.Deg2Rad;
-                float force = Random.Range(3f, 6f);
-                worldGold.Launch(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * force, floorY);
-            }
-        }
+        EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 5, goldDropMin, goldDropMax);
     }
 
     IEnumerator DeathRoutine()
     {
-        // 깜빡이며 사라짐
-        for (int i = 0; i < 8; i++)
-        {
-            sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.15f);
-        }
+        yield return EnemyUtils.DeathBlink(sr);
         Destroy(gameObject);
     }
 }

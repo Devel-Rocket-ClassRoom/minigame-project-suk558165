@@ -62,6 +62,7 @@ MonoBehaviour:
   interactRange: 1.5
   hintObject: {fileID: 5403062130086277630}
   builtinAnimDuration: 0.8
+  openSound: {fileID: 8300000, guid: b26a5ac966434a3449a4589964b246fe, type: 3}
   animatorOpenDuration: 0.5
 --- !u!95 &480172350482098075
 Animator:
@@ -168,6 +169,7 @@ MonoBehaviour:
   interactRange: 1.5
   hintObject: {fileID: 5403062130086277630}
   builtinAnimDuration: 0.8
+  openSound: {fileID: 8300000, guid: b26a5ac966434a3449a4589964b246fe, type: 3}
   animatorOpenDuration: 0.5
 --- !u!61 &7799193634695147943
 BoxCollider2D:

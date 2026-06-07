@@ -25,6 +25,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private float waveSpeed = 6f;
 
+    [SerializeField]
+    private float waveSpawnOffsetY = 0.5f;
+
     [Header("도약 베기")]
     [SerializeField]
     private float leapJumpForce = 18f;
@@ -49,17 +52,17 @@ public class MiniBossController : MonoBehaviour, IDamageable
     private float dashDuration = 0.25f;
 
     [SerializeField]
-    private float dashInterval = 0.3f;
+    private float dashInterval = 0.15f;
 
     [SerializeField]
     private float dashHitRadius = 1.3f;
 
     [Header("패턴 공통")]
     [SerializeField]
-    private float patternCooldown = 2.5f;
+    private float patternCooldown = 0.8f;
 
     [SerializeField]
-    private float tellDuration = 0.5f;
+    private float tellDuration = 0.3f;
 
     [SerializeField]
     private float detectionRange = 12f;
@@ -81,6 +84,15 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [Header("Audio")]
     [SerializeField]
     private AudioClip deathSound;
+
+    [SerializeField]
+    private AudioClip groundWaveSound;
+
+    [SerializeField]
+    private AudioClip leapSlashSound;
+
+    [SerializeField]
+    private AudioClip dashSound;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -150,12 +162,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         }
     }
 
-    void FlipToPlayer()
-    {
-        if (player == null)
-            return;
-        sr.flipX = player.position.x < transform.position.x;
-    }
+    void FlipToPlayer() => EnemyUtils.FlipToPlayer(sr, player, transform);
 
     void ChasePlayer()
     {
@@ -203,30 +210,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     // ── 텔 연출 ──────────────────────────────────────
 
-    IEnumerator TellFlash(Color color)
-    {
-        float elapsed = 0f;
-        while (elapsed < tellDuration)
-        {
-            sr.color = Color.Lerp(originalColor, color, Mathf.PingPong(elapsed * 10f, 1f));
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        sr.color = originalColor;
-    }
+    IEnumerator TellFlash(Color color) => EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
 
-    IEnumerator TellShake()
-    {
-        Vector3 origin = transform.position;
-        float elapsed = 0f;
-        while (elapsed < tellDuration)
-        {
-            transform.position = origin + new Vector3(Random.Range(-0.06f, 0.06f), 0f, 0f);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        transform.position = origin;
-    }
+    IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
     // ── 패턴 1: 지면 파동 ─────────────────────────────
     // 바닥을 내리쳐 좌우로 파동이 퍼져나감
@@ -239,9 +225,10 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
         rb.linearVelocity = Vector2.zero;
 
+        AudioManager.Instance?.PlaySFX(groundWaveSound);
         if (wavePrefab != null)
         {
-            Vector3 origin = transform.position;
+            Vector3 origin = transform.position + Vector3.up * waveSpawnOffsetY;
 
             var left = Instantiate(wavePrefab, origin, Quaternion.identity);
             left.GetComponent<Projectile>()?.Init(Vector2.left, waveSpeed, damage, gameObject);
@@ -255,7 +242,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
                 rightSr.flipX = true;
         }
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.3f);
     }
 
     // ── 패턴 2: 도약 베기 ─────────────────────────────
@@ -267,8 +254,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
             animator.Play("LeapSlash", 0, 0f);
         yield return TellFlash(Color.yellow);
 
+        AudioManager.Instance?.PlaySFX(leapSlashSound);
         rb.linearVelocity = new Vector2(0f, leapJumpForce);
-        yield return new WaitForSeconds(0.35f);
+        yield return new WaitForSeconds(0.2f);
 
         // 플레이어 X로 이동 후 급낙하
         if (player != null)
@@ -289,7 +277,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         // 착지 충격 — IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
         DealAreaDamage(transform.position, leapRadius);
 
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.2f);
     }
 
     // ── 패턴 3: 연속 돌진 ─────────────────────────────
@@ -297,9 +285,14 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     IEnumerator MultiDash()
     {
-        if (animator != null)
+        if (animator != null && animator.HasState(0, Animator.StringToHash("MultiDash")))
             animator.Play("MultiDash", 0, 0f);
         yield return TellFlash(Color.cyan);
+
+        AudioManager.Instance?.PlaySFX(dashSound);
+        bool prevRootMotion = animator != null && animator.applyRootMotion;
+        if (animator != null)
+            animator.applyRootMotion = false;
 
         for (int i = 0; i < dashCount; i++)
         {
@@ -328,10 +321,13 @@ public class MiniBossController : MonoBehaviour, IDamageable
                 yield return new WaitForSeconds(dashInterval);
         }
 
+        if (animator != null)
+            animator.applyRootMotion = prevRootMotion;
+
         // 스턴
         rb.linearVelocity = Vector2.zero;
         sr.color = Color.gray;
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.3f);
         sr.color = originalColor;
     }
 
@@ -364,18 +360,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
     }
 
-    bool IsGrounded()
-    {
-        float footY = col != null ? col.bounds.min.y : transform.position.y;
-        return Physics2D
-                .Raycast(
-                    new Vector2(transform.position.x, footY + 0.05f),
-                    Vector2.down,
-                    0.2f,
-                    groundLayer
-                )
-                .collider != null;
-    }
+    bool IsGrounded() => EnemyUtils.IsGrounded(col, transform, groundLayer);
 
     // ── 피격 / 사망 ────────────────────────────────────
 
@@ -396,13 +381,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         StartCoroutine(HitFlash());
     }
 
-    IEnumerator HitFlash()
-    {
-        sr.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        if (!isDead)
-            sr.color = originalColor;
-    }
+    IEnumerator HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
 
     void Die()
     {
@@ -428,36 +407,12 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        if (goldDropPrefab == null)
-            return;
-        Vector3 pos = transform.position + Vector3.up * 0.3f;
-        float floorY = transform.position.y;
-        var groundHit = Physics2D.Raycast(transform.position, Vector2.down, 20f, groundLayer);
-        if (groundHit.collider != null)
-            floorY = groundHit.point.y;
-        for (int i = 0; i < 3; i++)
-        {
-            var gold = Instantiate(goldDropPrefab, pos, Quaternion.identity);
-            var worldGold = gold.GetComponent<WorldGold>();
-            if (worldGold != null)
-            {
-                worldGold.amount = Random.Range(goldDropMin, goldDropMax + 1);
-                float angle = Random.Range(30f, 150f) * Mathf.Deg2Rad;
-                worldGold.Launch(
-                    new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * Random.Range(3f, 6f),
-                    floorY
-                );
-            }
-        }
+        EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 3, goldDropMin, goldDropMax);
     }
 
     IEnumerator DeathRoutine()
     {
-        for (int i = 0; i < 8; i++)
-        {
-            sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.15f);
-        }
+        yield return EnemyUtils.DeathBlink(sr);
         Destroy(gameObject);
     }
 }

@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 public class TitleOptionsUI : MonoBehaviour
@@ -12,6 +14,13 @@ public class TitleOptionsUI : MonoBehaviour
     [Header("언어")]
     [Tooltip("언어 선택 드롭다운 (옵션). 항목 순서: English, 한국어")]
     public TMP_Dropdown languageDropdown;
+
+    [Header("디스플레이")]
+    [Tooltip("해상도 선택 드롭다운 (옵션)")]
+    public TMP_Dropdown resolutionDropdown;
+
+    [Tooltip("화면 모드 드롭다운 (옵션). 항목 순서: 창 모드, 테두리 없는 창, 전체화면")]
+    public TMP_Dropdown fullscreenDropdown;
 
     [Header("키 바인딩 레이블 (액션 설명 텍스트에 연결)")]
     public TextMeshProUGUI dashKeyText;
@@ -41,15 +50,15 @@ public class TitleOptionsUI : MonoBehaviour
 
     void Awake()
     {
-        // 액션 설명 레이블을 정적 텍스트로 복원
+        // 액션 설명 레이블 — 로케일에 맞춘 텍스트로 설정 (테이블 미초기화면 한국어 기본)
         if (dashKeyText != null)
-            dashKeyText.text = "대시";
+            dashKeyText.text = GetLocalized("ui.options.dash", "대시");
         if (attackKeyText != null)
-            attackKeyText.text = "공격";
+            attackKeyText.text = GetLocalized("ui.options.attack", "공격");
         if (inventoryKeyText != null)
-            inventoryKeyText.text = "인벤토리";
+            inventoryKeyText.text = GetLocalized("ui.options.inventory", "인벤토리");
         if (interactKeyText != null)
-            interactKeyText.text = "상호작용";
+            interactKeyText.text = GetLocalized("ui.options.interact", "상호작용");
 
         // 어두운 KeyText 박스 안에 키 값 표시용 TMP 동적 생성
         dashKeyDisplay = CreateKeyDisplay(dashKeyText);
@@ -73,6 +82,20 @@ public class TitleOptionsUI : MonoBehaviour
             languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
         }
 
+        if (resolutionDropdown != null)
+        {
+            SetupResolutionDropdown();
+            resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
+        }
+
+        if (fullscreenDropdown != null)
+        {
+            SetupFullscreenDropdown();
+            fullscreenDropdown.onValueChanged.AddListener(OnFullscreenChanged);
+        }
+
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+
         RefreshVolume();
         RefreshKeyLabels();
     }
@@ -88,12 +111,56 @@ public class TitleOptionsUI : MonoBehaviour
 
         if (languageDropdown != null)
             languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged);
+
+        if (resolutionDropdown != null)
+            resolutionDropdown.onValueChanged.RemoveListener(OnResolutionChanged);
+
+        if (fullscreenDropdown != null)
+            fullscreenDropdown.onValueChanged.RemoveListener(OnFullscreenChanged);
+
+        LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+    }
+
+    void OnLocaleChanged(Locale _)
+    {
+        // 언어 변경 시 드롭다운의 동적 라벨(전체화면 등) 다시 채우기
+        if (fullscreenDropdown != null)
+        {
+            int prev = fullscreenDropdown.value;
+            SetupFullscreenDropdown();
+            fullscreenDropdown.SetValueWithoutNotify(prev);
+            fullscreenDropdown.RefreshShownValue();
+        }
+
+        // 액션 라벨 — Awake에서만 설정되므로 여기서 다시 한 번 갱신
+        if (dashKeyText != null)
+            dashKeyText.text = GetLocalized("ui.options.dash", "대시");
+        if (attackKeyText != null)
+            attackKeyText.text = GetLocalized("ui.options.attack", "공격");
+        if (inventoryKeyText != null)
+            inventoryKeyText.text = GetLocalized("ui.options.inventory", "인벤토리");
+        if (interactKeyText != null)
+            interactKeyText.text = GetLocalized("ui.options.interact", "상호작용");
+    }
+
+    static string GetLocalized(string key, string fallback)
+    {
+        var table = LocalizationSettings.StringDatabase?.GetTable("Items");
+        if (table == null)
+            return fallback;
+        var entry = table.GetEntry(key);
+        return entry != null ? entry.GetLocalizedString() : fallback;
     }
 
     void Update()
     {
         if (!isRebinding)
+        {
+            // 리바인딩 중이 아닐 때 ESC → 옵션 패널 닫기
+            if (Input.GetKeyDown(KeyCode.Escape))
+                OnClose();
             return;
+        }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -132,41 +199,71 @@ public class TitleOptionsUI : MonoBehaviour
 
     // ── 볼륨 ──────────────────────────────────────────────
 
+    const string PrefKeyMaster = "Vol_Master";
+    const string PrefKeyBGM = "Vol_BGM";
+    const string PrefKeySFX = "Vol_SFX";
+
     void RefreshVolume()
     {
-        if (SaveManager.Instance == null)
-            return;
-        var d = SaveManager.Instance.Data;
+        float master, bgm, sfx;
+
+        if (SaveManager.Instance != null)
+        {
+            var d = SaveManager.Instance.Data;
+            master = d.volumeMaster;
+            bgm = d.volumeBGM;
+            sfx = d.volumeSFX;
+        }
+        else
+        {
+            master = PlayerPrefs.GetFloat(PrefKeyMaster, 1f);
+            bgm = PlayerPrefs.GetFloat(PrefKeyBGM, 1f);
+            sfx = PlayerPrefs.GetFloat(PrefKeySFX, 1f);
+        }
+
         if (masterSlider != null)
-            masterSlider.value = d.volumeMaster;
+            masterSlider.SetValueWithoutNotify(master);
         if (bgmSlider != null)
-            bgmSlider.value = d.volumeBGM;
+            bgmSlider.SetValueWithoutNotify(bgm);
         if (sfxSlider != null)
-            sfxSlider.value = d.volumeSFX;
+            sfxSlider.SetValueWithoutNotify(sfx);
+
+        AudioListener.volume = master;
+        AudioManager.Instance?.SetBGMVolume(bgm);
+        AudioManager.Instance?.SetSFXVolume(sfx);
     }
 
     public void OnMasterChanged(float v)
     {
         AudioListener.volume = v;
+        PlayerPrefs.SetFloat(PrefKeyMaster, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeMaster = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     public void OnBGMChanged(float v)
     {
         AudioManager.Instance?.SetBGMVolume(v);
+        PlayerPrefs.SetFloat(PrefKeyBGM, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeBGM = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     public void OnSFXChanged(float v)
     {
         AudioManager.Instance?.SetSFXVolume(v);
+        PlayerPrefs.SetFloat(PrefKeySFX, v);
         if (SaveManager.Instance != null)
+        {
             SaveManager.Instance.Data.volumeSFX = v;
-        SaveManager.Instance?.Save();
+            SaveManager.Instance.Save();
+        }
     }
 
     // ── 언어 ──────────────────────────────────────────────
@@ -176,15 +273,20 @@ public class TitleOptionsUI : MonoBehaviour
         if (languageDropdown == null)
             return;
 
-        // 항목이 비어있으면 기본값으로 채워줌
-        if (languageDropdown.options == null || languageDropdown.options.Count == 0)
+        if (languageDropdown.template == null)
         {
-            languageDropdown.options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>
-            {
-                new TMP_Dropdown.OptionData("English"),
-                new TMP_Dropdown.OptionData("한국어"),
-            };
+            Debug.LogWarning(
+                "[TitleOptionsUI] languageDropdown.template이 비어 있습니다. Editor에서 TMP Dropdown의 Template 필드를 연결하세요."
+            );
+            return;
         }
+
+        // 인스펙터에 더미 항목(Option A/B/C)이 있어도 항상 덮어쓴다
+        languageDropdown.options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>
+        {
+            new TMP_Dropdown.OptionData("English"),
+            new TMP_Dropdown.OptionData("한국어"),
+        };
 
         // onValueChanged 발화 없이 현재 값만 설정
         int current = LanguageManager.Instance != null ? LanguageManager.Instance.CurrentIndex : 0;
@@ -196,6 +298,93 @@ public class TitleOptionsUI : MonoBehaviour
     {
         LanguageManager.Instance?.SetLanguage(index);
     }
+
+    // ── 디스플레이 ────────────────────────────────────────
+
+    void SetupResolutionDropdown()
+    {
+        var dm = DisplayManager.Instance;
+        if (dm == null || resolutionDropdown == null)
+            return;
+
+        if (resolutionDropdown.template == null)
+        {
+            Debug.LogWarning(
+                "[TitleOptionsUI] resolutionDropdown.template이 비어 있습니다. Editor에서 TMP Dropdown의 Template 필드를 연결하세요."
+            );
+            return;
+        }
+
+        var opts = new System.Collections.Generic.List<TMP_Dropdown.OptionData>();
+        foreach (var r in dm.AvailableResolutions)
+            opts.Add(new TMP_Dropdown.OptionData($"{r.x} x {r.y}"));
+        resolutionDropdown.options = opts;
+        resolutionDropdown.SetValueWithoutNotify(dm.GetCurrentResolutionIndex());
+        resolutionDropdown.RefreshShownValue();
+    }
+
+    void SetupFullscreenDropdown()
+    {
+        if (fullscreenDropdown == null)
+            return;
+
+        if (fullscreenDropdown.template == null)
+        {
+            Debug.LogWarning(
+                "[TitleOptionsUI] fullscreenDropdown.template이 비어 있습니다. Editor에서 TMP Dropdown의 Template 필드를 연결하세요."
+            );
+            return;
+        }
+
+        // 인스펙터 더미 항목 무시하고 항상 덮어쓴다. 로케일별로 라벨 자동 적용
+        fullscreenDropdown.options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>
+        {
+            new TMP_Dropdown.OptionData(GetLocalized("ui.options.fullscreen_windowed", "창 모드")),
+            new TMP_Dropdown.OptionData(
+                GetLocalized("ui.options.fullscreen_borderless", "테두리 없는 창")
+            ),
+            new TMP_Dropdown.OptionData(
+                GetLocalized("ui.options.fullscreen_exclusive", "전체화면")
+            ),
+        };
+
+        int idx = FullscreenModeToIndex(Screen.fullScreenMode);
+        fullscreenDropdown.SetValueWithoutNotify(idx);
+        fullscreenDropdown.RefreshShownValue();
+    }
+
+    public void OnResolutionChanged(int index)
+    {
+        var dm = DisplayManager.Instance;
+        if (dm == null || index < 0 || index >= dm.AvailableResolutions.Count)
+            return;
+        var r = dm.AvailableResolutions[index];
+        dm.SetResolution(r.x, r.y);
+    }
+
+    public void OnFullscreenChanged(int index)
+    {
+        DisplayManager.Instance?.SetFullscreenMode(IndexToFullscreenMode(index));
+    }
+
+    static int FullscreenModeToIndex(FullScreenMode mode) =>
+        mode switch
+        {
+            FullScreenMode.Windowed => 0,
+            FullScreenMode.FullScreenWindow => 1,
+            FullScreenMode.ExclusiveFullScreen => 2,
+            FullScreenMode.MaximizedWindow => 1,
+            _ => 1,
+        };
+
+    static FullScreenMode IndexToFullscreenMode(int index) =>
+        index switch
+        {
+            0 => FullScreenMode.Windowed,
+            1 => FullScreenMode.FullScreenWindow,
+            2 => FullScreenMode.ExclusiveFullScreen,
+            _ => FullScreenMode.FullScreenWindow,
+        };
 
     // ── 키 바인딩 ─────────────────────────────────────────
 

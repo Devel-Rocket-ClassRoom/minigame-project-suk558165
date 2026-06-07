@@ -205,3 +205,4 @@ MonoBehaviour:
   magnetRadius: 1
   pickupRadius: 0.2
   magnetSpeed: 6
+  pickupSound: {fileID: 8300000, guid: 65f0b5c44769d584b854f6cd3967e4ff, type: 3}

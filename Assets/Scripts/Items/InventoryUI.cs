@@ -155,6 +155,7 @@ public class InventoryUI : MonoBehaviour
         IsOpen = false;
         frame.SetActive(false);
         Time.timeScale = 1f;
+        ItemTooltip.Instance?.Hide();
     }
 
     void HandleDragStarted(InventorySlotUI source)
@@ -310,7 +311,7 @@ public class InventoryUI : MonoBehaviour
 
     void InsertBackpack(int index, ScriptableObject item)
     {
-        inventory.AddToBackpack(item);
+        inventory.InsertToBackpack(index, item);
     }
 
     void SwapEquipSlots(InventorySlotUI a, InventorySlotUI b)
@@ -348,7 +349,7 @@ public class InventoryUI : MonoBehaviour
             bool hasItem =
                 weapons != null && i < weapons.weapons.Count && weapons.weapons[i] != null;
             if (hasItem)
-                weaponSlots[i].SetItem(weapons.weapons[i].sprite);
+                weaponSlots[i].SetItem(weapons.weapons[i], weapons.weapons[i].sprite);
             else
                 weaponSlots[i].Clear();
         }
@@ -359,7 +360,7 @@ public class InventoryUI : MonoBehaviour
                 continue;
             bool hasItem = i < inventory.Accessories.Count && inventory.Accessories[i] != null;
             if (hasItem)
-                accessorySlots[i].SetItem(inventory.Accessories[i].icon);
+                accessorySlots[i].SetItem(inventory.Accessories[i], inventory.Accessories[i].icon);
             else
                 accessorySlots[i].Clear();
         }
@@ -372,9 +373,9 @@ public class InventoryUI : MonoBehaviour
             {
                 var item = inventory.Backpack[i];
                 if (item is WeaponData w)
-                    backpackSlots[i].SetItem(w.sprite);
+                    backpackSlots[i].SetItem(w, w.sprite);
                 else if (item is AccessoryData a)
-                    backpackSlots[i].SetItem(a.icon);
+                    backpackSlots[i].SetItem(a, a.icon);
                 else
                     backpackSlots[i].Clear();
             }

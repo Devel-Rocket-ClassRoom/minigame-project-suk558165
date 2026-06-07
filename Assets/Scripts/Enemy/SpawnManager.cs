@@ -56,6 +56,14 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private List<Wave> waves = new List<Wave>();
 
+    [Header("BGM")]
+    [SerializeField]
+    private AudioClip bossBGM;
+
+    [Tooltip("보스 처치 후 재생할 BGM. 비워두면 음악 정지.")]
+    [SerializeField]
+    private AudioClip afterBossBGM;
+
     public System.Action onAllEnemiesDead;
 
     private int currentWaveIndex;
@@ -63,6 +71,7 @@ public class SpawnManager : MonoBehaviour
     private int pendingSpawnCount;
     private bool waitingForTrigger;
     private bool allWavesCleared;
+    private readonly List<GameObject> spawnedEnemies = new List<GameObject>();
 
     void Start()
     {
@@ -89,15 +98,18 @@ public class SpawnManager : MonoBehaviour
             }
         }
 
+        if (bossBGM != null)
+            AudioManager.Instance?.PlayBGM(bossBGM);
+
         if (waves.Count == 0)
             return;
 
         var bossIntro = GetComponentInChildren<BossIntro>();
         if (bossIntro != null)
         {
-            // 인트로와 첫 웨이브 스폰을 병렬로 시작 — 보스가 스폰되는 모습을 카메라가 잡도록.
-            bossIntro.Play(null);
-            StartCoroutine(SpawnWave(waves[0]));
+            Wave firstWave = waves[0];
+            // 카메라가 보스 위치에 도착하면 보스를 스폰 — 연출 후 입력 잠금 해제.
+            bossIntro.Play(onSpawn: () => StartCoroutine(SpawnWave(firstWave)), onComplete: null);
         }
         else
         {
@@ -166,6 +178,8 @@ public class SpawnManager : MonoBehaviour
         }
 
         var go = Instantiate(prefab, position, Quaternion.identity);
+        go.transform.SetParent(transform.root, worldPositionStays: true);
+        spawnedEnemies.Add(go);
         aliveCount++;
         pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - 1);
 
@@ -185,7 +199,22 @@ public class SpawnManager : MonoBehaviour
 
         var miniBoss = go.GetComponent<MiniBossController>();
         if (miniBoss != null)
+        {
             miniBoss.onDeath += OnEnemyDied;
+            yield break;
+        }
+
+        // 알 수 없는 컴포넌트 — onDeath 연결 불가, aliveCount 즉시 보정
+        aliveCount = Mathf.Max(0, aliveCount - 1);
+    }
+
+    public void CleanupAll()
+    {
+        StopAllCoroutines();
+        foreach (var go in spawnedEnemies)
+            if (go != null)
+                Destroy(go);
+        spawnedEnemies.Clear();
     }
 
     void OnEnemyDied()
@@ -209,6 +238,8 @@ public class SpawnManager : MonoBehaviour
         if (currentWaveIndex >= waves.Count)
         {
             allWavesCleared = true;
+            if (bossBGM != null)
+                AudioManager.Instance?.PlayBGM(afterBossBGM);
             onAllEnemiesDead?.Invoke();
             return;
         }

@@ -19,8 +19,14 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private GameObject quitConfirmPanel;
 
+    [Header("HUD (타이틀 진입 시 숨길 오브젝트)")]
+    [SerializeField]
     private GameObject hpBar;
+
+    [SerializeField]
     private GameObject controls;
+
+    [SerializeField]
     private GameObject goldDisplay;
 
     void Start()
@@ -42,14 +48,12 @@ public class TitleUI : MonoBehaviour
 
     void OnEnable()
     {
-        hpBar = GameObject.Find("HpBar_Frame");
-        controls = GameObject.Find("ControlsPanel");
-        goldDisplay = GameObject.Find("GoldDisplay");
         SetHUD(false);
 
         // 세이브 데이터가 없으면 컨티뉴 버튼 비활성화
         if (continueButton != null)
-            continueButton.interactable = GameFlowController.Instance.HasSaveData();
+            continueButton.interactable =
+                GameFlowController.Instance != null && GameFlowController.Instance.HasSaveData();
     }
 
     void OnDisable()
@@ -69,6 +73,9 @@ public class TitleUI : MonoBehaviour
 
     public void OnNewGame()
     {
+        if (GameFlowController.Instance == null)
+            return;
+
         if (GameFlowController.Instance.HasSaveData() && newGameConfirmPanel != null)
         {
             newGameConfirmPanel.SetActive(true);
@@ -83,7 +90,7 @@ public class TitleUI : MonoBehaviour
         if (newGameConfirmPanel != null)
             newGameConfirmPanel.SetActive(false);
 
-        GameFlowController.Instance.StartNewGame();
+        GameFlowController.Instance?.StartNewGame();
     }
 
     public void OnNewGameCancel()
@@ -92,7 +99,7 @@ public class TitleUI : MonoBehaviour
             newGameConfirmPanel.SetActive(false);
     }
 
-    public void OnContinue() => GameFlowController.Instance.ContinueGame();
+    public void OnContinue() => GameFlowController.Instance?.ContinueGame();
 
     public void OnOptions()
     {

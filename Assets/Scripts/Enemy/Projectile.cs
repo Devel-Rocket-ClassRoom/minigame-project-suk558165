@@ -1,10 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
     public float lifetime = 5f;
+    [Tooltip("원본 스프라이트가 향하는 각도 (오른쪽=0, 왼쪽=180)")]
+    public float spriteAngleOffset;
 
     private float damage;
     private float knockbackForce;
@@ -13,14 +14,18 @@ public class Projectile : MonoBehaviour
     private int pierceRemaining;
     private float spinSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
+    private Rigidbody2D rb;
 
     void Awake()
     {
-        var rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        GetComponent<CircleCollider2D>().isTrigger = true;
+
+        // 모든 콜라이더를 트리거로 설정 (이전 RequireComponent로 남은 콜라이더 대응)
+        foreach (var col in GetComponents<Collider2D>())
+            col.isTrigger = true;
     }
 
     public void Init(
@@ -38,12 +43,9 @@ public class Projectile : MonoBehaviour
         this.shooter = shooter;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
-        var rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        rb.constraints = RigidbodyConstraints2D.None;
-        transform.rotation = Quaternion.Euler(0, 0, angle - 45f);
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
         Invoke(nameof(Activate), 0.05f);
         Destroy(gameObject, lifetime);
     }
@@ -73,9 +75,9 @@ public class Projectile : MonoBehaviour
         if (shooter != null)
         {
             bool shooterIsEnemy = shooterLayer == enemyLayer;
-            // 히트 대상의 루트 오브젝트 레이어로 팀 판별 (자식 콜라이더 레이어 불일치 대응)
-            int rootLayer = other.transform.root.gameObject.layer;
-            bool targetIsEnemy = rootLayer == enemyLayer;
+            var targetBody = other.attachedRigidbody;
+            int targetLayer = targetBody != null ? targetBody.gameObject.layer : other.gameObject.layer;
+            bool targetIsEnemy = targetLayer == enemyLayer;
 
             if (shooterIsEnemy && targetIsEnemy)
                 return; // 적 → 적 무시
@@ -96,7 +98,7 @@ public class Projectile : MonoBehaviour
                 var playerCtrl = other.GetComponentInParent<PlayerController>();
                 if (playerCtrl != null)
                 {
-                    Vector2 dir = GetComponent<Rigidbody2D>().linearVelocity.normalized;
+                    Vector2 dir = rb.linearVelocity.normalized;
                     playerCtrl.Knockback(new Vector2(dir.x, 0.3f).normalized * knockbackForce);
                 }
             }

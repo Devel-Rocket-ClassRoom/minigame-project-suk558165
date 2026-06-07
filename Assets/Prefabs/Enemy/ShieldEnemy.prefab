@@ -346,4 +346,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShieldController
   blockAngle: 70
-  blockSound: {fileID: 0}
+  blockSound: {fileID: 8300000, guid: ed8572017028ae946a9ee417ea8668c9, type: 3}

@@ -24,6 +24,14 @@ public class BossIntro : MonoBehaviour
     private float zoomDuration = 0.8f;
 
     [Header("타이밍")]
+    [Tooltip("카메라 도착 후 보스 스폰까지 대기 시간")]
+    [SerializeField]
+    private float spawnDelay = 0.2f;
+
+    [Tooltip("보스 스폰 후 이름 표시까지 대기 시간")]
+    [SerializeField]
+    private float spawnToNameDelay = 0.4f;
+
     [Tooltip("보스 이름 표시 시간")]
     [SerializeField]
     private float nameDisplayDuration = 1.5f;
@@ -37,12 +45,14 @@ public class BossIntro : MonoBehaviour
     [SerializeField]
     private Transform cameraTarget;
 
-    public void Play(System.Action onComplete)
+    /// <param name="onSpawn">카메라가 보스 위치에 도착한 직후 호출 — 보스 스폰 트리거로 사용.</param>
+    /// <param name="onComplete">인트로 전체 완료 후 호출.</param>
+    public void Play(System.Action onSpawn, System.Action onComplete)
     {
-        StartCoroutine(IntroSequence(onComplete));
+        StartCoroutine(IntroSequence(onSpawn, onComplete));
     }
 
-    IEnumerator IntroSequence(System.Action onComplete)
+    IEnumerator IntroSequence(System.Action onSpawn, System.Action onComplete)
     {
         IsPlaying = true;
         var cam = CameraFollow.Instance;
@@ -59,10 +69,22 @@ public class BossIntro : MonoBehaviour
         {
             originalTarget = cam.target;
             originalLensSize = cam.OrthographicSize;
-
             cam.SetFollowTarget(focusTarget);
             yield return cam.LerpOrthographicSize(originalLensSize, zoomOutSize, zoomDuration);
         }
+        else
+        {
+            yield return new WaitForSeconds(zoomDuration);
+        }
+
+        // 카메라가 보스 위치에 도착 — 보스 스폰
+        if (spawnDelay > 0f)
+            yield return new WaitForSeconds(spawnDelay);
+        onSpawn?.Invoke();
+
+        // 보스 등장 직후 잠깐 보여준 뒤 이름 표시
+        if (spawnToNameDelay > 0f)
+            yield return new WaitForSeconds(spawnToNameDelay);
 
         if (bossNameUIPrefab != null)
         {
@@ -70,13 +92,17 @@ public class BossIntro : MonoBehaviour
             var nameUI = uiGO.GetComponent<BossNameUI>();
             if (nameUI != null)
                 nameUI.Show(bossName, bossTitle, nameDisplayDuration);
-            yield return new WaitForSeconds(nameDisplayDuration);
         }
+        yield return new WaitForSeconds(nameDisplayDuration);
 
         if (cam != null)
         {
             cam.SetFollowTarget(originalTarget);
             yield return cam.LerpOrthographicSize(zoomOutSize, originalLensSize, zoomDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(zoomDuration);
         }
 
         if (playerController != null)

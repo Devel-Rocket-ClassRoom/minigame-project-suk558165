@@ -75,6 +75,16 @@ public class Inventory : MonoBehaviour
         return true;
     }
 
+    public bool InsertToBackpack(int index, ScriptableObject item)
+    {
+        if (backpack.Count >= MaxBackpack)
+            return false;
+        index = Mathf.Clamp(index, 0, backpack.Count);
+        backpack.Insert(index, item);
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
     public ScriptableObject RemoveFromBackpack(int index)
     {
         if (index < 0 || index >= backpack.Count)
@@ -90,7 +100,7 @@ public class Inventory : MonoBehaviour
         if (weaponInventory == null)
             return weapon;
 
-        if (slotIndex >= WeaponInventory.MaxSlots)
+        if (slotIndex < 0 || slotIndex >= WeaponInventory.MaxSlots)
             return weapon;
 
         while (weaponInventory.weapons.Count <= slotIndex)
@@ -143,6 +153,9 @@ public class Inventory : MonoBehaviour
 
     public AccessoryData EquipAccessory(int slotIndex, AccessoryData accessory)
     {
+        if (slotIndex < 0 || slotIndex >= MaxAccessories)
+            return accessory;
+
         while (accessories.Count <= slotIndex)
             accessories.Add(null);
 
@@ -210,6 +223,14 @@ public class Inventory : MonoBehaviour
     {
         if (SaveManager.Instance != null)
             gold = SaveManager.Instance.Data.gold;
+    }
+
+    /// <summary>죽음으로 마을 귀환 시 호출 — 액세서리/가방 아이템 전부 제거.</summary>
+    public void ResetOnDeath()
+    {
+        accessories.Clear();
+        backpack.Clear();
+        OnInventoryChanged?.Invoke();
     }
 
     public StatBonus GetTotalStatBonus()

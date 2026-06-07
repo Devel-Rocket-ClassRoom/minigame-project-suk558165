@@ -152,7 +152,7 @@ MonoBehaviour:
   m_text: "[A] \uC0C1\uC810"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d55e1f7e2cb833a4d8aa7db5a1d5dcf5, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 1300427677, guid: d55e1f7e2cb833a4d8aa7db5a1d5dcf5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 7581389508441118033}
   - component: {fileID: 7409760366368868775}
   - component: {fileID: 4884382761708222041}
+  - component: {fileID: 1333214380606593205}
   m_Layer: 0
   m_Name: NPC4
   m_TagString: Untagged
@@ -367,4 +368,19 @@ MonoBehaviour:
   randomizeOnStart: 1
   restockOnReopen: 0
   shopUI: {fileID: 5507794489144179678, guid: 054d0feb336d7a246addcba92ad1859a, type: 3}
+  shopScale: 1
   interactPrompt: {fileID: 158397148676140750}
+--- !u!114 &1333214380606593205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810710947956184056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d900f3cedce524182d2f2826cb6b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoLocalizePanel
+  tableName: Items
+  debugLogMisses: 0

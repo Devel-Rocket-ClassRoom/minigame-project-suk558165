@@ -36,6 +36,12 @@ public class SaveData
 
     // 키 바인딩
     public KeyBindingSaveData keyBindings = new KeyBindingSaveData();
+
+    // 디스플레이 설정 (0 이하 = 미설정, 시스템 기본 사용)
+    public int resolutionWidth = 0;
+    public int resolutionHeight = 0;
+    public int refreshRate = 0;
+    public int fullscreenMode = -1; // -1 = 미설정, 0=Windowed, 1=Borderless, 2=Exclusive Fullscreen
 }
 
 [Serializable]

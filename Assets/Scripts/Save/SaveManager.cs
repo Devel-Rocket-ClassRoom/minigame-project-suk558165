@@ -10,6 +10,7 @@ public class SaveManager : MonoBehaviour
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics() => Instance = null;
+
     public const int CurrentVersion = 1;
 
     public SaveData Data { get; private set; }
@@ -50,6 +51,7 @@ public class SaveManager : MonoBehaviour
         if (!File.Exists(FilePath))
         {
             Data = new SaveData();
+            ApplyPlayerPrefsVolume();
             return;
         }
 
@@ -66,23 +68,52 @@ public class SaveManager : MonoBehaviour
         // 구버전(15바이트 IV) 세이브 호환 복호화
         if (TryDecrypt(encrypted, LegacyIV, out json))
         {
-            Debug.Log("[SaveManager] 구버전 세이브 감지 → 새 형식으로 재저장");
             Data = JsonUtility.FromJson<SaveData>(json);
             Save(); // 새 IV로 덮어쓰기
             Migrate();
             return;
         }
 
-        Debug.LogWarning("[SaveManager] 세이브 복호화 실패, 새 데이터 생성");
         Data = new SaveData();
     }
 
     // ── 세이브 초기화 ──
     public void DeleteSave()
     {
+        // 사용자 설정은 보존
+        float master = Data.volumeMaster;
+        float bgm = Data.volumeBGM;
+        float sfx = Data.volumeSFX;
+        string lang = Data.languageCode;
+        KeyBindingSaveData keys = Data.keyBindings;
+        int resW = Data.resolutionWidth;
+        int resH = Data.resolutionHeight;
+        int refresh = Data.refreshRate;
+        int fullscreen = Data.fullscreenMode;
+
         if (File.Exists(FilePath))
             File.Delete(FilePath);
+
         Data = new SaveData();
+        Data.volumeMaster = master;
+        Data.volumeBGM = bgm;
+        Data.volumeSFX = sfx;
+        Data.languageCode = lang;
+        Data.keyBindings = keys;
+        Data.resolutionWidth = resW;
+        Data.resolutionHeight = resH;
+        Data.refreshRate = refresh;
+        Data.fullscreenMode = fullscreen;
+    }
+
+    void ApplyPlayerPrefsVolume()
+    {
+        if (PlayerPrefs.HasKey("Vol_Master"))
+            Data.volumeMaster = PlayerPrefs.GetFloat("Vol_Master");
+        if (PlayerPrefs.HasKey("Vol_BGM"))
+            Data.volumeBGM = PlayerPrefs.GetFloat("Vol_BGM");
+        if (PlayerPrefs.HasKey("Vol_SFX"))
+            Data.volumeSFX = PlayerPrefs.GetFloat("Vol_SFX");
     }
 
     // ── 마이그레이션 ──
@@ -91,16 +122,8 @@ public class SaveManager : MonoBehaviour
         if (Data.version >= CurrentVersion)
             return;
 
-        // 예시: version 1 → 2 마이그레이션이 필요할 때
-        // if (Data.version < 2)
-        // {
-        //     Data.newField = defaultValue;
-        //     Data.version = 2;
-        // }
-
         Data.version = CurrentVersion;
         Save();
-        Debug.Log($"[SaveManager] 세이브 마이그레이션 완료 → v{CurrentVersion}");
     }
 
     // ── AES-256 암호화 ──

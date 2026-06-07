@@ -8,6 +8,7 @@ public class WorldGold : MonoBehaviour
     public int amount = 5;
     public float magnetRadius = 3f;
     public float pickupRadius = 0.8f;
+    public AudioClip pickupSound;
     public float magnetSpeed = 8f;
 
     private Transform player;
@@ -27,6 +28,7 @@ public class WorldGold : MonoBehaviour
     }
 
     void OnEnable() => Instances.Add(this);
+
     void OnDisable() => Instances.Remove(this);
 
     void Start()
@@ -81,6 +83,7 @@ public class WorldGold : MonoBehaviour
 
         if (dist <= pickupRadius)
         {
+            AudioManager.Instance?.PlaySFX(pickupSound);
             inventory.AddGold(amount);
             Destroy(gameObject);
             return;

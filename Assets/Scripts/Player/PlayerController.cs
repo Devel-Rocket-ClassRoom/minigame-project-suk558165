@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -17,7 +18,11 @@ public class PlayerController : MonoBehaviour
     private PlayerMovement movement;
     private PlayerCombat combat;
     private WeaponInventory weaponInventory;
+    private Inventory inventory;
     private bool deathHandled;
+    private SortingGroup sortingGroup;
+    private const int DefaultSortingOrder = 32000;
+    private const int BehindShopSortingOrder = -100;
 
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
 
@@ -29,10 +34,22 @@ public class PlayerController : MonoBehaviour
         combat = GetComponent<PlayerCombat>();
         health = GetComponent<PlayerHealth>();
         weaponInventory = GetComponentInChildren<WeaponInventory>();
+        inventory = GetComponent<Inventory>();
+
+        sortingGroup = GetComponent<SortingGroup>();
+        if (sortingGroup == null)
+            sortingGroup = gameObject.AddComponent<SortingGroup>();
+        sortingGroup.sortingLayerName = "Default";
+        sortingGroup.sortingOrder = DefaultSortingOrder;
     }
 
     void Update()
     {
+        if (sortingGroup != null)
+            sortingGroup.sortingOrder = ShopUI.IsOpen
+                ? BehindShopSortingOrder
+                : DefaultSortingOrder;
+
         bool dead = (health != null && health.IsDead) || previewDeath;
         if (dead)
         {
@@ -46,7 +63,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (InputLocked)
+        if (InputLocked || DialogueUI.IsOpen)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             movement.UpdateAnimatorAndFlip(false);
@@ -65,10 +82,6 @@ public class PlayerController : MonoBehaviour
         movement.FixedUpdateMovement();
     }
 
-    /// <summary>
-    /// 마을 귀환 시 죽음 상태를 완전히 초기화합니다.
-    /// HP 복구 + 물리/애니메이터 상태 복원
-    /// </summary>
     public void Knockback(Vector2 velocity)
     {
         if (health == null || health.IsDead)
@@ -76,10 +89,15 @@ public class PlayerController : MonoBehaviour
         movement.ApplyKnockback(velocity);
     }
 
+    /// <summary>
+    /// 마을 귀환 시 죽음 상태를 완전히 초기화합니다.
+    /// HP 복구 + 물리/애니메이터 상태 복원
+    /// </summary>
     public void Revive()
     {
         health?.Revive();
         weaponInventory?.ResetToDefault();
+        inventory?.ResetOnDeath();
 
         deathHandled = false;
         rb.bodyType = RigidbodyType2D.Dynamic;

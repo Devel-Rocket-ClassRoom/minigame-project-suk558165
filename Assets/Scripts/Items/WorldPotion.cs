@@ -27,10 +27,32 @@ public class WorldPotion : MonoBehaviour
     }
 
     void OnEnable() => Instances.Add(this);
+
     void OnDisable() => Instances.Remove(this);
 
     void Start()
     {
+        // 포션의 모든 콜라이더(자식 포함)를 트리거로 — 물리 충돌 방지
+        foreach (var col in GetComponentsInChildren<Collider2D>(true))
+            col.isTrigger = true;
+
+        // 자식의 Rigidbody2D를 Kinematic으로 — 스크립트가 직접 위치를 제어
+        foreach (var rb in GetComponentsInChildren<Rigidbody2D>(true))
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0f;
+        }
+
+        // 플레이어의 모든 콜라이더(자식 포함)와 충돌 무시
+        if (PlayerRef.Exists)
+        {
+            var playerCols = PlayerRef.GameObject.GetComponentsInChildren<Collider2D>(true);
+            foreach (var myCol in GetComponentsInChildren<Collider2D>(true))
+            foreach (var pc in playerCols)
+                if (pc != null)
+                    Physics2D.IgnoreCollision(myCol, pc, true);
+        }
+
         if (!launched)
             SnapToGround();
     }

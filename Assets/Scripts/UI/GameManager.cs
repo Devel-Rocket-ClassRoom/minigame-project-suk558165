@@ -17,12 +17,20 @@ public class GameManager : MonoBehaviour
             {
                 int count = 0;
                 foreach (var e in EnemyController.Instances.ToArray())
-                    { e.TakeDamage(99999f); count++; }
+                {
+                    e.TakeDamage(99999f);
+                    count++;
+                }
                 foreach (var m in MiniBossController.Instances.ToArray())
-                    { m.TakeDamage(99999f); count++; }
+                {
+                    m.TakeDamage(99999f);
+                    count++;
+                }
                 foreach (var b in BossController.Instances.ToArray())
-                    { b.TakeDamage(99999f); count++; }
-                Debug.Log($"[Debug] 적 전멸: {count}마리 처치");
+                {
+                    b.TakeDamage(99999f);
+                    count++;
+                }
             }
         }
 #endif

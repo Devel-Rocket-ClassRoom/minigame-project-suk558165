@@ -1,0 +1,51 @@
+id,Key,한국어,English
+ui,ui.options.title,옵션,Options
+ui,ui.options.volume_section,■ 볼륨,■ Volume
+ui,ui.options.master,마스터,Master
+ui,ui.options.master_volume,마스터 음량,Master Volume
+ui,ui.options.bgm,BGM,BGM
+ui,ui.options.bgm_volume,BGM 음량,BGM Volume
+ui,ui.options.sfx,효과음,SFX
+ui,ui.options.display_section,■ 화면설정,■ Display
+ui,ui.options.resolution,해상도,Resolution
+ui,ui.options.fullscreen,화면 모드,Screen Mode
+ui,ui.options.language,언어,Language
+ui,ui.options.controls_section,■ 조작 키,■ Controls
+ui,ui.options.dash,대시,Dash
+ui,ui.options.attack,공격,Attack
+ui,ui.options.inventory,인벤토리,Inventory
+ui,ui.options.interact,상호작용,Interact
+ui,ui.options.rebind,변경,Rebind
+ui,ui.options.fullscreen_windowed,창 모드,Windowed
+ui,ui.options.fullscreen_borderless,테두리 없는 창,Borderless
+ui,ui.options.fullscreen_exclusive,전체화면,Fullscreen
+ui,ui.options.duplicate_key,중복된 키입니다,Duplicate key
+ui,ui.inv.equipment,장비,Equipment
+ui,ui.inv.backpack,가방,Bag
+ui,ui.inv.weapon,무기,Weapon
+ui,ui.inv.armor_accessory,방어구  & 장신구,Armor & Accessory
+ui,ui.inv.close,닫기  [A],Close [A]
+ui,ui.inv.tab_close,TAB to close,TAB to close
+ui,ui.shop.title,상점,Shop
+ui,ui.shop.buy,구매,Buy
+ui,ui.shop.back,뒤로,Back
+ui,ui.shop.gold,골드: {0},Gold: {0}
+ui,ui.shop.not_enough_gold,골드가 부족합니다.,Not enough gold.
+ui,ui.shop.inventory_full,인벤토리가 가득 찼습니다.,Inventory is full.
+ui,ui.pause.title,일시정지,Paused
+ui,ui.pause.quit_confirm,게임종료하시겠습니까?,Quit the game?
+ui,ui.pause.new_run_confirm,새로 시작하시겠습니까?,Start a new run?
+ui,ui.pause.return_title_confirm,타이틀로 돌아가시겠습니까?,Return to title?
+ui,ui.common.yes,네,Yes
+ui,ui.common.no,아니오,No
+ui,ui.gameover.title,GAME OVER,GAME OVER
+ui,ui.clear.title,GAME CLEAR!,GAME CLEAR!
+ui,ui.stats.kills,처치 수  {0},Kills  {0}
+ui,ui.stats.gold_earned,획득 골드  {0},Gold Earned  {0}
+ui,ui.stats.items_gained,획득 아이템  {0},Items Gained  {0}
+ui,ui.stats.damage_taken,받은 피해  {0},Damage Taken  {0}
+ui,ui.stats.damage_dealt,총 딜량  {0},Damage Dealt  {0}
+ui,ui.stats.deaths,사망 횟수  {0},Deaths  {0}
+ui,ui.stats.playtime,플레이 타임  {0},Play Time  {0}
+ui,ui.hud.gold,골드: 0,Gold: 0
+ui,ui.return_village,[ {0} ] 마을로 돌아가기,[ {0} ] Return to Village

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -39,12 +40,13 @@ public class GameFlowController : MonoBehaviour
     private GameObject playerInstance;
     private GameObject pauseMenuInstance;
     private GameObject tutorialInstance;
+    private GameObject uiCanvasInstance;
 
     void Awake()
     {
         Instance = this;
         if (uiCanvasPrefab != null)
-            Instantiate(uiCanvasPrefab);
+            uiCanvasInstance = Instantiate(uiCanvasPrefab);
 
         // SaveManager 가 씬에 없으면 자동 생성
         if (SaveManager.Instance == null)
@@ -141,6 +143,11 @@ public class GameFlowController : MonoBehaviour
         GameOverUI.Instance?.ResetUI();
         GameClearUI.Instance?.ResetUI();
 
+        if (uiCanvasInstance != null)
+            uiCanvasInstance.SetActive(false);
+
+        BossHealthBarUI.Instance?.Hide();
+
         titleInstance = Instantiate(titlePrefab);
     }
 
@@ -200,6 +207,9 @@ public class GameFlowController : MonoBehaviour
             Destroy(titleInstance);
             titleInstance = null;
         }
+
+        if (uiCanvasInstance != null)
+            uiCanvasInstance.SetActive(true);
     }
 
     void SpawnPlayer()
@@ -307,15 +317,35 @@ public class GameFlowController : MonoBehaviour
 
     public void ReturnToVillage()
     {
+        StartCoroutine(ReturnToVillageRoutine());
+    }
+
+    IEnumerator ReturnToVillageRoutine()
+    {
+        if (ScreenFader.Instance != null)
+            yield return ScreenFader.Instance.FadeOut();
+
         roomManager.ResetDungeon();
         GameClearUI.Instance?.ResetUI();
         GameOverUI.Instance?.ResetUI();
+        BossHealthBarUI.Instance?.Hide();
 
-        // 사망 후 귀환 시 플레이어 전체 상태 복구 (HP + 물리 + 애니메이터)
         if (playerInstance != null)
+        {
+            var inv = playerInstance.GetComponentInChildren<Inventory>();
+            if (inv != null && SaveManager.Instance != null)
+            {
+                SaveManager.Instance.Data.gold = inv.Gold;
+                SaveManager.Instance.Save();
+            }
+
             playerInstance.GetComponent<PlayerController>()?.Revive();
+        }
 
         GoToVillage();
+
+        if (ScreenFader.Instance != null)
+            yield return ScreenFader.Instance.FadeIn();
     }
 
     public void EnterDungeon()

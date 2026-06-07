@@ -39,7 +39,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1100220033001100553}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -66,7 +66,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.5433664, y: -0.33960402}
+  m_Offset: {x: -0.31961638, y: -0.22595322}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -76,7 +76,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.41326725, y: 0.32079196}
+  m_Size: {x: 0.86076725, y: 0.80380774}
   m_EdgeRadius: 0
 --- !u!1 &6703836035709968910
 GameObject:
@@ -108,8 +108,8 @@ Transform:
   m_GameObject: {fileID: 6703836035709968910}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0.2, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2200330044001100664}
@@ -235,7 +235,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.05}
+  m_Offset: {x: 0, y: 0.414}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -264,6 +264,7 @@ MonoBehaviour:
   damage: 15
   wavePrefab: {fileID: 7915919628461615539, guid: 7cc1028d63a1bd945b0c8a555bab478e, type: 3}
   waveSpeed: 6
+  waveSpawnOffsetY: 1.6
   leapJumpForce: 18
   leapFallSpeed: 25
   leapRadius: 2
@@ -272,6 +273,7 @@ MonoBehaviour:
   dashSpeed: 14
   dashDuration: 0.25
   dashInterval: 0.3
+  dashHitRadius: 1.3
   patternCooldown: 2.5
   tellDuration: 0.5
   detectionRange: 12
@@ -282,9 +284,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   deathSound: {fileID: 8300000, guid: 72265339aaff48742995e6a979ab6b29, type: 3}
+  groundWaveSound: {fileID: 8300000, guid: 08c688208e1aa16418313fc1c6829033, type: 3}
+  leapSlashSound: {fileID: 8300000, guid: f8f1fed761395994d96ecc327264d507, type: 3}
+  dashSound: {fileID: 8300000, guid: 3f34edecaa132514fb8b4b06bf21fc6c, type: 3}
 --- !u!95 &2200330044002200998
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -299,7 +304,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0

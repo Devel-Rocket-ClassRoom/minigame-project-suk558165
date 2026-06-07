@@ -4728,6 +4728,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.0890045, y: 2.2855415}
   m_EdgeRadius: 0
+--- !u!114 &7777771801801801801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218297697804358803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 7588163228990406135}
 --- !u!1 &2462396429722952020
 GameObject:
   m_ObjectHideFlags: 0
@@ -5232,6 +5245,7 @@ MonoBehaviour:
       count: 1
       interval: 0.5
     delayBeforeSpawn: 1
+    instantSpawn: 0
     triggerZone: {fileID: 0}
   - groups:
     - prefab: {fileID: 5673119980097987662, guid: f11f116f904c68841a699156638bc453, type: 3}
@@ -5247,7 +5261,10 @@ MonoBehaviour:
       count: 3
       interval: 0.4
     delayBeforeSpawn: 2
+    instantSpawn: 0
     triggerZone: {fileID: 8128810840653742690}
+  bossBGM: {fileID: 0}
+  afterBossBGM: {fileID: 0}
 --- !u!1 &5912749791875171746
 GameObject:
   m_ObjectHideFlags: 0
@@ -8136,16 +8153,3 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
---- !u!114 &7777771801801801801
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2218297697804358803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da1186d0750daa049ae178da1be14d11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 7588163228990406135}
