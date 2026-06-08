@@ -328,7 +328,16 @@ public class BossController : MonoBehaviour, IDamageable
 
         // 점프
         rb.linearVelocity = new Vector2(0f, slamJumpForce);
-        yield return new WaitForSeconds(0.25f);
+
+        // 점프 후 실제로 지면을 벗어날 때까지 대기 (바로 IsGrounded 체크하면 아직 지면 접촉 판정)
+        float liftWait = 0f;
+        while (IsGrounded() && liftWait < 0.3f)
+        {
+            liftWait += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.2f);
 
         // 경고 표시 (바닥 전체)
         Vector3 targetPos = player.position;
@@ -341,8 +350,10 @@ public class BossController : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(0.15f);
 
-        // 급강하
-        transform.position = new Vector3(targetPos.x, transform.position.y, 0f);
+        // 급강하 — Rigidbody 통해 X 이동 (transform.position 직접 수정은 물리 디싱크 유발)
+        rb.MovePosition(new Vector2(targetPos.x, rb.position.y));
+        rb.linearVelocity = new Vector2(0f, -slamFallSpeed);
+
         float fallTimeout = 3f;
         float fallElapsed = 0f;
         while (!IsGrounded() && fallElapsed < fallTimeout)
@@ -356,7 +367,7 @@ public class BossController : MonoBehaviour, IDamageable
         if (warning != null)
             Destroy(warning);
 
-        // 착지 데미지 — 바닥 위 플레이어를 OverlapBox로 탐지
+        // 착지 데미지
         AudioManager.Instance?.PlaySFX(slamSound);
         SlamGroundDamage();
 
