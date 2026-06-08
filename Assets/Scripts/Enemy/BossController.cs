@@ -202,11 +202,11 @@ public class BossController : MonoBehaviour, IDamageable
             return;
         }
 
+        FlipToPlayer();
+
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist > detectionRange)
             return;
-
-        FlipToPlayer();
 
         if (isActing)
             return;
@@ -270,7 +270,8 @@ public class BossController : MonoBehaviour, IDamageable
 
     // ── 텔 (예고 연출) ──
 
-    IEnumerator TellFlash(Color color) => EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
+    IEnumerator TellFlash(Color color) =>
+        EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
 
     IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
@@ -553,7 +554,14 @@ public class BossController : MonoBehaviour, IDamageable
 
     void SpawnDrops()
     {
-        EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 5, goldDropMin, goldDropMax);
+        EnemyUtils.SpawnGoldDrops(
+            goldDropPrefab,
+            transform.position,
+            groundLayer,
+            5,
+            goldDropMin,
+            goldDropMax
+        );
     }
 
     IEnumerator DeathRoutine()
