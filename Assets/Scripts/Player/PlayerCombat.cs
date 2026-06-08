@@ -97,7 +97,10 @@ public class PlayerCombat : MonoBehaviour
             return;
         if (attackTimer > 0f)
             return;
-        if (!movement.IsGrounded && movement.AirAttackUsed)
+
+        // 근접 무기는 공중 1회 제한, 원거리/마법은 제한 없이 쏠 수 있음
+        bool isMelee = currentWeapon.weaponType == WeaponType.Melee;
+        if (isMelee && !movement.IsGrounded && movement.AirAttackUsed)
             return;
 
         Vector2 attackDir = GetAttackDirection();
@@ -115,8 +118,7 @@ public class PlayerCombat : MonoBehaviour
         }
         else if (currentWeapon.weaponType == WeaponType.Ranged && arrowProjectilePrefab != null)
         {
-            if (!movement.IsGrounded)
-                movement.AirAttackUsed = true;
+            // 원거리는 공중 제한 없음 — AirAttackUsed 설정 안 함
             IsAttacking = true;
             weapon?.Show();
             animator.Play(BowAttackState, 0, 0f);
@@ -128,8 +130,7 @@ public class PlayerCombat : MonoBehaviour
         }
         else if (currentWeapon.weaponType == WeaponType.Magic && magicProjectilePrefab != null)
         {
-            if (!movement.IsGrounded)
-                movement.AirAttackUsed = true;
+            // 마법도 공중 제한 없음 — AirAttackUsed 설정 안 함
             IsAttacking = true;
             weapon?.Show();
             animator.Play(MagicAttackState, 0, 0f);
