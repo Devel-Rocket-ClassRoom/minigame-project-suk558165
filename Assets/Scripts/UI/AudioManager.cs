@@ -11,6 +11,8 @@ public class AudioManager : MonoBehaviour
     public AudioSource bgmSource;
     public AudioSource sfxSource;
 
+    private AudioClip defaultBGM;
+
     void Awake()
     {
         if (Instance != null)
@@ -21,6 +23,9 @@ public class AudioManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        if (bgmSource != null)
+            defaultBGM = bgmSource.clip;
+
         LoadVolumes();
     }
 
@@ -28,6 +33,11 @@ public class AudioManager : MonoBehaviour
     {
         if (bgmSource != null && bgmSource.clip != null && !bgmSource.isPlaying)
             bgmSource.Play();
+    }
+
+    public void PlayDefaultBGM()
+    {
+        PlayBGM(defaultBGM);
     }
 
     void LoadVolumes()

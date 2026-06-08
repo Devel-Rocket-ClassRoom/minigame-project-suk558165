@@ -127,6 +127,7 @@ public class GameFlowController : MonoBehaviour
 
     public void GoToTitle()
     {
+        AudioManager.Instance?.PlayDefaultBGM();
         roomManager.ResetDungeon();
 
         if (villageInstance != null)
