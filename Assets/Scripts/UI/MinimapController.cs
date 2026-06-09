@@ -3,6 +3,11 @@ using UnityEngine.UI;
 
 public class MinimapController : MonoBehaviour
 {
+    public static MinimapController Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [Header("UI")]
     [SerializeField]
     private RawImage minimapImage;
@@ -38,6 +43,11 @@ public class MinimapController : MonoBehaviour
     private Transform player;
     private RoomManager roomManager;
     private bool isVisible = true;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -99,8 +109,18 @@ public class MinimapController : MonoBehaviour
             playerMarker.anchoredPosition = Vector2.zero;
     }
 
+    public void Hide()
+    {
+        if (minimapPanel != null)
+            minimapPanel.SetActive(false);
+        if (minimapCamera != null)
+            minimapCamera.enabled = false;
+    }
+
     void OnDestroy()
     {
+        if (Instance == this)
+            Instance = null;
         if (minimapCamera != null)
             Destroy(minimapCamera.gameObject);
         if (renderTexture != null)

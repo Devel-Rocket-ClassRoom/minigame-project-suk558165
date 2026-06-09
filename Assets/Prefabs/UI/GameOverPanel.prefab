@@ -1290,7 +1290,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 68fa5795e23f475419303964335f3bbd, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2460,6 +2460,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
   canvasGroup: {fileID: 956797245947654211}
   fadeInDuration: 0.6
+  backgroundSprite: {fileID: -8241423778954257514, guid: bcb6d3422458a3845924a745dd760d57, type: 3}
   playTimeText: {fileID: 6100000004}
   deathCountText: {fileID: 6200000004}
   killCountText: {fileID: 6300000004}

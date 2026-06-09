@@ -286,6 +286,7 @@ MonoBehaviour:
   goldDropMax: 40
   knockbackForce: 3
   knockbackDuration: 0.1
+  spriteFacesLeft: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 576

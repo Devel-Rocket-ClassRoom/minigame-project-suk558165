@@ -130,6 +130,7 @@ public class BossController : MonoBehaviour, IDamageable
     private bool isPhase2;
     private bool isActing;
     private float cooldownTimer;
+    private bool attackFlip;
 
     private Transform player;
     private Color originalColor;
@@ -223,7 +224,16 @@ public class BossController : MonoBehaviour, IDamageable
         }
     }
 
-    void FlipToPlayer() => EnemyUtils.FlipToPlayer(sr, player, transform);
+    void FlipToPlayer()
+    {
+        if (player == null)
+            return;
+        float dx = player.position.x - transform.position.x;
+        if (Mathf.Abs(dx) < 0.3f)
+            return;
+        bool flip = dx > 0f;
+        sr.flipX = attackFlip ? !flip : flip;
+    }
 
     void ChasePlayer()
     {
@@ -275,43 +285,46 @@ public class BossController : MonoBehaviour, IDamageable
 
     IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
-    // ── 패턴: 돌진 ──
+    // ── 패턴: 돌진 공격 (돌진 후 베기) ──
 
     IEnumerator ChargeAttack()
     {
         yield return TellFlash(Color.red);
 
+        attackFlip = true;
+        FlipToPlayer();
         AudioManager.Instance?.PlaySFX(dashSound);
-        bool prevRootMotion = animator != null && animator.applyRootMotion;
         if (animator != null)
-        {
-            animator.applyRootMotion = false;
             animator.Play("Dash", 0, 0f);
-        }
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
-        bool hitPlayer = false;
 
+        // 돌진: 플레이어 근처까지 이동 (데미지 없음)
         while (elapsed < chargeDuration)
         {
             transform.position += new Vector3(dir * chargeSpeed * Time.deltaTime, 0f, 0f);
 
-            if (!hitPlayer && Vector2.Distance(transform.position, player.position) <= 1.2f)
-            {
-                DealAreaDamage(transform.position, 1.2f);
-                hitPlayer = true;
-            }
+            if (Vector2.Distance(transform.position, player.position) <= comboRange)
+                break;
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
+        // 도착 후 베기
+        rb.linearVelocity = Vector2.zero;
+        FlipToPlayer();
         if (animator != null)
-            animator.applyRootMotion = prevRootMotion;
+            animator.Play("Dash", 0, 0f);
+
+        yield return new WaitForSeconds(0.2f);
+        DealAreaDamage(transform.position, comboRange);
+        yield return new WaitForSeconds(0.15f);
+
+        attackFlip = false;
 
         // 스턴 (반격 타이밍)
-        rb.linearVelocity = Vector2.zero;
         sr.color = Color.gray;
         yield return new WaitForSeconds(chargeStunDuration);
         sr.color = originalColor;
@@ -380,6 +393,7 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellFlash(new Color(1f, 0.5f, 0f));
 
+        FlipToPlayer();
         if (animator != null)
             animator.Play("Charge", 0, 0f);
 
@@ -418,6 +432,8 @@ public class BossController : MonoBehaviour, IDamageable
     {
         yield return TellShake();
 
+        attackFlip = true;
+        FlipToPlayer();
         AudioManager.Instance?.PlaySFX(comboSound);
         if (animator != null)
             animator.Play("Combo", 0, 0f);
@@ -425,14 +441,13 @@ public class BossController : MonoBehaviour, IDamageable
         for (int i = 0; i < comboHitCount; i++)
         {
             FlipToPlayer();
-
-            // IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
             DealAreaDamage(transform.position, comboRange);
 
             if (i < comboHitCount - 1)
                 yield return new WaitForSeconds(comboInterval);
         }
 
+        attackFlip = false;
         yield return new WaitForSeconds(0.15f);
     }
 

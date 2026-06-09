@@ -3,12 +3,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.UI;
 
 public class GameClearUI : MonoBehaviour
 {
     [Header("Panel")]
     public CanvasGroup canvasGroup;
     public float fadeInDuration = 0.6f;
+
+    [Header("Background")]
+    [Tooltip("게임클리어 배경 스프라이트 (책 오른쪽 페이지)")]
+    public Sprite backgroundSprite;
 
     [Header("Stats")]
     public TextMeshProUGUI playTimeText;
@@ -67,7 +72,6 @@ public class GameClearUI : MonoBehaviour
         RunStats.Instance?.StopTimer();
         Time.timeScale = 0f;
 
-        // 부모 체인이 비활성이면 코루틴 시작이 실패하므로 자기 자신부터 루트까지 활성화.
         for (var t = transform; t != null; t = t.parent)
         {
             if (!t.gameObject.activeSelf)
@@ -79,6 +83,11 @@ public class GameClearUI : MonoBehaviour
 
     IEnumerator ShowRoutine()
     {
+        BossHealthBarUI.Instance?.Hide();
+        WeaponSlotUI.Instance?.SetActive(false);
+        MinimapController.Instance?.Hide();
+
+        SetupBackground();
         PopulateStats();
 
         float elapsed = 0f;
@@ -105,6 +114,63 @@ public class GameClearUI : MonoBehaviour
                 "[ {0} ] 마을로 돌아가기",
                 returnKey
             );
+    }
+
+    void SetupBackground()
+    {
+        if (backgroundSprite == null)
+            return;
+
+        foreach (var img in GetComponentsInChildren<Image>(true))
+        {
+            if (img.gameObject != gameObject && img.gameObject.name != "BG" && img.gameObject.name != "Dim")
+            {
+                var c = img.color;
+                img.color = new Color(c.r, c.g, c.b, 0f);
+            }
+        }
+
+        if (transform.Find("Dim") == null)
+        {
+            var dimGo = new GameObject("Dim", typeof(RectTransform));
+            dimGo.transform.SetParent(transform, false);
+            dimGo.transform.SetAsFirstSibling();
+            var dimRt = dimGo.GetComponent<RectTransform>();
+            dimRt.anchorMin = new Vector2(-1f, -1f);
+            dimRt.anchorMax = new Vector2(2f, 2f);
+            dimRt.offsetMin = Vector2.zero;
+            dimRt.offsetMax = Vector2.zero;
+            var dimImg = dimGo.AddComponent<Image>();
+            dimImg.color = new Color(0f, 0f, 0f, 0.7f);
+            dimImg.raycastTarget = false;
+        }
+
+        var bgTransform = transform.Find("BG");
+        Image bgImage;
+
+        if (bgTransform != null)
+        {
+            bgImage = bgTransform.GetComponent<Image>();
+        }
+        else
+        {
+            var bgGo = new GameObject("BG", typeof(RectTransform));
+            bgGo.transform.SetParent(transform, false);
+            bgGo.transform.SetSiblingIndex(1);
+
+            var rt = bgGo.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            bgImage = bgGo.AddComponent<Image>();
+            bgImage.raycastTarget = false;
+        }
+
+        bgImage.sprite = backgroundSprite;
+        bgImage.preserveAspect = true;
+        bgImage.color = Color.white;
     }
 
     void Update()

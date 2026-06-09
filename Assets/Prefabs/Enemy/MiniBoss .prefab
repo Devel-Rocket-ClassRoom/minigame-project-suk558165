@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 8800990011001100331}
   - component: {fileID: 1545085872832900189}
   - component: {fileID: 2200330044002200998}
+  - component: {fileID: 8177219699530732233}
   m_Layer: 7
   m_Name: 'MiniBoss '
   m_TagString: Untagged
@@ -309,3 +310,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8177219699530732233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6703836035709968910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f325f0bc8c08445a659c0833ff767c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossIntro
+  bossName: "\uC911\uAC04\uBCF4\uC2A4"
+  bossTitle: Qween
+  zoomOutSize: 8
+  zoomDuration: 0.8
+  spawnDelay: 0.2
+  spawnToNameDelay: 0.4
+  nameDisplayDuration: 1.5
+  bossNameUIPrefab: {fileID: 0}
+  cameraTarget: {fileID: 3432657406977393941}

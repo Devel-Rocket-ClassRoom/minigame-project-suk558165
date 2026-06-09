@@ -33,7 +33,7 @@ public class DamagePopup : MonoBehaviour
     public static void Spawn(Vector3 position, float damage, bool isCrit = false, bool isPlayerDamage = false)
     {
         EnsureCanvas();
-        var go = new GameObject("DmgPopup");
+        var go = new GameObject("DmgPopup", typeof(RectTransform));
         go.transform.SetParent(popupCanvas.transform, false);
         var popup = go.AddComponent<DamagePopup>();
         popup.Init(position, damage, isCrit, isPlayerDamage, false);
@@ -42,7 +42,7 @@ public class DamagePopup : MonoBehaviour
     public static void SpawnHeal(Vector3 position, float amount)
     {
         EnsureCanvas();
-        var go = new GameObject("HealPopup");
+        var go = new GameObject("HealPopup", typeof(RectTransform));
         go.transform.SetParent(popupCanvas.transform, false);
         var popup = go.AddComponent<DamagePopup>();
         popup.Init(position, amount, false, false, true);

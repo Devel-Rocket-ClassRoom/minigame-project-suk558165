@@ -4,9 +4,9 @@ using UnityEngine.UI;
 public class WeaponSlotUI : MonoBehaviour
 {
     [Header("크기")]
-    [SerializeField] private float frontSize = 70f;
-    [SerializeField] private float backSize = 50f;
-    [SerializeField] private float padding = 20f;
+    [SerializeField] private float frontSize = 100f;
+    [SerializeField] private float backSize = 70f;
+    [SerializeField] private float padding = 10f;
 
     [Header("애니메이션")]
     [SerializeField] private float swapDuration = 0.15f;
@@ -26,17 +26,15 @@ public class WeaponSlotUI : MonoBehaviour
 
     private WeaponInventory weaponInventory;
 
-    private Vector2 frontTargetPos;
-    private Vector2 backTargetPos;
-    private Vector2 frontStartPos;
-    private Vector2 backStartPos;
+    private Vector2 frontPosFrom, frontPosTo;
+    private Vector2 backPosFrom, backPosTo;
+    private float frontSizeFrom, frontSizeTo;
+    private float backSizeFrom, backSizeTo;
     private float swapTimer;
     private bool isSwapping;
 
-    private Vector2 frontScale;
-    private Vector2 backScale;
-    private Vector2 frontStartScale;
-    private Vector2 backStartScale;
+    private Vector2 frontRestPos;
+    private Vector2 backRestPos;
 
     void Awake()
     {
@@ -74,33 +72,30 @@ public class WeaponSlotUI : MonoBehaviour
         containerRect.anchorMax = new Vector2(0f, 0f);
         containerRect.pivot = new Vector2(0f, 0f);
         containerRect.anchoredPosition = new Vector2(padding, padding);
+        containerRect.sizeDelta = new Vector2(frontSize + backSize, frontSize + backSize * 0.5f);
 
-        float totalW = frontSize + backSize * 0.4f;
-        float totalH = frontSize + backSize * 0.3f;
-        containerRect.sizeDelta = new Vector2(totalW, totalH);
+        BuildSlot(container.transform, "BackSlot", out backRect, out backBg, out backIcon);
+        BuildSlot(container.transform, "FrontSlot", out frontRect, out frontBg, out frontIcon);
 
-        BuildSlot(container.transform, "BackSlot", backSize, out backRect, out backBg, out backIcon);
-        backRect.anchoredPosition = new Vector2(frontSize * 0.5f, frontSize * 0.45f);
+        frontRestPos = new Vector2(0f, 0f);
+        backRestPos = new Vector2(frontSize * 0.55f, frontSize * 0.4f);
 
-        BuildSlot(container.transform, "FrontSlot", frontSize, out frontRect, out frontBg, out frontIcon);
-        frontRect.anchoredPosition = new Vector2(0f, 0f);
+        frontRect.sizeDelta = new Vector2(frontSize, frontSize);
+        frontRect.anchoredPosition = frontRestPos;
 
-        frontTargetPos = frontRect.anchoredPosition;
-        backTargetPos = backRect.anchoredPosition;
-        frontScale = Vector2.one;
-        backScale = new Vector2(backSize / frontSize, backSize / frontSize);
+        backRect.sizeDelta = new Vector2(backSize, backSize);
+        backRect.anchoredPosition = backRestPos;
 
         backBg.color = new Color(0.15f, 0.15f, 0.15f, 0.7f);
         frontBg.color = new Color(0.1f, 0.1f, 0.1f, 0.9f);
     }
 
-    void BuildSlot(Transform parent, string name, float size,
+    void BuildSlot(Transform parent, string name,
         out RectTransform rect, out Image bg, out Image icon)
     {
         var slotGo = new GameObject(name);
         slotGo.transform.SetParent(parent, false);
         rect = slotGo.AddComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(size, size);
         rect.pivot = new Vector2(0f, 0f);
 
         bg = slotGo.AddComponent<Image>();
@@ -144,20 +139,26 @@ public class WeaponSlotUI : MonoBehaviour
             Refresh();
         }
 
-        if (isSwapping)
+        if (!isSwapping)
+            return;
+
+        swapTimer += Time.unscaledDeltaTime;
+        float t = Mathf.Clamp01(swapTimer / swapDuration);
+        t = t * t * (3f - 2f * t);
+
+        frontRect.anchoredPosition = Vector2.Lerp(frontPosFrom, frontPosTo, t);
+        backRect.anchoredPosition = Vector2.Lerp(backPosFrom, backPosTo, t);
+
+        float fs = Mathf.Lerp(frontSizeFrom, frontSizeTo, t);
+        frontRect.sizeDelta = new Vector2(fs, fs);
+
+        float bs = Mathf.Lerp(backSizeFrom, backSizeTo, t);
+        backRect.sizeDelta = new Vector2(bs, bs);
+
+        if (t >= 1f)
         {
-            swapTimer += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(swapTimer / swapDuration);
-            t = t * t * (3f - 2f * t);
-
-            frontRect.anchoredPosition = Vector2.Lerp(frontStartPos, frontTargetPos, t);
-            backRect.anchoredPosition = Vector2.Lerp(backStartPos, backTargetPos, t);
-
-            frontRect.localScale = Vector3.Lerp(frontStartScale, frontScale, t);
-            backRect.localScale = Vector3.Lerp(backStartScale, backScale, t);
-
-            if (t >= 1f)
-                isSwapping = false;
+            isSwapping = false;
+            frontRect.SetAsLastSibling();
         }
     }
 
@@ -169,12 +170,19 @@ public class WeaponSlotUI : MonoBehaviour
 
     void PlaySwap()
     {
-        frontStartPos = backTargetPos;
-        backStartPos = frontTargetPos;
-        frontStartScale = backScale;
-        backStartScale = frontScale;
+        frontPosFrom = backRestPos;
+        frontPosTo = frontRestPos;
+        backPosFrom = frontRestPos;
+        backPosTo = backRestPos;
+
+        frontSizeFrom = backSize;
+        frontSizeTo = frontSize;
+        backSizeFrom = frontSize;
+        backSizeTo = backSize;
+
         swapTimer = 0f;
         isSwapping = true;
+        backRect.SetAsLastSibling();
     }
 
     void Refresh()

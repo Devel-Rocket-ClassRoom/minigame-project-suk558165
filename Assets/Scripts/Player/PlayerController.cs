@@ -86,6 +86,8 @@ public class PlayerController : MonoBehaviour
     {
         if (health == null || health.IsDead)
             return;
+        if (movement.IsDashing)
+            return;
         movement.ApplyKnockback(velocity);
     }
 
