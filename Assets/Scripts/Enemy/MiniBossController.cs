@@ -369,6 +369,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         if (isDead)
             return;
         hp -= amount;
+        DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, amount);
 
         healthBar?.SetHealth(hp, maxHp);
 

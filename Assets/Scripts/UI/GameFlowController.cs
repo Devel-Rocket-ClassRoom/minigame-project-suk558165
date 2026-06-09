@@ -63,6 +63,10 @@ public class GameFlowController : MonoBehaviour
         // InputManager 가 씬에 없으면 자동 생성
         if (InputManager.Instance == null)
             new GameObject("InputManager").AddComponent<InputManager>();
+
+        // WeaponSlotUI 가 씬에 없으면 자동 생성
+        if (WeaponSlotUI.Instance == null)
+            new GameObject("WeaponSlotUI").AddComponent<WeaponSlotUI>();
     }
 
     void Start()
@@ -148,6 +152,7 @@ public class GameFlowController : MonoBehaviour
             uiCanvasInstance.SetActive(false);
 
         BossHealthBarUI.Instance?.Hide();
+        WeaponSlotUI.Instance?.SetActive(false);
 
         titleInstance = Instantiate(titlePrefab);
     }
@@ -211,6 +216,8 @@ public class GameFlowController : MonoBehaviour
 
         if (uiCanvasInstance != null)
             uiCanvasInstance.SetActive(true);
+
+        WeaponSlotUI.Instance?.SetActive(true);
     }
 
     void SpawnPlayer()

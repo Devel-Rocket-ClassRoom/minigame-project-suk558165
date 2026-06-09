@@ -16,7 +16,7 @@ public class SpawnManager : MonoBehaviour
         public int count = 1;
 
         [Tooltip("여러 마리일 때 스폰 간격")]
-        public float interval = 0.5f;
+        public float interval = 0.2f;
     }
 
     [System.Serializable]
@@ -172,7 +172,7 @@ public class SpawnManager : MonoBehaviour
         {
             var fxPos = position + new Vector3(0f, spawnEffectYOffset, 0f);
             var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
-            Destroy(fx, 3f);
+            Destroy(fx, 0.8f);
             if (spawnEffectDelay > 0f)
                 yield return new WaitForSeconds(spawnEffectDelay);
         }

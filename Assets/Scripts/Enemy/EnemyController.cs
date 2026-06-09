@@ -350,6 +350,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         hp -= amount;
         healthBar?.SetHealth(hp, maxHp);
+        DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, amount);
         StartCoroutine(HitFlash());
 
         if (hp <= 0f)

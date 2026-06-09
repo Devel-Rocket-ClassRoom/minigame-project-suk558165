@@ -490,6 +490,7 @@ public class BossController : MonoBehaviour, IDamageable
             return;
 
         hp -= amount;
+        DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, amount);
 
         if (!isPhase2 && hp <= maxHp * phase2Threshold)
         {
