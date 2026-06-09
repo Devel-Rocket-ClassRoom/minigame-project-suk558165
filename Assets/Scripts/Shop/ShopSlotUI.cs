@@ -1,11 +1,12 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
-public class ShopSlotUI : MonoBehaviour
+public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField]
     private Image iconImage;
@@ -178,6 +179,17 @@ public class ShopSlotUI : MonoBehaviour
         if (buyButton != null)
             buyButton.interactable = false;
         item = null;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (item != null)
+            ItemTooltip.GetOrCreate(GetComponentInParent<Canvas>())?.Show(item);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        ItemTooltip.Instance?.Hide();
     }
 
     void OnBuyClick()

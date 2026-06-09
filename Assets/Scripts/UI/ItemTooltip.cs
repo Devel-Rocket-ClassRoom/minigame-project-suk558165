@@ -1,3 +1,4 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,9 @@ public class ItemTooltip : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI descText;
+
+    [SerializeField]
+    private TextMeshProUGUI statsText;
 
     [SerializeField]
     private Image iconImage;
@@ -136,10 +140,32 @@ public class ItemTooltip : MonoBehaviour
         descRT.sizeDelta = new Vector2(-16, -44);
         descTMP.textWrappingMode = TextWrappingModes.Normal;
 
+        var statsGO = CreateTMP(
+            panel.transform,
+            "StatsText",
+            out var statsTMP,
+            13,
+            FontStyles.Normal,
+            borrowedFont,
+            borrowedMat
+        );
+        var statsRT = statsGO.GetComponent<RectTransform>();
+        statsRT.anchorMin = new Vector2(0, 0);
+        statsRT.anchorMax = new Vector2(1, 0);
+        statsRT.pivot = new Vector2(0.5f, 0);
+        statsRT.anchoredPosition = new Vector2(0, 6);
+        statsRT.sizeDelta = new Vector2(-16, 0);
+        statsTMP.textWrappingMode = TextWrappingModes.Normal;
+        statsTMP.color = new Color(0.7f, 0.85f, 1f);
+        statsTMP.enableAutoSizing = true;
+        statsTMP.fontSizeMin = 10;
+        statsTMP.fontSizeMax = 13;
+
         var tt = panel.GetComponent<ItemTooltip>();
         tt.rootPanel = panel;
         tt.nameText = nameTMP;
         tt.descText = descTMP;
+        tt.statsText = statsTMP;
         tt.InitRefs();
         tt.Hide();
 
@@ -202,6 +228,7 @@ public class ItemTooltip : MonoBehaviour
 
         string name = "";
         string desc = "";
+        string stats = "";
         Sprite icon = null;
 
         if (item is WeaponData w)
@@ -215,6 +242,7 @@ public class ItemTooltip : MonoBehaviour
                     ? w.description.GetLocalizedString()
                     : "";
             icon = w.sprite;
+            stats = BuildWeaponStats(w);
         }
         else if (item is AccessoryData a)
         {
@@ -227,6 +255,7 @@ public class ItemTooltip : MonoBehaviour
                     ? a.description.GetLocalizedString()
                     : "";
             icon = a.icon;
+            stats = BuildAccessoryStats(a);
         }
         else
         {
@@ -237,15 +266,99 @@ public class ItemTooltip : MonoBehaviour
             nameText.text = name;
         if (descText != null)
             descText.text = desc;
+        if (statsText != null)
+            statsText.text = stats;
         if (iconImage != null)
         {
             iconImage.sprite = icon;
             iconImage.enabled = icon != null;
         }
 
+        ResizePanel(desc, stats);
+
         var target = rootPanel != null ? rootPanel : gameObject;
         target.SetActive(true);
         _isShown = true;
+    }
+
+    void ResizePanel(string desc, string stats)
+    {
+        if (_rt == null) return;
+        float height = 40f;
+        if (!string.IsNullOrEmpty(desc))
+            height += 20f + desc.Length * 0.4f;
+        if (!string.IsNullOrEmpty(stats))
+        {
+            int lineCount = 1;
+            foreach (char c in stats)
+                if (c == '\n') lineCount++;
+            height += lineCount * 18f + 8f;
+        }
+        height = Mathf.Clamp(height, 80f, 400f);
+        _rt.sizeDelta = new Vector2(300, height);
+    }
+
+    static string BuildWeaponStats(WeaponData w)
+    {
+        var sb = new StringBuilder();
+        sb.Append($"공격력 {w.damage}");
+        sb.Append($"  |  쿨타임 {w.attackCooldown}초");
+        string typeName = w.weaponType switch
+        {
+            WeaponType.Melee => "근접",
+            WeaponType.Ranged => "원거리",
+            WeaponType.Magic => "마법",
+            _ => ""
+        };
+        if (!string.IsNullOrEmpty(typeName))
+            sb.Append($"  |  {typeName}");
+        return sb.ToString();
+    }
+
+    static string BuildAccessoryStats(AccessoryData a)
+    {
+        var sb = new StringBuilder();
+        void Add(string label, float val, string suffix = "")
+        {
+            if (val == 0) return;
+            if (sb.Length > 0) sb.Append('\n');
+            string sign = val > 0 ? "+" : "";
+            sb.Append($"{label} {sign}{val}{suffix}");
+        }
+        void AddPercent(string label, float val)
+        {
+            if (val == 0) return;
+            if (sb.Length > 0) sb.Append('\n');
+            string sign = val > 0 ? "+" : "";
+            sb.Append($"{label} {sign}{val * 100f:0.#}%");
+        }
+        void AddInt(string label, int val, string suffix = "")
+        {
+            if (val == 0) return;
+            if (sb.Length > 0) sb.Append('\n');
+            string sign = val > 0 ? "+" : "";
+            sb.Append($"{label} {sign}{val}{suffix}");
+        }
+
+        Add("최대 HP", a.maxHpBonus);
+        Add("공격력", a.damageBonus);
+        Add("이동속도", a.speedBonus);
+        Add("점프력", a.jumpBonus);
+        AddPercent("크리티컬 확률", a.criticalChance);
+        AddPercent("크리티컬 데미지", a.criticalDamage);
+        AddPercent("공격속도", a.attackSpeedBonus);
+        Add("방어력", a.damageReduction);
+        AddPercent("받는 피해", a.damageReceivedMult);
+        AddPercent("주는 피해", a.damageDealtMult);
+        AddInt("대쉬 횟수", a.dashCountBonus);
+        Add("대쉬 거리", a.dashRangeBonus);
+        AddPercent("회피율", a.evasionRate);
+        AddPercent("골드 드랍", a.goldDropBonus);
+        AddInt("화살 수", a.arrowCount);
+        AddPercent("화살 데미지", a.arrowDamageMult);
+        AddInt("관통", a.penetrationCount);
+
+        return sb.ToString();
     }
 
     public void Hide()

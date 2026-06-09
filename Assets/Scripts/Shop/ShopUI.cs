@@ -112,6 +112,7 @@ public class ShopUI : MonoBehaviour
             frame.SetActive(false);
             openCount = Mathf.Max(0, openCount - 1);
             closedFrame = Time.frameCount;
+            ItemTooltip.Instance?.Hide();
             if (openCount == 0)
                 Time.timeScale = 1f;
             OnClosed?.Invoke();
