@@ -76,6 +76,12 @@ public class GameFlowController : MonoBehaviour
             new GameObject("WeaponSlotUI").AddComponent<WeaponSlotUI>();
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     void Start()
     {
         GoToTitle();

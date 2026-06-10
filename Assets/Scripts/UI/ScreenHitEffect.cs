@@ -6,6 +6,9 @@ public class ScreenHitEffect : MonoBehaviour
 {
     public static ScreenHitEffect Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
+
     [SerializeField]
     float flashAlpha = 0.4f;
 

@@ -38,6 +38,12 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     // ── GameFlowController 에서 호출 ──────────────────────
 
     public void Open()

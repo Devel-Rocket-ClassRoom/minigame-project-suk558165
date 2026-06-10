@@ -23,6 +23,12 @@ public class ScreenFader : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public Coroutine FadeOut() => StartCoroutine(Fade(0, 1));
     public Coroutine FadeIn() => StartCoroutine(Fade(1, 0));
 
