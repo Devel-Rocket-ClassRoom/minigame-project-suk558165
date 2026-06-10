@@ -368,6 +368,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
     {
         if (isDead)
             return;
+        amount *= MetaUpgrades.BossDamageMult;
         hp -= amount;
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, amount);
 

@@ -10,6 +10,9 @@ public class NpcController : MonoBehaviour
     [Header("대화 데이터")]
     public DialogueData dialogueData;
 
+    [Header("강화창 (설정 시 대화 대신 강화창을 연다)")]
+    public UpgradeShopUI upgradeShopUI;
+
     [Header("상호작용 범위")]
     public float interactRange = 2f;
 
@@ -44,6 +47,26 @@ public class NpcController : MonoBehaviour
 
         float dist = Vector2.Distance(transform.position, player.position);
         bool inRange = dist <= interactRange;
+
+        // 강화 NPC: 대화 대신 강화창을 토글한다.
+        if (upgradeShopUI != null)
+        {
+            if (hintObject != null)
+                hintObject.SetActive(inRange && !UpgradeShopUI.IsOpen);
+
+            if (!inRange)
+                return;
+
+            var key = InputManager.Instance?.Interact ?? KeyCode.A;
+            if (Input.GetKeyDown(key))
+            {
+                if (UpgradeShopUI.IsOpen)
+                    upgradeShopUI.Close();
+                else
+                    upgradeShopUI.Open();
+            }
+            return;
+        }
 
         if (hintObject != null)
             hintObject.SetActive(inRange && !DialogueUI.IsOpen);

@@ -7,7 +7,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [Header("Audio")]
     public AudioClip deathSound;
 
+    [Header("부활 무적 시간(초)")]
+    public float reviveInvulnDuration = 1f;
+
     private float hp;
+    private float invulnTimer;
     private Inventory inventory;
     private PlayerMovement movement;
 
@@ -29,13 +33,19 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         PlayerRef.Clear(this);
     }
 
+    void Update()
+    {
+        if (invulnTimer > 0f)
+            invulnTimer -= Time.deltaTime;
+    }
+
     public void TakeDamage(float amount, GameObject attacker = null)
     {
         if (IsDead)
             return;
 
-        // 대쉬 중 무적
-        if (movement != null && movement.IsDashing)
+        // 대쉬 중 / 부활 무적
+        if ((movement != null && movement.IsDashing) || invulnTimer > 0f)
             return;
 
         var bonus = inventory?.GetTotalStatBonus() ?? default;
@@ -55,6 +65,16 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, finalDamage, isPlayerDamage: true);
         ScreenHitEffect.Instance?.Flash();
+
+        // 1회성 부활: 죽을 데미지를 받았으나 부활 강화가 남아있으면 체력을 복구한다.
+        if (hp <= 0f && MetaUpgrades.CanRevive)
+        {
+            MetaUpgrades.ConsumeRevive();
+            hp = EffectiveMaxHp;
+            invulnTimer = reviveInvulnDuration;
+            return;
+        }
+
         if (IsDead)
         {
             RunStats.Instance?.AddDeath();

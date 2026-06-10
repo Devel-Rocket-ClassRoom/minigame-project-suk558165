@@ -84,7 +84,8 @@ public class WorldGold : MonoBehaviour
         if (dist <= pickupRadius)
         {
             AudioManager.Instance?.PlaySFX(pickupSound);
-            inventory.AddGold(amount);
+            float goldDrop = inventory.GetTotalStatBonus().goldDrop;
+            inventory.AddGold(Mathf.RoundToInt(amount * (1f + goldDrop)));
             Destroy(gameObject);
             return;
         }

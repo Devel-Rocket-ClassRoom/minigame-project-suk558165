@@ -422,7 +422,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 1, goldDropMin, goldDropMax, 50f, 130f);
 
-        if (potionDropPrefab != null && Random.value < potionDropChance)
+        if (potionDropPrefab != null && Random.value < potionDropChance + MetaUpgrades.PotionDropBonus)
         {
             float floorY = EnemyUtils.FindFloorY(transform.position, groundLayer);
             Vector3 pos = transform.position + Vector3.up * 0.3f;

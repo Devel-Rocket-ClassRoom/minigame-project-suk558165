@@ -31,6 +31,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private ItemDatabase itemDatabase;
 
+    [SerializeField]
+    private MetaUpgradeConfig metaUpgradeConfig;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -55,6 +58,10 @@ public class GameFlowController : MonoBehaviour
         // ItemDatabase 초기화
         if (itemDatabase != null)
             itemDatabase.Init();
+
+        // MetaUpgradeConfig 초기화
+        if (metaUpgradeConfig != null)
+            metaUpgradeConfig.Init();
 
         // RunStats 가 씬에 없으면 자동 생성
         if (RunStats.Instance == null)
@@ -369,6 +376,7 @@ public class GameFlowController : MonoBehaviour
             roomManager.SetPlayer(playerInstance.transform);
 
         RunStats.Instance?.StartRun();
+        MetaUpgrades.BeginRun();
         roomManager.StartGame();
     }
 }

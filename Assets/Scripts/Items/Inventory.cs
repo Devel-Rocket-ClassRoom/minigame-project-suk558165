@@ -276,6 +276,7 @@ public class Inventory : MonoBehaviour
             bonus.projectileSpeedMult += acc.projectileSpeedMult;
             bonus.potionHealMult += acc.potionHealMult;
         }
+        MetaUpgrades.Contribute(ref bonus);
         return bonus;
     }
 }

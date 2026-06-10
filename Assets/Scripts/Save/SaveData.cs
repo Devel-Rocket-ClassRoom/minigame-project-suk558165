@@ -12,6 +12,9 @@ public class SaveData
     // 기본 장착 무기 (이름으로 저장)
     public List<string> equippedWeapons = new List<string>();
 
+    // 마을 영구 강화 레벨 (인덱스 = MetaUpgradeType)
+    public List<int> permaUpgradeLevels = new List<int>();
+
     // 베스트 런 기록
     public BestRunData bestRun = new BestRunData();
 
