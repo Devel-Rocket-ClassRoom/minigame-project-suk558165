@@ -37,6 +37,10 @@ public class PlayerMovement : MonoBehaviour
     public bool IsGrounded { get; private set; }
     public bool IsOnPlatform { get; private set; }
     public bool IsDashing { get; private set; }
+
+    /// <summary>마지막 대쉬가 끝난 시각(Time.time). 대쉬 후 버프 판정용.</summary>
+    public float LastDashEndTime { get; private set; } = -999f;
+
     public float MoveInput { get; private set; }
     public Transform Visuals { get; private set; }
     public SpriteRenderer Sr { get; private set; }
@@ -184,6 +188,7 @@ public class PlayerMovement : MonoBehaviour
             if (dashTimer <= 0f)
             {
                 IsDashing = false;
+                LastDashEndTime = Time.time;
                 rb.gravityScale = gravityScale;
                 dashGhost?.StopGhost();
             }

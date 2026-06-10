@@ -29,7 +29,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         PlayerRef.Clear(this);
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, GameObject attacker = null)
     {
         if (IsDead)
             return;
@@ -48,6 +48,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         hp -= finalDamage;
         RunStats.Instance?.AddDamageTaken(finalDamage);
+
+        // 반사: 받은 데미지의 일부를 공격자에게 되돌려줌 (반사 데미지는 다시 반사되지 않도록 attacker 미전달)
+        if (attacker != null && bonus.reflectRatio > 0f)
+            attacker.GetComponent<IDamageable>()?.TakeDamage(finalDamage * bonus.reflectRatio);
+
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, finalDamage, isPlayerDamage: true);
         ScreenHitEffect.Instance?.Flash();
         if (IsDead)

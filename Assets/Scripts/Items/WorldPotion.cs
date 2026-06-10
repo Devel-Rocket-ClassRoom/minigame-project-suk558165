@@ -111,8 +111,10 @@ public class WorldPotion : MonoBehaviour
 
         if (dist <= pickupRadius)
         {
-            health.Heal(healAmount);
-            DamagePopup.SpawnHeal(player.position + Vector3.up * 0.5f, healAmount);
+            var bonus = Inventory.Instance?.GetTotalStatBonus() ?? default;
+            float amount = healAmount * (1f + bonus.potionHealMult);
+            health.Heal(amount);
+            DamagePopup.SpawnHeal(player.position + Vector3.up * 0.5f, amount);
             Destroy(gameObject);
             return;
         }

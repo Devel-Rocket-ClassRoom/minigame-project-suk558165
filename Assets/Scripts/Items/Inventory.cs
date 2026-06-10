@@ -26,6 +26,14 @@ public struct StatBonus
     public int arrowCount;
     public float arrowDamageMult;
     public int penetration;
+
+    public float reflectRatio;
+    public float lifesteal;
+    public float lowHpDamageBonus;
+    public float dashAttackSpeedBonus;
+    public float dashAttackSpeedDuration;
+    public float projectileSpeedMult;
+    public float potionHealMult;
 }
 
 public class Inventory : MonoBehaviour
@@ -257,6 +265,16 @@ public class Inventory : MonoBehaviour
             bonus.arrowCount += acc.arrowCount;
             bonus.arrowDamageMult += acc.arrowDamageMult;
             bonus.penetration += acc.penetrationCount;
+            bonus.reflectRatio += acc.reflectRatio;
+            bonus.lifesteal += acc.lifesteal;
+            bonus.lowHpDamageBonus += acc.lowHpDamageBonus;
+            bonus.dashAttackSpeedBonus += acc.dashAttackSpeedBonus;
+            bonus.dashAttackSpeedDuration = Mathf.Max(
+                bonus.dashAttackSpeedDuration,
+                acc.dashAttackSpeedDuration
+            );
+            bonus.projectileSpeedMult += acc.projectileSpeedMult;
+            bonus.potionHealMult += acc.potionHealMult;
         }
         return bonus;
     }

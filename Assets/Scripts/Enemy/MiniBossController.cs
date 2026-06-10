@@ -340,7 +340,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         if (Vector2.Distance(center, player.position) > radius)
             return;
 
-        player.GetComponent<IDamageable>()?.TakeDamage(damage);
+        player.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
         dashHitThisSegment = true;
 
         var ctrl = player.GetComponent<PlayerController>();
@@ -357,14 +357,14 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         if (!other.CompareTag("Player"))
             return;
-        other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
+        other.GetComponentInParent<IDamageable>()?.TakeDamage(damage, gameObject);
     }
 
     bool IsGrounded() => EnemyUtils.IsGrounded(col, transform, groundLayer);
 
     // ── 피격 / 사망 ────────────────────────────────────
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, GameObject attacker = null)
     {
         if (isDead)
             return;

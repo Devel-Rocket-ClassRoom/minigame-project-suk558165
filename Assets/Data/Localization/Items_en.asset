@@ -422,6 +422,54 @@ MonoBehaviour:
     m_Localized: A precious metal that can be sold for a high price.
     m_Metadata:
       m_Items: []
+  - m_Id: 2522484877496325
+    m_Localized: Thorn Mail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496326
+    m_Localized: Reflects part of the damage taken back to the attacker.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496327
+    m_Localized: Vampiric Fang
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496328
+    m_Localized: Restores HP equal to a portion of the damage you deal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496329
+    m_Localized: Last Stand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496330
+    m_Localized: The lower your HP, the higher your attack power.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496331
+    m_Localized: Momentum Sigil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496332
+    m_Localized: Briefly increases attack speed right after dashing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496333
+    m_Localized: Swift String
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496334
+    m_Localized: Increases the speed of projectiles you fire.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496335
+    m_Localized: Bountiful Chalice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496336
+    m_Localized: Increases the amount restored by potions.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

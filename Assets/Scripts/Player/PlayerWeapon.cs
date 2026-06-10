@@ -12,6 +12,7 @@ public class PlayerWeapon : MonoBehaviour
     private Transform playerRoot;
     private Transform visuals;
     private Inventory inventory;
+    private PlayerHealth health;
 
     void Awake()
     {
@@ -19,6 +20,7 @@ public class PlayerWeapon : MonoBehaviour
         playerRoot = transform.root;
         visuals = playerRoot.Find("Visuals");
         inventory = playerRoot.GetComponent<Inventory>();
+        health = playerRoot.GetComponent<PlayerHealth>();
 
         if (enemyLayer == 0)
             enemyLayer = LayerMask.GetMask("Enemy");
@@ -74,6 +76,7 @@ public class PlayerWeapon : MonoBehaviour
 
         var bonus = inventory?.GetTotalStatBonus() ?? default;
         float effectiveDamage = (damage + bonus.damage) * (1f + bonus.damageDealtMult);
+        effectiveDamage *= CombatMath.LowHpMultiplier(health, bonus.lowHpDamageBonus);
         if (bonus.criticalChance > 0f && Random.value < bonus.criticalChance)
             effectiveDamage *= 1f + bonus.criticalDamage;
 
@@ -85,6 +88,10 @@ public class PlayerWeapon : MonoBehaviour
                 continue;
             damageable.TakeDamage(effectiveDamage);
             RunStats.Instance?.AddDamageDealt(effectiveDamage);
+
+            // 흡혈: 가한 데미지 비율만큼 회복
+            if (bonus.lifesteal > 0f)
+                health?.Heal(effectiveDamage * bonus.lifesteal);
         }
     }
 

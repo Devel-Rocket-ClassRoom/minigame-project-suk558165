@@ -36,6 +36,7 @@ public class PlayerCombat : MonoBehaviour
     private AnimatorOverrideController overrideController;
     private PlayerMovement movement;
     private Inventory inventory;
+    private PlayerHealth health;
     private float attackTimer;
 
     // 원거리 발사 이벤트용 임시 저장
@@ -50,6 +51,7 @@ public class PlayerCombat : MonoBehaviour
         animator = GetComponent<Animator>();
         movement = GetComponent<PlayerMovement>();
         inventory = GetComponent<Inventory>();
+        health = GetComponent<PlayerHealth>();
 
         overrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
         animator.runtimeAnimatorController = overrideController;
@@ -105,7 +107,16 @@ public class PlayerCombat : MonoBehaviour
 
         Vector2 attackDir = GetAttackDirection();
         var bonus = inventory?.GetTotalStatBonus() ?? default;
-        attackTimer = currentWeapon.attackCooldown / Mathf.Max(0.01f, 1f + bonus.attackSpeed);
+
+        // 대쉬 직후 일정 시간 동안 공격 속도 추가
+        float attackSpeed = bonus.attackSpeed;
+        if (
+            bonus.dashAttackSpeedBonus > 0f
+            && movement != null
+            && Time.time - movement.LastDashEndTime <= bonus.dashAttackSpeedDuration
+        )
+            attackSpeed += bonus.dashAttackSpeedBonus;
+        attackTimer = currentWeapon.attackCooldown / Mathf.Max(0.01f, 1f + attackSpeed);
 
         if (currentWeapon.weaponType == WeaponType.Melee && weapon != null)
         {
@@ -154,6 +165,7 @@ public class PlayerCombat : MonoBehaviour
     void ShootInDirection(Vector2 dir, float baseDamage, StatBonus bonus, WeaponType weaponType)
     {
         float effectiveDamage = (baseDamage + bonus.damage) * (1f + bonus.damageDealtMult);
+        effectiveDamage *= CombatMath.LowHpMultiplier(health, bonus.lowHpDamageBonus);
         if (bonus.criticalChance > 0f && Random.value < bonus.criticalChance)
             effectiveDamage *= 1f + bonus.criticalDamage;
 
@@ -168,15 +180,31 @@ public class PlayerCombat : MonoBehaviour
         GameObject prefab =
             weaponType == WeaponType.Magic ? magicProjectilePrefab : arrowProjectilePrefab;
 
+        float effectiveSpeed = projectileSpeed * (1f + bonus.projectileSpeedMult);
+
         float spreadAngle = 30f;
         for (int i = 0; i < totalArrows; i++)
         {
             float offset = totalArrows > 1 ? (i - (totalArrows - 1) * 0.5f) * spreadAngle : 0f;
-            SpawnProjectile(prefab, RotateVector(dir, offset), perArrowDmg, bonus.penetration);
+            SpawnProjectile(
+                prefab,
+                RotateVector(dir, offset),
+                perArrowDmg,
+                bonus.penetration,
+                effectiveSpeed,
+                bonus.lifesteal
+            );
         }
     }
 
-    void SpawnProjectile(GameObject prefab, Vector2 dir, float damage, int pierce)
+    void SpawnProjectile(
+        GameObject prefab,
+        Vector2 dir,
+        float damage,
+        int pierce,
+        float speed,
+        float lifesteal
+    )
     {
         if (prefab == null)
             return;
@@ -195,7 +223,7 @@ public class PlayerCombat : MonoBehaviour
         var proj = Instantiate(prefab, origin, Quaternion.identity);
         var projComp = proj.GetComponent<Projectile>();
         if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject, pierce: pierce);
+            projComp.Init(dir, speed, damage, gameObject, pierce: pierce, lifesteal: lifesteal);
     }
 
     static Vector2 RotateVector(Vector2 v, float degrees)

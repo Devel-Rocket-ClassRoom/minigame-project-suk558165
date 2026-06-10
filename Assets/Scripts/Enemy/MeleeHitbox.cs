@@ -51,7 +51,8 @@ public class MeleeHitbox : MonoBehaviour
         if (owner != null && owner.IsDead)
             return;
         hasHitThisActivation = true;
-        other.GetComponentInParent<IDamageable>()?.TakeDamage(damage);
+        other.GetComponentInParent<IDamageable>()?
+            .TakeDamage(damage, owner != null ? owner.gameObject : null);
 
         var playerCtrl = other.GetComponentInParent<PlayerController>();
         if (playerCtrl != null)

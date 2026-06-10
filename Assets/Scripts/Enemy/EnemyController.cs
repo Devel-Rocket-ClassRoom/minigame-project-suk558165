@@ -340,7 +340,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     // ShieldController 등이 등록해서 데미지 차단 여부를 결정
     public System.Func<bool> isAttackBlocked;
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, GameObject attacker = null)
     {
         if (isDead)
             return;

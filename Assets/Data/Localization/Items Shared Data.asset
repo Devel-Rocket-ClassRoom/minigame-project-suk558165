@@ -419,6 +419,54 @@ MonoBehaviour:
     m_Key: acc_sell_item_desc
     m_Metadata:
       m_Items: []
+  - m_Id: 2522484877496325
+    m_Key: acc_reflect_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496326
+    m_Key: acc_reflect_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496327
+    m_Key: acc_lifesteal_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496328
+    m_Key: acc_lifesteal_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496329
+    m_Key: acc_low_hp_power_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496330
+    m_Key: acc_low_hp_power_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496331
+    m_Key: acc_dash_attack_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496332
+    m_Key: acc_dash_attack_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496333
+    m_Key: acc_swift_arrow_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496334
+    m_Key: acc_swift_arrow_desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496335
+    m_Key: acc_vital_flask_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2522484877496336
+    m_Key: acc_vital_flask_desc
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

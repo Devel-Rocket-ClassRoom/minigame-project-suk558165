@@ -10,6 +10,7 @@ public class Projectile : MonoBehaviour
     private float damage;
     private float knockbackForce;
     private GameObject shooter;
+    private float lifesteal;
     private bool ready;
     private int pierceRemaining;
     private float spinSpeed;
@@ -35,12 +36,14 @@ public class Projectile : MonoBehaviour
         GameObject shooter = null,
         float knockbackForce = 8f,
         int pierce = 0,
-        float spinSpeed = 0f
+        float spinSpeed = 0f,
+        float lifesteal = 0f
     )
     {
         this.damage = damage;
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
+        this.lifesteal = lifesteal;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
         rb.linearVelocity = direction.normalized * speed;
@@ -91,7 +94,11 @@ public class Projectile : MonoBehaviour
             if (!hitIds.Add(other.GetInstanceID()))
                 return;
 
-            damageable.TakeDamage(damage);
+            damageable.TakeDamage(damage, shooter);
+
+            // 흡혈: 플레이어가 쏜 투사체가 적을 맞히면 가한 데미지 비율만큼 회복
+            if (lifesteal > 0f && shooter != null)
+                shooter.GetComponent<PlayerHealth>()?.Heal(damage * lifesteal);
 
             if (other.CompareTag("Player"))
             {

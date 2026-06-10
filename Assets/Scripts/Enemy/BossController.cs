@@ -459,7 +459,7 @@ public class BossController : MonoBehaviour, IDamageable
             return;
         if (Vector2.Distance(center, player.position) <= radius)
         {
-            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+            player.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
             var playerCtrl = player.GetComponent<PlayerController>();
             if (playerCtrl != null)
             {
@@ -479,7 +479,7 @@ public class BossController : MonoBehaviour, IDamageable
 
         if (Mathf.Abs(playerY - footY) <= 2f)
         {
-            player.GetComponent<IDamageable>()?.TakeDamage(damage);
+            player.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
             var playerCtrl = player.GetComponent<PlayerController>();
             if (playerCtrl != null)
                 playerCtrl.Knockback(Vector2.up * 8f);
@@ -496,10 +496,10 @@ public class BossController : MonoBehaviour, IDamageable
             return;
         if (!other.CompareTag("Player"))
             return;
-        other.GetComponent<IDamageable>()?.TakeDamage(damage);
+        other.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, GameObject attacker = null)
     {
         if (isDead)
             return;
