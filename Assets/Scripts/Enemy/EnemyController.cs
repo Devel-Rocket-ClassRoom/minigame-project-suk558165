@@ -31,6 +31,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 8f;
+    private ObjectPool<Projectile> projPool;
     public float safeDistance = 3f;
 
     [Tooltip("원거리 적의 공격 쿨다운에 곱해지는 배수 — 회피 시간 확보용")]
@@ -193,13 +194,15 @@ public class EnemyController : MonoBehaviour, IDamageable
         bool sameLine = Mathf.Abs(player.position.y - transform.position.y) <= rangedYThreshold;
         if (dist <= detectionRange && sameLine)
         {
-            if (dist < safeDistance)
+            if (dist > safeDistance)
             {
-                float dir = transform.position.x > player.position.x ? 1f : -1f;
+                // 사정거리 밖 — 플레이어에게 접근
+                float dir = player.position.x > transform.position.x ? 1f : -1f;
                 Move(IsEdgeAhead(dir) ? 0f : dir);
             }
             else
             {
+                // 사정거리 안 — 멈춰서 사격
                 Move(0f);
             }
 
@@ -207,7 +210,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             bool playerOnLeft = player.position.x < transform.position.x;
             sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
 
-            if (attackTimer <= 0f)
+            if (attackTimer <= 0f && dist <= safeDistance)
             {
                 attackTimer = attackCooldown * Mathf.Max(1f, rangedCooldownMultiplier);
                 animator.SetTrigger(HashAttack);
@@ -237,10 +240,11 @@ public class EnemyController : MonoBehaviour, IDamageable
             dir = facingLeft ? Vector2.left : Vector2.right;
         }
 
-        var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
-        var projComp = proj.GetComponent<Projectile>();
-        if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
+        if (projPool == null)
+            projPool = new ObjectPool<Projectile>(projectilePrefab.GetComponent<Projectile>());
+        var projComp = projPool.Get(origin, Quaternion.identity);
+        projComp.Pool = projPool;
+        projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
     }
 
     void Patrol()

@@ -145,6 +145,8 @@ public class BossController : MonoBehaviour, IDamageable
     private BossHealthBarUI healthBarUI;
     private Animator animator;
 
+    private ObjectPool<Projectile> projPool;
+
     public System.Action onDeath;
 
     void Awake()
@@ -417,13 +419,19 @@ public class BossController : MonoBehaviour, IDamageable
             float angle = (baseAngle + offset) * Mathf.Deg2Rad;
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            var proj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            var projComp = proj.GetComponent<Projectile>();
-            if (projComp != null)
-                projComp.Init(dir, projectileSpeed, damage, gameObject);
+            var projComp = GetPooledProjectile();
+            projComp.Pool = projPool;
+            projComp.Init(dir, projectileSpeed, damage, gameObject);
         }
 
         yield return new WaitForSeconds(0.25f);
+    }
+
+    Projectile GetPooledProjectile()
+    {
+        if (projPool == null)
+            projPool = new ObjectPool<Projectile>(projectilePrefab.GetComponent<Projectile>());
+        return projPool.Get(transform.position, Quaternion.identity);
     }
 
     // ── 패턴: 연속 베기 ──

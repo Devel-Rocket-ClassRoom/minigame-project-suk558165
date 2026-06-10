@@ -21,6 +21,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [Header("지면 파동")]
     [SerializeField]
     private GameObject wavePrefab;
+    private ObjectPool<Projectile> wavePool;
 
     [SerializeField]
     private float waveSpeed = 6f;
@@ -230,12 +231,20 @@ public class MiniBossController : MonoBehaviour, IDamageable
         {
             Vector3 origin = transform.position + Vector3.up * waveSpawnOffsetY;
 
-            var left = Instantiate(wavePrefab, origin, Quaternion.identity);
-            left.GetComponent<Projectile>()?.Init(Vector2.left, waveSpeed, damage, gameObject);
-            left.transform.rotation = Quaternion.identity;
+            if (wavePool == null)
+                wavePool = new ObjectPool<Projectile>(wavePrefab.GetComponent<Projectile>());
 
-            var right = Instantiate(wavePrefab, origin, Quaternion.identity);
-            right.GetComponent<Projectile>()?.Init(Vector2.right, waveSpeed, damage, gameObject);
+            var left = wavePool.Get(origin, Quaternion.identity);
+            left.Pool = wavePool;
+            left.Init(Vector2.left, waveSpeed, damage, gameObject);
+            left.transform.rotation = Quaternion.identity;
+            var leftSr = left.GetComponent<SpriteRenderer>();
+            if (leftSr != null)
+                leftSr.flipX = false;
+
+            var right = wavePool.Get(origin, Quaternion.identity);
+            right.Pool = wavePool;
+            right.Init(Vector2.right, waveSpeed, damage, gameObject);
             right.transform.rotation = Quaternion.identity;
             var rightSr = right.GetComponent<SpriteRenderer>();
             if (rightSr != null)

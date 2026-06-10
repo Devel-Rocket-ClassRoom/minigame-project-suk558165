@@ -6,7 +6,10 @@ public class Projectile : MonoBehaviour
     public float lifetime = 5f;
     [Tooltip("원본 스프라이트가 향하는 각도 (오른쪽=0, 왼쪽=180)")]
     public float spriteAngleOffset;
+    
+    public ObjectPool<Projectile> Pool;
 
+    private bool released;
     private float damage;
     private float knockbackForce;
     private GameObject shooter;
@@ -41,6 +44,10 @@ public class Projectile : MonoBehaviour
     )
     {
         this.damage = damage;
+        released = false;
+        ready = false;
+        hitIds.Clear();
+        CancelInvoke();
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
         this.lifesteal = lifesteal;
@@ -50,7 +57,7 @@ public class Projectile : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
         Invoke(nameof(Activate), 0.05f);
-        Destroy(gameObject, lifetime);
+        Invoke(nameof(ReleaseSelf), lifetime);
     }
 
     void Update()
@@ -111,9 +118,22 @@ public class Projectile : MonoBehaviour
             }
 
             if (pierceRemaining <= 0)
-                Destroy(gameObject);
+                ReleaseSelf();
             else
                 pierceRemaining--;
         }
+    }
+
+    void ReleaseSelf()
+    {
+        if (released)
+            return;
+
+        released = true;
+        CancelInvoke();
+        if (Pool != null)
+            Pool.Release(this);
+        else
+            Destroy(gameObject);
     }
 }

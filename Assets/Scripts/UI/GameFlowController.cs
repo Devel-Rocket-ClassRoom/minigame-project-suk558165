@@ -283,7 +283,7 @@ public class GameFlowController : MonoBehaviour
                 tutorialInstance = null;
                 GoToVillage();
             };
-            tutorial.Begin();
+            tutorial.Begin(playerInstance);
         }
     }
 

@@ -29,10 +29,18 @@ public class TutorialManager : MonoBehaviour
 
     public System.Action onTutorialComplete;
 
-    public void Begin()
+    private PlayerCombat playerCombat;
+    private PlayerMovement playerMovement;
+
+    public void Begin(GameObject player = null)
     {
         if (stepUI == null)
             stepUI = TutorialStepUI.Instance;
+        if (player != null)
+        {
+            playerCombat = player.GetComponent<PlayerCombat>();
+            playerMovement = player.GetComponent<PlayerMovement>();
+        }
         StartCoroutine(RunSteps());
     }
 
@@ -68,15 +76,47 @@ public class TutorialManager : MonoBehaviour
     IEnumerator WaitForInput(TutorialInput input, string baseMessage)
     {
         int count = 0;
+        bool prevActive = false;
         while (count < 5)
         {
             yield return null;
-            if (CheckInput(input))
+
+            bool counted;
+            if (UsesAnimationGate(input))
+            {
+                // 공격/대시는 애니메이션(동작)이 끝나는 순간을 1회로 인정.
+                // 연타해도 동작 중에는 카운트가 올라가지 않는다.
+                bool active = IsActionInProgress(input);
+                counted = prevActive && !active;
+                prevActive = active;
+            }
+            else
+            {
+                counted = CheckInput(input);
+            }
+
+            if (counted)
             {
                 count++;
                 if (stepUI != null)
                     stepUI.UpdateText($"{baseMessage}  {count} / 5");
             }
+        }
+    }
+
+    bool UsesAnimationGate(TutorialInput input) =>
+        input == TutorialInput.Attack || input == TutorialInput.Dash;
+
+    bool IsActionInProgress(TutorialInput input)
+    {
+        switch (input)
+        {
+            case TutorialInput.Attack:
+                return playerCombat != null && playerCombat.IsAttacking;
+            case TutorialInput.Dash:
+                return playerMovement != null && playerMovement.IsDashing;
+            default:
+                return false;
         }
     }
 

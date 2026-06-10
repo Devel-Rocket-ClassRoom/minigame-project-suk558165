@@ -99,7 +99,7 @@ public class ItemTooltip : MonoBehaviour
         panel.transform.SetParent(rootCanvas.transform, false);
 
         var rt = panel.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(280, 110);
+        rt.sizeDelta = new Vector2(300, 0);
         rt.pivot = new Vector2(0, 1);
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
 
@@ -107,7 +107,21 @@ public class ItemTooltip : MonoBehaviour
         bg.color = new Color(0.05f, 0.05f, 0.08f, 0.92f);
         bg.raycastTarget = false;
 
-        var nameGO = CreateTMP(
+        // 내용에 맞춰 패널이 세로로 자동 확장 — 텍스트가 상자를 넘치지 않도록
+        var layout = panel.AddComponent<VerticalLayoutGroup>();
+        layout.padding = new RectOffset(10, 10, 8, 8);
+        layout.spacing = 4f;
+        layout.childAlignment = TextAnchor.UpperLeft;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+
+        var fitter = panel.AddComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        CreateTMP(
             panel.transform,
             "NameText",
             out var nameTMP,
@@ -116,14 +130,9 @@ public class ItemTooltip : MonoBehaviour
             borrowedFont,
             borrowedMat
         );
-        var nameRT = nameGO.GetComponent<RectTransform>();
-        nameRT.anchorMin = new Vector2(0, 1);
-        nameRT.anchorMax = new Vector2(1, 1);
-        nameRT.pivot = new Vector2(0.5f, 1);
-        nameRT.anchoredPosition = new Vector2(0, -8);
-        nameRT.sizeDelta = new Vector2(-16, 24);
+        nameTMP.textWrappingMode = TextWrappingModes.Normal;
 
-        var descGO = CreateTMP(
+        CreateTMP(
             panel.transform,
             "DescText",
             out var descTMP,
@@ -132,15 +141,9 @@ public class ItemTooltip : MonoBehaviour
             borrowedFont,
             borrowedMat
         );
-        var descRT = descGO.GetComponent<RectTransform>();
-        descRT.anchorMin = new Vector2(0, 0);
-        descRT.anchorMax = new Vector2(1, 1);
-        descRT.pivot = new Vector2(0.5f, 1);
-        descRT.anchoredPosition = new Vector2(0, -36);
-        descRT.sizeDelta = new Vector2(-16, -44);
         descTMP.textWrappingMode = TextWrappingModes.Normal;
 
-        var statsGO = CreateTMP(
+        CreateTMP(
             panel.transform,
             "StatsText",
             out var statsTMP,
@@ -149,17 +152,8 @@ public class ItemTooltip : MonoBehaviour
             borrowedFont,
             borrowedMat
         );
-        var statsRT = statsGO.GetComponent<RectTransform>();
-        statsRT.anchorMin = new Vector2(0, 0);
-        statsRT.anchorMax = new Vector2(1, 0);
-        statsRT.pivot = new Vector2(0.5f, 0);
-        statsRT.anchoredPosition = new Vector2(0, 6);
-        statsRT.sizeDelta = new Vector2(-16, 0);
         statsTMP.textWrappingMode = TextWrappingModes.Normal;
         statsTMP.color = new Color(0.7f, 0.85f, 1f);
-        statsTMP.enableAutoSizing = true;
-        statsTMP.fontSizeMin = 10;
-        statsTMP.fontSizeMax = 13;
 
         var tt = panel.GetComponent<ItemTooltip>();
         tt.rootPanel = panel;
@@ -274,28 +268,13 @@ public class ItemTooltip : MonoBehaviour
             iconImage.enabled = icon != null;
         }
 
-        ResizePanel(desc, stats);
-
         var target = rootPanel != null ? rootPanel : gameObject;
         target.SetActive(true);
         _isShown = true;
-    }
 
-    void ResizePanel(string desc, string stats)
-    {
-        if (_rt == null) return;
-        float height = 40f;
-        if (!string.IsNullOrEmpty(desc))
-            height += 20f + desc.Length * 0.4f;
-        if (!string.IsNullOrEmpty(stats))
-        {
-            int lineCount = 1;
-            foreach (char c in stats)
-                if (c == '\n') lineCount++;
-            height += lineCount * 18f + 8f;
-        }
-        height = Mathf.Clamp(height, 80f, 400f);
-        _rt.sizeDelta = new Vector2(300, height);
+        // 텍스트 갱신 후 즉시 레이아웃을 재계산해 첫 프레임 크기 깜빡임 방지
+        if (_rt != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_rt);
     }
 
     static string BuildWeaponStats(WeaponData w)
