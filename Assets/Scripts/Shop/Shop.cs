@@ -22,9 +22,6 @@ public class Shop : MonoBehaviour
     private Canvas parentCanvas;
 
     [SerializeField]
-    private float shopScale = 1f;
-
-    [SerializeField]
     private GameObject interactPrompt;
 
     private bool playerInRange = false;
