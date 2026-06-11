@@ -13,20 +13,25 @@ public class PlayerHealthDisplay : MonoBehaviour
     public float lowHpThreshold = 30f;
     public Color lowHpColor = Color.red;
 
-    private PlayerHealth playerHealth;
     private Color defaultHpColor;
     private bool colorCaptured;
 
-    void Update()
+    void OnEnable()
     {
-        if (playerHealth == null)
-            playerHealth = PlayerRef.Health;
+        PlayerHealth.OnHealthChanged += UpdateDisplay;
+        // 이미 플레이어가 존재하면 현재 값으로 즉시 1회 갱신 (구독 이후 발행을 기다리지 않음).
+        if (PlayerRef.Health != null)
+            UpdateDisplay(PlayerRef.Health.CurrentHp, PlayerRef.Health.EffectiveMaxHp);
+    }
 
-        if (playerHealth == null)
-            return;
+    void OnDisable()
+    {
+        PlayerHealth.OnHealthChanged -= UpdateDisplay;
+    }
 
-        float effectiveMax = playerHealth.EffectiveMaxHp;
-        float ratio = Mathf.Clamp01(playerHealth.CurrentHp / effectiveMax);
+    void UpdateDisplay(float currentHp, float effectiveMax)
+    {
+        float ratio = Mathf.Clamp01(currentHp / effectiveMax);
 
         if (fillImage != null)
             fillImage.fillAmount = ratio;
@@ -34,15 +39,14 @@ public class PlayerHealthDisplay : MonoBehaviour
         if (hpText != null)
         {
             hpText.text =
-                $"{Mathf.Max(0, Mathf.CeilToInt(playerHealth.CurrentHp))} / {Mathf.CeilToInt(effectiveMax)}";
+                $"{Mathf.Max(0, Mathf.CeilToInt(currentHp))} / {Mathf.CeilToInt(effectiveMax)}";
 
             if (!colorCaptured)
             {
                 defaultHpColor = hpText.color;
                 colorCaptured = true;
             }
-            hpText.color =
-                playerHealth.CurrentHp <= lowHpThreshold ? lowHpColor : defaultHpColor;
+            hpText.color = currentHp <= lowHpThreshold ? lowHpColor : defaultHpColor;
         }
     }
 }

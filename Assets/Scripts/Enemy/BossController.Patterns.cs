@@ -270,6 +270,9 @@ public partial class BossController
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
+        if (animator != null)
+            animator.Play("Fly", 0, 0f);
+
         Vector3 start = transform.position;
         Vector3 target = start + Vector3.up * height;
         float t = 0f;
@@ -287,6 +290,9 @@ public partial class BossController
 
     IEnumerator ReturnFromAir(float duration)
     {
+        if (animator != null)
+            animator.Play("Fly", 0, 0f);
+
         Vector3 start = transform.position;
         float t = 0f;
         while (t < duration)

@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761e7a47e2d663d4a88a39bcefd10230, type: 3}
+  m_Name: MetaUpgradeConfig
+  m_EditorClassIdentifier: 
+  entries:
+  - type: 0
+    nameKey: 
+    fallbackName: "\uCD5C\uB300 \uCCB4\uB825"
+    descKey: 
+    fallbackDesc: "\uCD5C\uB300 \uCCB4\uB825\uC774 \uB808\uBCA8\uB2F9 20 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 100
+    costStep: 100
+    valuePerLevel: 20
+  - type: 1
+    nameKey: 
+    fallbackName: "\uACF5\uACA9\uB825"
+    descKey: 
+    fallbackDesc: "\uACF5\uACA9\uB825\uC774 \uB808\uBCA8\uB2F9 2 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 120
+    costStep: 120
+    valuePerLevel: 2
+  - type: 2
+    nameKey: 
+    fallbackName: "\uCE58\uBA85\uD0C0 \uD655\uB960"
+    descKey: 
+    fallbackDesc: "\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 \uB808\uBCA8\uB2F9 5% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 150
+    costStep: 150
+    valuePerLevel: 0.05
+  - type: 3
+    nameKey: 
+    fallbackName: "\uC774\uB3D9 \uC18D\uB3C4"
+    descKey: 
+    fallbackDesc: "\uC774\uB3D9 \uC18D\uB3C4\uAC00 \uB808\uBCA8\uB2F9 0.3 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 100
+    costStep: 100
+    valuePerLevel: 0.3
+  - type: 4
+    nameKey: 
+    fallbackName: "\uACE8\uB4DC \uD68D\uB4DD"
+    descKey: 
+    fallbackDesc: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9\uC774 \uB808\uBCA8\uB2F9 10% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 120
+    costStep: 120
+    valuePerLevel: 0.1
+  - type: 5
+    nameKey: 
+    fallbackName: "\uD3EC\uC158 \uB4DC\uB78D"
+    descKey: 
+    fallbackDesc: "\uD3EC\uC158 \uB4DC\uB78D \uD655\uB960\uC774 \uB808\uBCA8\uB2F9
+      3% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 100
+    costStep: 100
+    valuePerLevel: 0.03
+  - type: 6
+    nameKey: 
+    fallbackName: "\uBCF4\uC2A4 \uD53C\uD574"
+    descKey: 
+    fallbackDesc: "\uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uD53C\uD574\uAC00 \uB808\uBCA8\uB2F9
+      10% \uC99D\uAC00\uD569\uB2C8\uB2E4."
+    maxLevel: 5
+    baseCost: 150
+    costStep: 150
+    valuePerLevel: 0.1
+  - type: 7
+    nameKey: 
+    fallbackName: "\uBD80\uD65C"
+    descKey: 
+    fallbackDesc: "\uC0AC\uB9DD \uC2DC 1\uD68C \uBD80\uD65C\uD569\uB2C8\uB2E4."
+    maxLevel: 1
+    baseCost: 5000
+    costStep: 0
+    valuePerLevel: 1
