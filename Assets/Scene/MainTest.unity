@@ -183,7 +183,7 @@ MonoBehaviour:
   pauseMenuPrefab: {fileID: 329134092034828580, guid: 8b0e523b1f54db94fb32a257ea326eb5, type: 3}
   tutorialRoomPrefab: {fileID: 2926933431237095319, guid: 9a75018149bfd5941b28e033f417bdbe, type: 3}
   itemDatabase: {fileID: 11400000, guid: b3729aac221931249a72f1b27908e7ad, type: 2}
-  metaUpgradeConfig: {fileID: 0}
+  metaUpgradeConfig: {fileID: 11400000, guid: 7c9e1f2a4b6d8e3f5a0c1d2e3f4a5b6c, type: 2}
   roomManager: {fileID: 2085237427}
 --- !u!1 &582639439
 GameObject:

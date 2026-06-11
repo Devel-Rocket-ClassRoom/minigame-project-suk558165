@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1526078134307176955}
   - component: {fileID: 6515600709896517846}
+  - component: {fileID: 5221146852791718542}
   m_Layer: 0
   m_Name: NPC3
   m_TagString: Untagged
@@ -91,3 +92,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5221146852791718542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6501008743345067093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbd1db235ff7f124289a260e3e5603f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcController
+  dialogueData: {fileID: 0}
+  upgradeShopUI: {fileID: 0}
+  interactRange: 2
+  hintObject: {fileID: 0}
