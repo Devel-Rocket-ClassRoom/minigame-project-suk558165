@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -338,13 +338,13 @@ public class GameFlowController : MonoBehaviour
 
     public void ReturnToVillage()
     {
-        StartCoroutine(ReturnToVillageRoutine());
+        ReturnToVillageRoutine().Forget();
     }
 
-    IEnumerator ReturnToVillageRoutine()
+    async UniTaskVoid ReturnToVillageRoutine()
     {
         if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeOut();
+            await ScreenFader.Instance.FadeOut();
 
         roomManager.ResetDungeon();
         GameClearUI.Instance?.ResetUI();
@@ -366,7 +366,7 @@ public class GameFlowController : MonoBehaviour
         GoToVillage();
 
         if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeIn();
+            await ScreenFader.Instance.FadeIn();
     }
 
     public void EnterDungeon()

@@ -778,6 +778,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
   fillImage: {fileID: 94290713356493374}
   hpText: {fileID: 4929983750267772390}
+  lowHpThreshold: 30
+  lowHpColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &2002002002002002001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1212,11 +1214,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8140730527634995717, guid: 404e77bf1e4d17948b7d8af5b4a27ac1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -510
+      value: -549
       objectReference: {fileID: 0}
     - target: {fileID: 8140730527634995717, guid: 404e77bf1e4d17948b7d8af5b4a27ac1, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 538
+      value: 527
       objectReference: {fileID: 0}
     - target: {fileID: 8140730527634995717, guid: 404e77bf1e4d17948b7d8af5b4a27ac1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

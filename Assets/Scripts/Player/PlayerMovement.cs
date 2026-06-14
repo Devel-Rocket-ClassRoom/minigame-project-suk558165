@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -133,14 +133,15 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleJump()
     {
-        if (!Input.GetButtonDown("Jump"))
+        var jumpKey = InputManager.Instance?.Jump ?? KeyCode.Space;
+        if (!Input.GetKeyDown(jumpKey))
             return;
 
         bool pressingDown = Input.GetKey(KeyCode.DownArrow);
 
         if (pressingDown && IsOnPlatform)
         {
-            StartCoroutine(DropDown());
+            DropDown().Forget();
             return;
         }
 
@@ -288,10 +289,10 @@ public class PlayerMovement : MonoBehaviour
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, platformLayer);
     }
 
-    IEnumerator DropDown()
+    async UniTaskVoid DropDown()
     {
         if (isDropping)
-            yield break;
+            return;
 
         float feetY = mainCollider != null ? mainCollider.bounds.min.y : groundCheck.position.y;
         var hits = Physics2D.OverlapCircleAll(groundCheck.position, 0.5f, platformLayer);
@@ -310,7 +311,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         if (toIgnore.Count == 0)
-            yield break;
+            return;
 
         isDropping = true;
         foreach (var p in toIgnore)
@@ -322,7 +323,7 @@ public class PlayerMovement : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < 0.5f)
         {
-            yield return null;
+            await UniTask.Yield();
             elapsed += Time.deltaTime;
             float currentFeetY = mainCollider != null ? mainCollider.bounds.min.y : transform.position.y;
             if (currentFeetY < clearY)

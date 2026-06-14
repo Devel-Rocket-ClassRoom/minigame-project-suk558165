@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -135,6 +136,8 @@ public partial class BossController : MonoBehaviour, IDamageable
     private Transform player;
     private Color originalColor;
 
+    private CancellationTokenSource _cts = new();
+
     [Header("UI")]
     [SerializeField]
     private string bossDisplayName = "BOSS";
@@ -169,6 +172,14 @@ public partial class BossController : MonoBehaviour, IDamageable
     private Vector3 preAirbornePos;
 
     public System.Action onDeath;
+
+    CancellationToken RefreshToken()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts.Token;
+    }
 
     void Awake()
     {
@@ -205,6 +216,12 @@ public partial class BossController : MonoBehaviour, IDamageable
 
     void OnDisable() => Instances.Remove(this);
 
+    void OnDestroy()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
     void Start()
     {
         if (PlayerRef.Exists)
@@ -226,8 +243,6 @@ public partial class BossController : MonoBehaviour, IDamageable
             return;
         }
 
-        FlipToPlayer();
-
         float dist = Vector2.Distance(transform.position, player.position);
         if (dist > detectionRange)
             return;
@@ -235,11 +250,13 @@ public partial class BossController : MonoBehaviour, IDamageable
         if (isActing)
             return;
 
+        FlipToPlayer();
+
         cooldownTimer -= Time.deltaTime;
         if (cooldownTimer <= 0f)
         {
             cooldownTimer = isPhase2 ? patternCooldown * phase2CooldownMult : patternCooldown;
-            StartCoroutine(PickAndExecutePattern());
+            PickAndExecutePattern(_cts.Token).Forget();
         }
         else
         {
@@ -266,7 +283,7 @@ public partial class BossController : MonoBehaviour, IDamageable
 
     // ── 패턴 선택 (실제 패턴 구현은 BossController.Patterns.cs) ──
 
-    IEnumerator PickAndExecutePattern()
+    async UniTaskVoid PickAndExecutePattern(CancellationToken token)
     {
         isActing = true;
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -277,13 +294,13 @@ public partial class BossController : MonoBehaviour, IDamageable
             switch (Random.Range(0, 3))
             {
                 case 0:
-                    yield return SpikeStormAttack();
+                    await SpikeStormAttack(token);
                     break;
                 case 1:
-                    yield return AirMagicAttack();
+                    await AirMagicAttack(token);
                     break;
                 case 2:
-                    yield return SlamAttack();
+                    await SlamAttack(token);
                     break;
             }
         }
@@ -301,16 +318,16 @@ public partial class BossController : MonoBehaviour, IDamageable
             switch (pattern)
             {
                 case 0:
-                    yield return ComboAttack();
+                    await ComboAttack(token);
                     break;
                 case 1:
-                    yield return SlamAttack();
+                    await SlamAttack(token);
                     break;
                 case 2:
-                    yield return ChargeAttack();
+                    await ChargeAttack(token);
                     break;
                 case 3:
-                    yield return ProjectileAttack();
+                    await ProjectileAttack(token);
                     break;
             }
         }
@@ -347,7 +364,7 @@ public partial class BossController : MonoBehaviour, IDamageable
         if (!isPhase2 && hp <= maxHp * phase2Threshold)
         {
             isPhase2 = true;
-            StartCoroutine(Phase2Flash());
+            Phase2Flash(_cts.Token).Forget();
         }
 
         healthBarUI?.SetHealth(hp, maxHp);
@@ -360,33 +377,33 @@ public partial class BossController : MonoBehaviour, IDamageable
             return;
         }
 
-        StartCoroutine(HitFlash());
+        HitFlash().Forget();
 
         if (!isActing && player != null)
-            StartCoroutine(Knockback((transform.position - player.position).normalized));
+            Knockback((transform.position - player.position).normalized, _cts.Token).Forget();
     }
 
-    IEnumerator HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
+    UniTask HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
 
-    IEnumerator Phase2Flash()
+    async UniTaskVoid Phase2Flash(CancellationToken token)
     {
         for (int i = 0; i < 5; i++)
         {
             sr.color = new Color(1f, 0.3f, 0.3f);
-            yield return new WaitForSeconds(0.1f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.1f), cancellationToken: token);
             sr.color = originalColor;
-            yield return new WaitForSeconds(0.1f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.1f), cancellationToken: token);
         }
     }
 
-    IEnumerator Knockback(Vector2 dir)
+    async UniTaskVoid Knockback(Vector2 dir, CancellationToken token)
     {
         float elapsed = 0f;
         while (elapsed < knockbackDuration)
         {
             rb.linearVelocity = new Vector2(dir.x * knockbackForce, rb.linearVelocity.y);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
@@ -397,7 +414,7 @@ public partial class BossController : MonoBehaviour, IDamageable
     {
         isDead = true;
         AudioManager.Instance?.PlaySFX(deathSound);
-        StopAllCoroutines();
+        var token = RefreshToken();
         if (animator != null)
             animator.enabled = false;
         sr.color = originalColor;
@@ -413,7 +430,7 @@ public partial class BossController : MonoBehaviour, IDamageable
         onDeath = null;
         RunStats.Instance?.AddKill();
         SpawnDrops();
-        StartCoroutine(DeathRoutine());
+        DeathRoutine(token).Forget();
     }
 
     void SpawnDrops()
@@ -428,9 +445,9 @@ public partial class BossController : MonoBehaviour, IDamageable
         );
     }
 
-    IEnumerator DeathRoutine()
+    async UniTaskVoid DeathRoutine(CancellationToken token)
     {
-        yield return EnemyUtils.DeathBlink(sr);
+        await EnemyUtils.DeathBlink(sr);
         Destroy(gameObject);
     }
 }

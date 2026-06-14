@@ -50,10 +50,12 @@ public class SaveData
 [Serializable]
 public class KeyBindingSaveData
 {
+    public string jumpKey = "Space";
     public string dashKey = "Z";
     public string attackKey = "X";
     public string inventoryKey = "Tab";
     public string interactKey = "A";
+    public string weaponSwitchKey = "C";
 }
 
 [Serializable]

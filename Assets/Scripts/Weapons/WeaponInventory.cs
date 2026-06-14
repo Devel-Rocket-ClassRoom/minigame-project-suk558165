@@ -32,7 +32,8 @@ public class WeaponInventory : MonoBehaviour
         if (weapons.Count < 2 || InventoryUI.IsOpen)
             return;
 
-        if (Input.GetKeyDown(KeyCode.C))
+        var switchKey = InputManager.Instance?.WeaponSwitch ?? KeyCode.C;
+        if (Input.GetKeyDown(switchKey))
         {
             currentIndex = (currentIndex + 1) % weapons.Count;
             NotifyWeaponChanged();

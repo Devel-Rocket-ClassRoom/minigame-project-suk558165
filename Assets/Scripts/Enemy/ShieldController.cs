@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyController))]
@@ -14,7 +15,7 @@ public class ShieldController : MonoBehaviour
     private EnemyController _enemy;
     private SpriteRenderer _sr;
     private Transform _player;
-    private Coroutine _blockFlashCoroutine;
+    private CancellationTokenSource _blockFlashCts;
 
     void Awake()
     {
@@ -26,6 +27,12 @@ public class ShieldController : MonoBehaviour
     {
         _player = PlayerRef.Transform;
         _enemy.isAttackBlocked = IsBlocked;
+    }
+
+    void OnDestroy()
+    {
+        _blockFlashCts?.Cancel();
+        _blockFlashCts?.Dispose();
     }
 
     bool IsBlocked()
@@ -43,9 +50,10 @@ public class ShieldController : MonoBehaviour
 
         if (playerInFront)
         {
-            if (_blockFlashCoroutine != null)
-                StopCoroutine(_blockFlashCoroutine);
-            _blockFlashCoroutine = StartCoroutine(BlockFlash());
+            _blockFlashCts?.Cancel();
+            _blockFlashCts?.Dispose();
+            _blockFlashCts = new CancellationTokenSource();
+            BlockFlash(_blockFlashCts.Token).Forget();
             AudioManager.Instance?.PlaySFX(blockSound);
             return true;
         }
@@ -53,10 +61,10 @@ public class ShieldController : MonoBehaviour
         return false;
     }
 
-    IEnumerator BlockFlash()
+    async UniTaskVoid BlockFlash(CancellationToken token)
     {
         _sr.color = new Color(0.4f, 0.6f, 1f); // 파란 빛 = 방패로 막음
-        yield return new WaitForSeconds(0.12f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.12f), cancellationToken: token);
         _sr.color = Color.white;
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
@@ -41,20 +41,20 @@ public class TutorialManager : MonoBehaviour
             playerCombat = player.GetComponent<PlayerCombat>();
             playerMovement = player.GetComponent<PlayerMovement>();
         }
-        StartCoroutine(RunSteps());
+        RunSteps().Forget();
     }
 
-    IEnumerator RunSteps()
+    async UniTaskVoid RunSteps()
     {
         foreach (var step in steps)
         {
             if (stepUI != null)
                 stepUI.Show($"{step.message}  0 / 5");
 
-            yield return WaitForInput(step.requiredInput, step.message);
+            await WaitForInput(step.requiredInput, step.message);
 
             if (stepUI != null)
-                yield return stepUI.Hide();
+                await stepUI.Hide();
         }
 
         if (SaveManager.Instance != null)
@@ -66,26 +66,24 @@ public class TutorialManager : MonoBehaviour
         if (stepUI != null)
         {
             stepUI.Show("튜토리얼이 완료되었습니다\n3초 뒤에 이동합니다");
-            yield return new WaitForSeconds(3f);
-            yield return stepUI.Hide();
+            await UniTask.Delay(System.TimeSpan.FromSeconds(3f));
+            await stepUI.Hide();
         }
 
         onTutorialComplete?.Invoke();
     }
 
-    IEnumerator WaitForInput(TutorialInput input, string baseMessage)
+    async UniTask WaitForInput(TutorialInput input, string baseMessage)
     {
         int count = 0;
         bool prevActive = false;
         while (count < 5)
         {
-            yield return null;
+            await UniTask.Yield();
 
             bool counted;
             if (UsesAnimationGate(input))
             {
-                // 공격/대시는 애니메이션(동작)이 끝나는 순간을 1회로 인정.
-                // 연타해도 동작 중에는 카운트가 올라가지 않는다.
                 bool active = IsActionInProgress(input);
                 counted = prevActive && !active;
                 prevActive = active;
@@ -127,7 +125,8 @@ public class TutorialManager : MonoBehaviour
             case TutorialInput.MoveLeftRight:
                 return Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
             case TutorialInput.Jump:
-                return Input.GetButtonDown("Jump");
+                var jumpKey = InputManager.Instance?.Jump ?? KeyCode.Space;
+                return Input.GetKeyDown(jumpKey);
             case TutorialInput.Dash:
                 var dashKey = InputManager.Instance?.Dash ?? KeyCode.Z;
                 return Input.GetKeyDown(dashKey);

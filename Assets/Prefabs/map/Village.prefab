@@ -1596,7 +1596,7 @@ Tilemap:
   - m_RefCount: 148
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 3
-    m_Data: {r: 0.7807873, g: 0.44994822, b: 0.4521663, a: 1}
+    m_Data: {r: 0.71932393, g: 0.29455483, b: 0.38134912, a: 1}
   - m_RefCount: 0
     m_Data: {r: 1.67e-43, g: 1.67e-43, b: 1.67e-43, a: 1.67e-43}
   m_TileObjectToInstantiateArray: []

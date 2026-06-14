@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class BossIntro : MonoBehaviour
@@ -49,10 +49,10 @@ public class BossIntro : MonoBehaviour
     /// <param name="onComplete">인트로 전체 완료 후 호출.</param>
     public void Play(System.Action onSpawn, System.Action onComplete)
     {
-        StartCoroutine(IntroSequence(onSpawn, onComplete));
+        IntroSequence(onSpawn, onComplete).Forget();
     }
 
-    IEnumerator IntroSequence(System.Action onSpawn, System.Action onComplete)
+    async UniTaskVoid IntroSequence(System.Action onSpawn, System.Action onComplete)
     {
         IsPlaying = true;
         var cam = CameraFollow.Instance;
@@ -70,21 +70,21 @@ public class BossIntro : MonoBehaviour
             originalTarget = cam.target;
             originalLensSize = cam.OrthographicSize;
             cam.SetFollowTarget(focusTarget);
-            yield return cam.LerpOrthographicSize(originalLensSize, zoomOutSize, zoomDuration);
+            await cam.LerpOrthographicSize(originalLensSize, zoomOutSize, zoomDuration);
         }
         else
         {
-            yield return new WaitForSeconds(zoomDuration);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration));
         }
 
         // 카메라가 보스 위치에 도착 — 보스 스폰
         if (spawnDelay > 0f)
-            yield return new WaitForSeconds(spawnDelay);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnDelay));
         onSpawn?.Invoke();
 
         // 보스 등장 직후 잠깐 보여준 뒤 이름 표시
         if (spawnToNameDelay > 0f)
-            yield return new WaitForSeconds(spawnToNameDelay);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnToNameDelay));
 
         if (bossNameUIPrefab != null)
         {
@@ -93,16 +93,16 @@ public class BossIntro : MonoBehaviour
             if (nameUI != null)
                 nameUI.Show(bossName, bossTitle, nameDisplayDuration);
         }
-        yield return new WaitForSeconds(nameDisplayDuration);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(nameDisplayDuration));
 
         if (cam != null)
         {
             cam.SetFollowTarget(originalTarget);
-            yield return cam.LerpOrthographicSize(zoomOutSize, originalLensSize, zoomDuration);
+            await cam.LerpOrthographicSize(zoomOutSize, originalLensSize, zoomDuration);
         }
         else
         {
-            yield return new WaitForSeconds(zoomDuration);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration));
         }
 
         if (playerController != null)

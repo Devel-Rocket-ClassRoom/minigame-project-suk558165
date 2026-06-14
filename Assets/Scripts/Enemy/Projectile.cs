@@ -17,6 +17,8 @@ public class Projectile : MonoBehaviour
     private bool ready;
     private int pierceRemaining;
     private float spinSpeed;
+    private Transform homingTarget;
+    private float homingTurnSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
     private Rigidbody2D rb;
 
@@ -53,6 +55,8 @@ public class Projectile : MonoBehaviour
         this.lifesteal = lifesteal;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
+        this.homingTarget = null;
+        this.homingTurnSpeed = 0f;
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
@@ -60,10 +64,24 @@ public class Projectile : MonoBehaviour
         Invoke(nameof(ReleaseSelf), lifetime);
     }
 
+    public void SetHoming(Transform target, float turnSpeed)
+    {
+        homingTarget = target;
+        homingTurnSpeed = turnSpeed;
+    }
+
     void Update()
     {
         if (spinSpeed != 0f)
             transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime);
+
+        if (homingTarget != null && rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            Vector2 toTarget = ((Vector2)homingTarget.position - rb.position).normalized;
+            Vector2 cur = rb.linearVelocity.normalized;
+            Vector2 newDir = Vector2.Lerp(cur, toTarget, homingTurnSpeed * Time.deltaTime).normalized;
+            rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+        }
     }
 
     void Activate() => ready = true;

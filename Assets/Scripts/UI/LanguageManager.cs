@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 
@@ -33,9 +33,9 @@ public class LanguageManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    IEnumerator Start()
+    async UniTaskVoid Start()
     {
-        yield return LocalizationSettings.InitializationOperation;
+        await LocalizationSettings.InitializationOperation;
 
         string saved = SaveManager.Instance != null
             ? SaveManager.Instance.Data.languageCode

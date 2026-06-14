@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,12 +29,12 @@ public class ScreenFader : MonoBehaviour
             Instance = null;
     }
 
-    public Coroutine FadeOut() => StartCoroutine(Fade(0, 1));
-    public Coroutine FadeIn() => StartCoroutine(Fade(1, 0));
+    public UniTask FadeOut() => Fade(0, 1);
+    public UniTask FadeIn() => Fade(1, 0);
 
-    IEnumerator Fade(float from, float to)
+    async UniTask Fade(float from, float to)
     {
-        if (fadeImage == null) yield break;
+        if (fadeImage == null) return;
 
         fadeImage.raycastTarget = true;
         float t = 0;
@@ -43,7 +43,7 @@ public class ScreenFader : MonoBehaviour
             t += Time.unscaledDeltaTime;
             float a = Mathf.Lerp(from, to, t / fadeDuration);
             fadeImage.color = new Color(0, 0, 0, a);
-            yield return null;
+            await UniTask.Yield();
         }
         fadeImage.color = new Color(0, 0, 0, to);
 

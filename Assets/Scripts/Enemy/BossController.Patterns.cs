@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 // BossController 의 패턴 연출 부분 (상태/수명주기는 BossController.cs).
@@ -7,22 +8,22 @@ public partial class BossController
 {
     // ── 텔 (예고 연출) ──
 
-    IEnumerator TellFlash(Color color) =>
+    UniTask TellFlash(Color color) =>
         EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
 
-    IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
+    UniTask TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
     // ── 패턴: 돌진 공격 (돌진 후 베기) ──
 
-    IEnumerator ChargeAttack()
+    async UniTask ChargeAttack(CancellationToken token)
     {
-        yield return TellFlash(Color.red);
+        await TellFlash(Color.red);
 
         attackFlip = true;
         FlipToPlayer();
         AudioManager.Instance?.PlaySFX(dashSound);
         if (animator != null)
-            animator.Play("Dash", 0, 0f);
+            animator.Play("DashRun", 0, 0f);
 
         float dir = player.position.x > transform.position.x ? 1f : -1f;
         float elapsed = 0f;
@@ -36,7 +37,7 @@ public partial class BossController
                 break;
 
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
 
         // 도착 후 베기
@@ -45,23 +46,23 @@ public partial class BossController
         if (animator != null)
             animator.Play("Dash", 0, 0f);
 
-        yield return new WaitForSeconds(0.2f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
         DealAreaDamage(transform.position, comboRange);
-        yield return new WaitForSeconds(0.15f);
-
-        attackFlip = false;
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f), cancellationToken: token);
 
         // 스턴 (반격 타이밍)
         sr.color = Color.gray;
-        yield return new WaitForSeconds(chargeStunDuration);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(chargeStunDuration), cancellationToken: token);
         sr.color = originalColor;
+
+        attackFlip = false;
     }
 
     // ── 패턴: 내려찍기 ──
 
-    IEnumerator SlamAttack()
+    async UniTask SlamAttack(CancellationToken token)
     {
-        yield return TellShake();
+        await TellShake();
 
         if (animator != null)
             animator.Play("Slam", 0, 0f);
@@ -69,18 +70,19 @@ public partial class BossController
         // 점프
         rb.linearVelocity = new Vector2(0f, slamJumpForce);
 
-        // 점프 후 실제로 지면을 벗어날 때까지 대기 (바로 IsGrounded 체크하면 아직 지면 접촉 판정)
+        // 점프 후 실제로 지면을 벗어날 때까지 대기
         float liftWait = 0f;
         while (IsGrounded() && liftWait < 0.3f)
         {
             liftWait += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
 
-        yield return new WaitForSeconds(0.2f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
 
-        // 경고 표시 (바닥 전체)
-        Vector3 targetPos = player.position;
+        // 경고 표시 (바닥 전체 — 항상 지면 높이)
+        float floorY = EnemyUtils.FindFloorY(player.position, groundLayer);
+        Vector3 targetPos = new Vector3(player.position.x, floorY, 0f);
         GameObject warning = null;
         if (slamWarningPrefab != null)
         {
@@ -88,9 +90,9 @@ public partial class BossController
             warning.transform.localScale = new Vector3(100f, 0.3f, 1f);
         }
 
-        yield return new WaitForSeconds(0.15f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f), cancellationToken: token);
 
-        // 급강하 — Rigidbody 통해 X 이동 (transform.position 직접 수정은 물리 디싱크 유발)
+        // 급강하
         rb.MovePosition(new Vector2(targetPos.x, rb.position.y));
         rb.linearVelocity = new Vector2(0f, -slamFallSpeed);
 
@@ -100,7 +102,7 @@ public partial class BossController
         {
             rb.linearVelocity = new Vector2(0f, -slamFallSpeed);
             fallElapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
         rb.linearVelocity = Vector2.zero;
 
@@ -111,21 +113,21 @@ public partial class BossController
         AudioManager.Instance?.PlaySFX(slamSound);
         SlamGroundDamage();
 
-        yield return new WaitForSeconds(0.25f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.25f), cancellationToken: token);
     }
 
     // ── 패턴: 투사체 ──
 
-    IEnumerator ProjectileAttack()
+    async UniTask ProjectileAttack(CancellationToken token)
     {
-        yield return TellFlash(new Color(1f, 0.5f, 0f));
+        await TellFlash(new Color(1f, 0.5f, 0f));
 
         FlipToPlayer();
         if (animator != null)
             animator.Play("Charge", 0, 0f);
 
         if (projectilePrefab == null || player == null)
-            yield break;
+            return;
 
         AudioManager.Instance?.PlaySFX(projectileSound);
         Vector2 baseDir = ((Vector2)player.position - (Vector2)transform.position).normalized;
@@ -149,7 +151,7 @@ public partial class BossController
             projComp.Init(dir, projectileSpeed, damage, gameObject);
         }
 
-        yield return new WaitForSeconds(0.25f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.25f), cancellationToken: token);
     }
 
     Projectile GetPooledProjectile()
@@ -161,12 +163,12 @@ public partial class BossController
 
     // ── Phase 2 패턴: 바닥 가시 (공중 이탈 후 랜덤 가시) ──
 
-    IEnumerator SpikeStormAttack()
+    async UniTask SpikeStormAttack(CancellationToken token)
     {
-        yield return GoAirborne(4f, 0.4f);
+        await GoAirborne(4f, 0.4f, token);
 
         const float spacing = 1.4f;
-        const float halfSpan = 7f; // 플레이어 기준 좌우 범위
+        const float halfSpan = 7f;
         const int waves = 2;
         const float warnTime = 0.45f;
         var positions = new List<Vector3>();
@@ -177,7 +179,6 @@ public partial class BossController
             float centerX = player != null ? player.position.x : transform.position.x;
             for (float x = centerX - halfSpan; x <= centerX + halfSpan; x += spacing)
             {
-                // 랜덤하게 띄엄띄엄 생성 → 회피 가능한 안전 구간 보장
                 if (Random.value > 0.55f)
                     continue;
                 float floorY = EnemyUtils.FindFloorY(
@@ -191,7 +192,7 @@ public partial class BossController
             if (warningPrefab != null)
                 foreach (var p in positions)
                     Destroy(Instantiate(warningPrefab, p, Quaternion.identity), warnTime);
-            yield return new WaitForSeconds(warnTime);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(warnTime), cancellationToken: token);
 
             // 가시 솟구침
             AudioManager.Instance?.PlaySFX(slamSound);
@@ -202,49 +203,43 @@ public partial class BossController
                     spike.GetComponent<BossSpike>()?.Init(damage, gameObject);
                 }
 
-            yield return new WaitForSeconds(0.7f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.7f), cancellationToken: token);
         }
 
-        yield return ReturnFromAir(0.4f);
+        await ReturnFromAir(0.4f, token);
     }
 
     // ── Phase 2 패턴: 공중 마법 (플레이어 추적 낙하) ──
 
-    IEnumerator AirMagicAttack()
+    async UniTask AirMagicAttack(CancellationToken token)
     {
-        yield return GoAirborne(4f, 0.4f);
+        await GoAirborne(4f, 0.4f, token);
 
-        const int waves = 3;
-        const float dropHeight = 8f;
-        const float warnTime = 0.4f;
+        const int count = 5;
+        const float spawnInterval = 0.5f;
+        const float spawnOffsetY = 3f;
+        const float homingTurn = 3f;
 
-        for (int w = 0; w < waves; w++)
+        for (int i = 0; i < count; i++)
         {
             if (player == null)
                 break;
 
-            float targetX = player.position.x; // 시전 순간 위치 추적
-            float floorY = EnemyUtils.FindFloorY(
-                new Vector3(targetX, transform.position.y, 0f),
-                groundLayer
-            );
-
-            if (warningPrefab != null)
-                Destroy(
-                    Instantiate(warningPrefab, new Vector3(targetX, floorY, 0f), Quaternion.identity),
-                    warnTime
-                );
-            yield return new WaitForSeconds(warnTime);
+            float offsetX = (i % 2 == 0 ? -1f : 1f) * (2f + i * 0.5f);
+            Vector3 spawnPos = (Vector3)rb.position + new Vector3(offsetX, spawnOffsetY, 0f);
 
             AudioManager.Instance?.PlaySFX(projectileSound);
-            var magic = GetPooledMagic(new Vector3(targetX, floorY + dropHeight, 0f));
+            var magic = GetPooledMagic(spawnPos);
             magic.Pool = magicPool;
-            magic.Init(Vector2.down, magicProjectileSpeed, damage, gameObject);
+            Vector2 dir = ((Vector2)player.position - (Vector2)spawnPos).normalized;
+            magic.Init(dir, magicProjectileSpeed * 0.6f, damage, gameObject);
+            magic.SetHoming(player, homingTurn);
 
-            yield return new WaitForSeconds(0.45f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnInterval), cancellationToken: token);
         }
 
-        yield return ReturnFromAir(0.4f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+        await ReturnFromAir(0.4f, token);
     }
 
     Projectile GetPooledMagic(Vector3 pos)
@@ -259,7 +254,10 @@ public partial class BossController
 
     // ── 공중 이탈 / 복귀 (가시·공중마법 공용) ──
 
-    IEnumerator GoAirborne(float height, float duration)
+    private bool isBobbing;
+    private Vector3 bobBasePos;
+
+    async UniTask GoAirborne(float height, float duration, CancellationToken token)
     {
         preAirbornePos = transform.position;
         untargetable = true;
@@ -281,15 +279,36 @@ public partial class BossController
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / duration);
             transform.position = Vector3.Lerp(start, target, k);
-            SetAlpha(Mathf.Lerp(1f, 0f, k));
-            yield return null;
+            await UniTask.Yield(token);
         }
         transform.position = target;
-        SetAlpha(0f);
+
+        // Fly → Float 전환, 둥둥 흔들림 시작
+        bobBasePos = target;
+        isBobbing = true;
+        if (animator != null)
+            animator.Play("Float", 0, 0f);
+        BobLoop(token).Forget();
     }
 
-    IEnumerator ReturnFromAir(float duration)
+    async UniTaskVoid BobLoop(CancellationToken token)
     {
+        float elapsed = 0f;
+        const float bobAmplitude = 0.3f;
+        const float bobSpeed = 2f;
+        while (isBobbing)
+        {
+            elapsed += Time.deltaTime;
+            float offsetY = Mathf.Sin(elapsed * bobSpeed) * bobAmplitude;
+            transform.position = bobBasePos + new Vector3(0f, offsetY, 0f);
+            await UniTask.Yield(token);
+        }
+    }
+
+    async UniTask ReturnFromAir(float duration, CancellationToken token)
+    {
+        isBobbing = false;
+
         if (animator != null)
             animator.Play("Fly", 0, 0f);
 
@@ -300,27 +319,20 @@ public partial class BossController
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / duration);
             transform.position = Vector3.Lerp(start, preAirbornePos, k);
-            SetAlpha(Mathf.Lerp(0f, 1f, k));
-            yield return null;
+            await UniTask.Yield(token);
         }
         transform.position = preAirbornePos;
-        SetAlpha(1f);
         rb.bodyType = RigidbodyType2D.Dynamic;
         if (col != null)
             col.enabled = true;
         untargetable = false;
     }
 
-    void SetAlpha(float a)
-    {
-        sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, a);
-    }
-
     // ── 패턴: 연속 베기 ──
 
-    IEnumerator ComboAttack()
+    async UniTask ComboAttack(CancellationToken token)
     {
-        yield return TellShake();
+        await TellShake();
 
         attackFlip = true;
         FlipToPlayer();
@@ -334,11 +346,11 @@ public partial class BossController
             DealAreaDamage(transform.position, comboRange);
 
             if (i < comboHitCount - 1)
-                yield return new WaitForSeconds(comboInterval);
+                await UniTask.Delay(System.TimeSpan.FromSeconds(comboInterval), cancellationToken: token);
         }
 
         attackFlip = false;
-        yield return new WaitForSeconds(0.15f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f), cancellationToken: token);
     }
 
     // ── 범위 데미지 ──
@@ -364,16 +376,14 @@ public partial class BossController
         if (player == null)
             return;
 
-        float footY = col != null ? col.bounds.min.y : transform.position.y;
-        float playerY = player.position.y;
+        var movement = player.GetComponent<PlayerMovement>();
+        if (movement != null && !movement.IsGrounded)
+            return;
 
-        if (Mathf.Abs(playerY - footY) <= 2f)
-        {
-            player.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
-            var playerCtrl = player.GetComponent<PlayerController>();
-            if (playerCtrl != null)
-                playerCtrl.Knockback(Vector2.up * 8f);
-        }
+        player.GetComponent<IDamageable>()?.TakeDamage(damage, gameObject);
+        var playerCtrl = player.GetComponent<PlayerController>();
+        if (playerCtrl != null)
+            playerCtrl.Knockback(Vector2.up * 8f);
     }
 
     bool IsGrounded() => EnemyUtils.IsGrounded(col, transform, groundLayer);

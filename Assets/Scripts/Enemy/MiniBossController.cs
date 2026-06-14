@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -111,6 +112,16 @@ public class MiniBossController : MonoBehaviour, IDamageable
     private Animator animator;
     public System.Action onDeath;
 
+    private CancellationTokenSource _cts = new();
+
+    CancellationToken RefreshToken()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts.Token;
+    }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -129,6 +140,12 @@ public class MiniBossController : MonoBehaviour, IDamageable
     void OnEnable() => Instances.Add(this);
 
     void OnDisable() => Instances.Remove(this);
+
+    void OnDestroy()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 
     void Start()
     {
@@ -155,7 +172,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         if (cooldownTimer <= 0f)
         {
             cooldownTimer = patternCooldown;
-            StartCoroutine(ExecutePattern());
+            ExecutePattern(_cts.Token).Forget();
         }
         else
         {
@@ -185,7 +202,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         return Physics2D.Raycast(origin, dir, dist, groundLayer).collider != null;
     }
 
-    IEnumerator ExecutePattern()
+    async UniTaskVoid ExecutePattern(CancellationToken token)
     {
         isActing = true;
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
@@ -194,13 +211,13 @@ public class MiniBossController : MonoBehaviour, IDamageable
         switch (pattern)
         {
             case 0:
-                yield return GroundWave();
+                await GroundWave(token);
                 break;
             case 1:
-                yield return LeapSlash();
+                await LeapSlash(token);
                 break;
             case 2:
-                yield return MultiDash();
+                await MultiDash(token);
                 break;
         }
 
@@ -211,18 +228,18 @@ public class MiniBossController : MonoBehaviour, IDamageable
 
     // ── 텔 연출 ──────────────────────────────────────
 
-    IEnumerator TellFlash(Color color) => EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
+    UniTask TellFlash(Color color) => EnemyUtils.TellFlash(sr, color, originalColor, tellDuration);
 
-    IEnumerator TellShake() => EnemyUtils.TellShake(transform, tellDuration);
+    UniTask TellShake() => EnemyUtils.TellShake(transform, tellDuration);
 
     // ── 패턴 1: 지면 파동 ─────────────────────────────
     // 바닥을 내리쳐 좌우로 파동이 퍼져나감
 
-    IEnumerator GroundWave()
+    async UniTask GroundWave(CancellationToken token)
     {
         if (animator != null)
             animator.Play("GroundWave", 0, 0f);
-        yield return TellShake();
+        await TellShake();
 
         rb.linearVelocity = Vector2.zero;
 
@@ -251,21 +268,21 @@ public class MiniBossController : MonoBehaviour, IDamageable
                 rightSr.flipX = true;
         }
 
-        yield return new WaitForSeconds(0.3f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
     }
 
     // ── 패턴 2: 도약 베기 ─────────────────────────────
     // 점프 후 플레이어 위치로 낙하, 착지 충격파
 
-    IEnumerator LeapSlash()
+    async UniTask LeapSlash(CancellationToken token)
     {
         if (animator != null)
             animator.Play("LeapSlash", 0, 0f);
-        yield return TellFlash(Color.yellow);
+        await TellFlash(Color.yellow);
 
         AudioManager.Instance?.PlaySFX(leapSlashSound);
         rb.linearVelocity = new Vector2(0f, leapJumpForce);
-        yield return new WaitForSeconds(0.2f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
 
         // 플레이어 X로 이동 후 급낙하
         if (player != null)
@@ -278,7 +295,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         while (!IsGrounded())
         {
             rb.linearVelocity = new Vector2(0f, -leapFallSpeed);
-            yield return null;
+            await UniTask.Yield(token);
         }
 
         rb.linearVelocity = Vector2.zero;
@@ -286,17 +303,17 @@ public class MiniBossController : MonoBehaviour, IDamageable
         // 착지 충격 — IgnoreLayerCollision으로 트리거가 막히므로 직접 거리 계산
         DealAreaDamage(transform.position, leapRadius);
 
-        yield return new WaitForSeconds(0.2f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
     }
 
     // ── 패턴 3: 연속 돌진 ─────────────────────────────
     // 짧은 대시를 dashCount 회 반복, 마지막에 짧은 스턴
 
-    IEnumerator MultiDash()
+    async UniTask MultiDash(CancellationToken token)
     {
         if (animator != null && animator.HasState(0, Animator.StringToHash("MultiDash")))
             animator.Play("MultiDash", 0, 0f);
-        yield return TellFlash(Color.cyan);
+        await TellFlash(Color.cyan);
 
         AudioManager.Instance?.PlaySFX(dashSound);
         bool prevRootMotion = animator != null && animator.applyRootMotion;
@@ -321,13 +338,13 @@ public class MiniBossController : MonoBehaviour, IDamageable
                     DealAreaDamage(transform.position, dashHitRadius);
 
                 elapsed += Time.deltaTime;
-                yield return null;
+                await UniTask.Yield(token);
             }
 
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
             if (i < dashCount - 1)
-                yield return new WaitForSeconds(dashInterval);
+                await UniTask.Delay(System.TimeSpan.FromSeconds(dashInterval), cancellationToken: token);
         }
 
         if (animator != null)
@@ -336,7 +353,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         // 스턴
         rb.linearVelocity = Vector2.zero;
         sr.color = Color.gray;
-        yield return new WaitForSeconds(0.3f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
         sr.color = originalColor;
     }
 
@@ -389,16 +406,16 @@ public class MiniBossController : MonoBehaviour, IDamageable
             return;
         }
 
-        StartCoroutine(HitFlash());
+        HitFlash().Forget();
     }
 
-    IEnumerator HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
+    UniTask HitFlash() => EnemyUtils.HitFlash(sr, originalColor, () => isDead);
 
     void Die()
     {
         isDead = true;
         AudioManager.Instance?.PlaySFX(deathSound);
-        StopAllCoroutines();
+        var token = RefreshToken();
         if (animator != null)
             animator.enabled = false;
         sr.color = originalColor;
@@ -413,7 +430,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         onDeath = null;
         RunStats.Instance?.AddKill();
         SpawnDrops();
-        StartCoroutine(DeathRoutine());
+        DeathRoutine(token).Forget();
     }
 
     void SpawnDrops()
@@ -421,9 +438,9 @@ public class MiniBossController : MonoBehaviour, IDamageable
         EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 3, goldDropMin, goldDropMax);
     }
 
-    IEnumerator DeathRoutine()
+    async UniTaskVoid DeathRoutine(CancellationToken token)
     {
-        yield return EnemyUtils.DeathBlink(sr);
+        await EnemyUtils.DeathBlink(sr);
         Destroy(gameObject);
     }
 }
