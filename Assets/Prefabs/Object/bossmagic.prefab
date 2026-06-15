@@ -180,4 +180,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   lifetime: 5
-  spriteAngleOffset: 0
+  spriteAngleOffset: -90

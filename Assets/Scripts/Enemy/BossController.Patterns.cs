@@ -25,12 +25,14 @@ public partial class BossController
         if (animator != null)
             animator.Play("DashRun", 0, 0f);
 
-        float dir = player.position.x > transform.position.x ? 1f : -1f;
+        // 돌진: 플레이어 근처까지 이동 (데미지 없음). 거리 기반 — chargeDuration은 안전망 상한.
+        // 플레이어가 멀어도 따라잡을 수 있도록, 진행 중 방향을 갱신하고 충분한 상한 시간을 사용.
+        float maxChaseTime = Mathf.Max(chargeDuration, Vector2.Distance(transform.position, player.position) / chargeSpeed + 0.3f);
         float elapsed = 0f;
-
-        // 돌진: 플레이어 근처까지 이동 (데미지 없음)
-        while (elapsed < chargeDuration)
+        while (elapsed < maxChaseTime)
         {
+            // 매 프레임 방향 재계산 — 플레이어가 움직이면 추격 갱신.
+            float dir = player.position.x > transform.position.x ? 1f : -1f;
             transform.position += new Vector3(dir * chargeSpeed * Time.deltaTime, 0f, 0f);
 
             if (Vector2.Distance(transform.position, player.position) <= comboRange)

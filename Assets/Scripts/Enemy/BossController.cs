@@ -244,13 +244,22 @@ public partial class BossController : MonoBehaviour, IDamageable
         }
 
         float dist = Vector2.Distance(transform.position, player.position);
-        if (dist > detectionRange)
-            return;
 
         if (isActing)
             return;
 
         FlipToPlayer();
+
+        // 인식 범위 밖이면 패턴 없이 추격만, 안에서는 정상 패턴.
+        // 단 추격 속도는 근접 범위에 들어오기 전까진 항상 부스트 —
+        // detectionRange 경계에서 속도가 급감해 무한 카이팅되는 함정 방지.
+        bool needBoost = dist > comboRange * 1.5f;
+
+        if (dist > detectionRange)
+        {
+            ChasePlayer(boost: true);
+            return;
+        }
 
         cooldownTimer -= Time.deltaTime;
         if (cooldownTimer <= 0f)
@@ -260,7 +269,7 @@ public partial class BossController : MonoBehaviour, IDamageable
         }
         else
         {
-            ChasePlayer();
+            ChasePlayer(boost: needBoost);
         }
     }
 
@@ -275,10 +284,12 @@ public partial class BossController : MonoBehaviour, IDamageable
         sr.flipX = attackFlip ? !flip : flip;
     }
 
-    void ChasePlayer()
+    void ChasePlayer(bool boost = false)
     {
         float dir = player.position.x > transform.position.x ? 1f : -1f;
-        rb.linearVelocity = new Vector2(dir * moveSpeed, rb.linearVelocity.y);
+        // 인식 범위 밖에서 호출될 땐 부스트 — 플레이어가 도망쳐도 따라잡을 수 있는 속도.
+        float speed = boost ? moveSpeed * 2.5f : moveSpeed;
+        rb.linearVelocity = new Vector2(dir * speed, rb.linearVelocity.y);
     }
 
     // ── 패턴 선택 (실제 패턴 구현은 BossController.Patterns.cs) ──
@@ -308,12 +319,15 @@ public partial class BossController : MonoBehaviour, IDamageable
         {
             float dist = Vector2.Distance(transform.position, player.position);
 
-            // 근거리면 근접 패턴 우선, 원거리면 돌진/투사체
+            // 근거리면 근접 패턴 우선, 원거리면 돌진/투사체.
+            // 매우 먼 거리(>6m)에선 무조건 돌진으로 거리부터 좁힘 — 플레이어가 카이팅 못 하게.
             int pattern;
             if (dist <= comboRange * 1.5f)
                 pattern = Random.Range(0, 2); // 0: 연속베기, 1: 내려찍기
+            else if (dist > 6f)
+                pattern = 2; // 무조건 돌진
             else
-                pattern = Random.Range(2, 4); // 2: 돌진, 3: 투사체
+                pattern = Random.Range(2, 4); // 2: 돌진, 3: 투사체 (50/50)
 
             switch (pattern)
             {
