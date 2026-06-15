@@ -42,7 +42,11 @@ public class AutoLocalizePanel : MonoBehaviour
             Bind();
             _initialized = true;
         }
-        Refresh();
+        // SelectedLocaleChanged 콜백 안에서 InitializationOperation이 이미 완료된 경우
+        // continuation이 동기 실행되어 ResourceManager.Update에 재진입하게 된다.
+        // 한 프레임 양보해서 콜백 밖으로 빠진 뒤 비동기 테이블 로드로 갱신.
+        await UniTask.Yield();
+        await RefreshAsync();
     }
 
     void OnLocaleChanged(Locale _) => InitAndRefresh().Forget();
@@ -65,9 +69,10 @@ public class AutoLocalizePanel : MonoBehaviour
         }
     }
 
-    void Refresh()
+    async UniTask RefreshAsync()
     {
-        var table = LocalizationSettings.StringDatabase?.GetTable(tableName);
+        var tableOp = LocalizationSettings.StringDatabase.GetTableAsync(tableName);
+        var table = await tableOp;
         if (table == null)
             return;
 

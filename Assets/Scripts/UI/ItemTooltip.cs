@@ -270,6 +270,8 @@ public class ItemTooltip : MonoBehaviour
 
         var target = rootPanel != null ? rootPanel : gameObject;
         target.SetActive(true);
+        // 같은 캔버스 내에서 다른 UI(상점 패널 등)보다 위에 그려지도록 항상 마지막 sibling으로 이동
+        target.transform.SetAsLastSibling();
         _isShown = true;
 
         // 텍스트 갱신 후 즉시 레이아웃을 재계산해 첫 프레임 크기 깜빡임 방지

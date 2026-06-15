@@ -63,7 +63,10 @@ public class NpcController : MonoBehaviour
                 if (UpgradeShopUI.IsOpen)
                     upgradeShopUI.Close();
                 else
+                {
+                    EnsureUpgradeShopInstance();
                     upgradeShopUI.Open();
+                }
             }
             return;
         }
@@ -77,6 +80,18 @@ public class NpcController : MonoBehaviour
         var interactKey = InputManager.Instance?.Interact ?? KeyCode.A;
         if (Input.GetKeyDown(interactKey))
             StartTalk();
+    }
+
+    // upgradeShopUI 필드가 씬 인스턴스가 아닌 프리팹 에셋을 가리키는 경우 첫 사용 시 인스턴스화한다.
+    // UpgradePanel 프리팹은 자체 Canvas/CanvasScaler/GraphicRaycaster를 갖는 루트 캔버스 구조이므로
+    // 다른 캔버스의 자식으로 넣지 말고 씬 루트에 직접 인스턴스화한다.
+    void EnsureUpgradeShopInstance()
+    {
+        if (upgradeShopUI == null || upgradeShopUI.gameObject.scene.IsValid())
+            return;
+
+        upgradeShopUI = Instantiate(upgradeShopUI);
+        upgradeShopUI.gameObject.name = "UpgradePanel";
     }
 
     void StartTalk()

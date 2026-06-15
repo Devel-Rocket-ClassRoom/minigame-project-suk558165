@@ -85,17 +85,40 @@ public class TitleOptionsUI : MonoBehaviour
 
     void OnLocaleChanged(Locale _)
     {
-        if (fullscreenDropdown != null)
+        // 콜백 안에서 동기 GetTable() 호출 시 ResourceManager 재진입 예외 발생.
+        // 라벨만 비동기로 다시 채우는 경로 사용 — 옵션 갯수/순서는 그대로 유지.
+        RefreshFullscreenLabelsAsync();
+    }
+
+    void RefreshFullscreenLabelsAsync()
+    {
+        if (fullscreenDropdown == null || fullscreenDropdown.options.Count < 3)
+            return;
+
+        SetLocalizedOption(0, "ui.options.fullscreen_windowed", "창 모드");
+        SetLocalizedOption(1, "ui.options.fullscreen_borderless", "테두리 없는 창");
+        SetLocalizedOption(2, "ui.options.fullscreen_exclusive", "전체화면");
+    }
+
+    void SetLocalizedOption(int index, string key, string fallback)
+    {
+        var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync("Items", key);
+        op.Completed += handle =>
         {
-            int prev = fullscreenDropdown.value;
-            SetupFullscreenDropdown();
-            fullscreenDropdown.SetValueWithoutNotify(prev);
+            if (fullscreenDropdown == null || index >= fullscreenDropdown.options.Count)
+                return;
+            string text = handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded
+                ? handle.Result
+                : fallback;
+            fullscreenDropdown.options[index].text = text;
             fullscreenDropdown.RefreshShownValue();
-        }
+        };
     }
 
     static string GetLocalized(string key, string fallback)
     {
+        // OnEnable에서 초기 셋업 시(콜백 외부) 동기 호출 — 안전.
+        // SelectedLocaleChanged 콜백 경로에서는 절대 호출하지 말 것.
         var table = LocalizationSettings.StringDatabase?.GetTable("Items");
         if (table == null)
             return fallback;

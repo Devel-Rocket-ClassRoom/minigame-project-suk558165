@@ -69,6 +69,10 @@ public class MiniBossController : MonoBehaviour, IDamageable
     [SerializeField]
     private float detectionRange = 12f;
 
+    [Tooltip("스프라이트 원본이 오른쪽을 향하면 체크. 왼쪽을 향하는 스프라이트면 해제.")]
+    [SerializeField]
+    private bool spriteFacesRight = false;
+
     [Header("Drops")]
     [SerializeField]
     private GameObject goldDropPrefab;
@@ -180,7 +184,7 @@ public class MiniBossController : MonoBehaviour, IDamageable
         }
     }
 
-    void FlipToPlayer() => EnemyUtils.FlipToPlayer(sr, player, transform);
+    void FlipToPlayer() => EnemyUtils.FlipToPlayer(sr, player, transform, spriteFacesRight);
 
     void ChasePlayer()
     {
