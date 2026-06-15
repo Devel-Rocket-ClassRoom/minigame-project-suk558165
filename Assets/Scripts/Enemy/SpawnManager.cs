@@ -170,6 +170,17 @@ public class SpawnManager : MonoBehaviour
         if (point == null)
             return;
 
+        // 같은 그룹의 적은 모두 같은 프레임에 동시 스폰 (SpawnGroup.interval, Wave.instantSpawn 무시).
+        // FX는 그룹당 한 번만 재생하고 spawnEffectDelay만큼 한 번 대기.
+        if (spawnEffectPrefab != null)
+        {
+            var fxPos = point.position + new Vector3(0f, spawnEffectYOffset, 0f);
+            var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
+            Destroy(fx, 0.8f);
+            if (spawnEffectDelay > 0f)
+                await UniTask.Delay(System.TimeSpan.FromSeconds(spawnEffectDelay), cancellationToken: token);
+        }
+
         for (int i = 0; i < group.count; i++)
         {
             if (allWavesCleared)
@@ -177,23 +188,12 @@ public class SpawnManager : MonoBehaviour
                 pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - (group.count - i));
                 return;
             }
-            await SpawnEnemyWithEffect(group.prefab, point.position, token);
-            if (!instant && i < group.count - 1 && group.interval > 0f)
-                await UniTask.Delay(System.TimeSpan.FromSeconds(group.interval), cancellationToken: token);
+            SpawnEnemyInstance(group.prefab, point.position);
         }
     }
 
-    async UniTask SpawnEnemyWithEffect(GameObject prefab, Vector3 position, CancellationToken token)
+    void SpawnEnemyInstance(GameObject prefab, Vector3 position)
     {
-        if (spawnEffectPrefab != null)
-        {
-            var fxPos = position + new Vector3(0f, spawnEffectYOffset, 0f);
-            var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
-            Destroy(fx, 0.8f);
-            if (spawnEffectDelay > 0f)
-                await UniTask.Delay(System.TimeSpan.FromSeconds(spawnEffectDelay), cancellationToken: token);
-        }
-
         var go = Instantiate(prefab, position, Quaternion.identity);
         go.transform.SetParent(transform.root, worldPositionStays: true);
         spawnedEnemies.Add(go);

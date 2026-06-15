@@ -170,16 +170,20 @@ public partial class BossController
         const float spacing = 1.4f;
         const float halfSpan = 7f;
         const int waves = 2;
-        const float warnTime = 0.45f;
+        const float warnTime = 0.75f;
         var positions = new List<Vector3>();
 
         for (int w = 0; w < waves; w++)
         {
             positions.Clear();
             float centerX = player != null ? player.position.x : transform.position.x;
+            // 인접한 두 슬롯이 동시에 가시로 채워지지 않도록 강제 — 플레이어가 빠질 안전 공간 보장.
+            bool lastSpawned = false;
             for (float x = centerX - halfSpan; x <= centerX + halfSpan; x += spacing)
             {
-                if (Random.value > 0.55f)
+                bool spawn = !lastSpawned && Random.value <= 0.55f;
+                lastSpawned = spawn;
+                if (!spawn)
                     continue;
                 float floorY = EnemyUtils.FindFloorY(
                     new Vector3(x, transform.position.y, 0f),

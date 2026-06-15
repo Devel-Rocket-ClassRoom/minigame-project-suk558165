@@ -81,6 +81,13 @@ public class Projectile : MonoBehaviour
             Vector2 cur = rb.linearVelocity.normalized;
             Vector2 newDir = Vector2.Lerp(cur, toTarget, homingTurnSpeed * Time.deltaTime).normalized;
             rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+
+            // 호밍으로 진행 방향이 바뀌므로 스프라이트도 따라 회전 (spinSpeed 사용 시 제외).
+            if (spinSpeed == 0f)
+            {
+                float angle = Mathf.Atan2(newDir.y, newDir.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
+            }
         }
     }
 
