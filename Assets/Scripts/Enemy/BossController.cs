@@ -393,7 +393,10 @@ public partial class BossController : MonoBehaviour, IDamageable
 
         HitFlash().Forget();
 
-        if (!isActing && player != null)
+        // 근접 범위에서만 knockback — 원거리 피격 시엔 추격을 끊지 않음.
+        // (멀리서 화살 연사로 knockback이 계속 발생해 추격이 끊기는 문제 방지)
+        if (!isActing && player != null
+            && Vector2.Distance(transform.position, player.position) <= comboRange * 2f)
             Knockback((transform.position - player.position).normalized, _cts.Token).Forget();
     }
 
