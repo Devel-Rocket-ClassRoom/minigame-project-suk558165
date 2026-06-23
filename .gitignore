@@ -84,3 +84,19 @@ Assets/google-services.json
 Assets/google-services.json.meta
 Assets/GoogleService-Info.plist
 Assets/GoogleService-Info.plist.meta
+
+# Firebase SDK 바이너리 (각자 .unitypackage Import로 설치, git에 올리지 않음)
+Assets/Firebase/
+Assets/Firebase.meta
+Assets/ExternalDependencyManager/
+Assets/ExternalDependencyManager.meta
+Assets/Plugins/iOS/Firebase/
+Assets/Plugins/iOS/Firebase.meta
+Assets/Plugins/tvOS/Firebase/
+Assets/Plugins/tvOS/Firebase.meta
+Assets/Editor Default Resources/Firebase/
+Assets/Editor Default Resources/Firebase.meta
+Assets/StreamingAssets/google-services-desktop.json
+Assets/StreamingAssets/google-services-desktop.json.meta
+Assets/Parse/
+Assets/Parse.meta
