@@ -98,7 +98,7 @@ public class Inventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F4))
         {
             var ph = PlayerRef.Health;
-            if (ph != null) ph.TakeDamage(99999f, Vector2.zero);
+            if (ph != null) ph.TakeDamage(99999f);
             Debug.Log("[Debug] F4: Force GameOver");
         }
     }
