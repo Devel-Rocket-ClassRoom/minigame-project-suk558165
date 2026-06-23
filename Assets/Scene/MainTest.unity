@@ -182,6 +182,8 @@ MonoBehaviour:
   uiCanvasPrefab: {fileID: 4668893597031252979, guid: 5208a9ca8040f064a8b49feee4bce6b6, type: 3}
   pauseMenuPrefab: {fileID: 329134092034828580, guid: 8b0e523b1f54db94fb32a257ea326eb5, type: 3}
   tutorialRoomPrefab: {fileID: 2926933431237095319, guid: 9a75018149bfd5941b28e033f417bdbe, type: 3}
+  firebaseSystemPrefab: {fileID: 6861943874853234632, guid: 08300f9e2fd296248b8b9f4eff1855d5, type: 3}
+  loginCanvasPrefab: {fileID: 3634775228663779224, guid: a04df4dba05a35546a5c1f1d06186738, type: 3}
   itemDatabase: {fileID: 11400000, guid: b3729aac221931249a72f1b27908e7ad, type: 2}
   roomManager: {fileID: 2085237427}
 --- !u!1 &582639439

@@ -80,6 +80,7 @@ public class Inventory : MonoBehaviour
         backpack.Add(item);
         RunStats.Instance?.AddItem();
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return true;
     }
 
@@ -90,6 +91,7 @@ public class Inventory : MonoBehaviour
         index = Mathf.Clamp(index, 0, backpack.Count);
         backpack.Insert(index, item);
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return true;
     }
 
@@ -100,6 +102,7 @@ public class Inventory : MonoBehaviour
         var item = backpack[index];
         backpack.RemoveAt(index);
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return item;
     }
 
@@ -170,6 +173,7 @@ public class Inventory : MonoBehaviour
         var old = accessories[slotIndex];
         accessories[slotIndex] = accessory;
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return old;
     }
 
@@ -181,6 +185,7 @@ public class Inventory : MonoBehaviour
         var old = accessories[slotIndex];
         accessories[slotIndex] = null;
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return old;
     }
 
@@ -190,6 +195,7 @@ public class Inventory : MonoBehaviour
             return false;
         accessories.Add(data);
         OnInventoryChanged?.Invoke();
+        SaveInventory();
         return true;
     }
 
@@ -199,6 +205,7 @@ public class Inventory : MonoBehaviour
             return;
         accessories.RemoveAt(index);
         OnInventoryChanged?.Invoke();
+        SaveInventory();
     }
 
     public void AddGold(int amount)
@@ -233,11 +240,57 @@ public class Inventory : MonoBehaviour
             gold = SaveManager.Instance.Data.gold;
     }
 
+    public void SaveInventory()
+    {
+        if (SaveManager.Instance == null) return;
+        var d = SaveManager.Instance.Data;
+
+        d.equippedAccessories.Clear();
+        foreach (var a in accessories)
+            d.equippedAccessories.Add(a != null ? a.id : "");
+
+        d.backpackWeapons.Clear();
+        d.backpackAccessories.Clear();
+        foreach (var item in backpack)
+        {
+            if (item is WeaponData w)
+                d.backpackWeapons.Add(w.id);
+            else if (item is AccessoryData a)
+                d.backpackAccessories.Add(a.id);
+        }
+        SaveManager.Instance.Save();
+    }
+
+    public void LoadInventory()
+    {
+        if (SaveManager.Instance == null || ItemDatabase.Instance == null) return;
+        var d = SaveManager.Instance.Data;
+        var db = ItemDatabase.Instance;
+
+        accessories.Clear();
+        foreach (var id in d.equippedAccessories)
+            accessories.Add(string.IsNullOrEmpty(id) ? null : db.FindAccessory(id));
+
+        backpack.Clear();
+        foreach (var id in d.backpackWeapons)
+        {
+            var w = db.FindWeapon(id);
+            if (w != null) backpack.Add(w);
+        }
+        foreach (var id in d.backpackAccessories)
+        {
+            var a = db.FindAccessory(id);
+            if (a != null) backpack.Add(a);
+        }
+        OnInventoryChanged?.Invoke();
+    }
+
     /// <summary>죽음으로 마을 귀환 시 호출 — 액세서리/가방 아이템 전부 제거.</summary>
     public void ResetOnDeath()
     {
         accessories.Clear();
         backpack.Clear();
+        SaveInventory();
         OnInventoryChanged?.Invoke();
     }
 

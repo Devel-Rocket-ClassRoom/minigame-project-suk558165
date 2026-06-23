@@ -6,11 +6,23 @@ public class SaveData
 {
     public int version = SaveManager.CurrentVersion;
 
+    // 클라우드 동기화용 타임스탬프 (Unix millis)
+    public long updatedAt;
+
     // 재화
     public int gold;
 
-    // 기본 장착 무기 (이름으로 저장)
+    // 기본 장착 무기 (id로 저장)
     public List<string> equippedWeapons = new List<string>();
+
+    // 장착 악세서리 (id로 저장, 빈 슬롯은 "")
+    public List<string> equippedAccessories = new List<string>();
+
+    // 가방 무기 (id로 저장)
+    public List<string> backpackWeapons = new List<string>();
+
+    // 가방 악세서리 (id로 저장)
+    public List<string> backpackAccessories = new List<string>();
 
     // 베스트 런 기록
     public BestRunData bestRun = new BestRunData();

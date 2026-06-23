@@ -27,6 +27,12 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private GameObject tutorialRoomPrefab;
 
+    [SerializeField]
+    private GameObject firebaseSystemPrefab;
+
+    [SerializeField]
+    private GameObject loginCanvasPrefab;
+
     [Header("데이터")]
     [SerializeField]
     private ItemDatabase itemDatabase;
@@ -45,8 +51,19 @@ public class GameFlowController : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        // Firebase 시스템 (Init/Auth/DB)
+        if (firebaseSystemPrefab != null && Game.Firebase.FirebaseInitializer.Instance == null)
+            Instantiate(firebaseSystemPrefab);
+
+        if (loginCanvasPrefab != null)
+            Instantiate(loginCanvasPrefab);
+
         if (uiCanvasPrefab != null)
+        {
             uiCanvasInstance = Instantiate(uiCanvasPrefab);
+            uiCanvasInstance.SetActive(false);
+        }
 
         // SaveManager 가 씬에 없으면 자동 생성
         if (SaveManager.Instance == null)
@@ -71,7 +88,34 @@ public class GameFlowController : MonoBehaviour
 
     void Start()
     {
+        var auth = Game.Firebase.FirebaseAuthManager.Instance;
+        if (auth != null)
+        {
+            auth.OnSignedIn += _ => GoToTitle();
+            auth.OnSignedOut += OnSignedOut;
+            if (!auth.IsLoggedIn)
+                return;
+        }
         GoToTitle();
+    }
+
+    void OnSignedOut()
+    {
+        if (titleInstance != null)
+        {
+            Destroy(titleInstance);
+            titleInstance = null;
+        }
+        if (villageInstance != null)
+        {
+            Destroy(villageInstance);
+            villageInstance = null;
+        }
+        if (playerInstance != null)
+        {
+            Destroy(playerInstance);
+            playerInstance = null;
+        }
     }
 
     void Update()
@@ -243,6 +287,9 @@ public class GameFlowController : MonoBehaviour
 
         // 골드 복원
         inventory.LoadGold();
+
+        // 인벤토리 (가방/악세서리) 복원
+        inventory.LoadInventory();
 
         // 장착 무기 복원
         if (itemDatabase != null && data.equippedWeapons.Count > 0)

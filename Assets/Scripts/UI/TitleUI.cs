@@ -146,4 +146,9 @@ public class TitleUI : MonoBehaviour
         Application.Quit();
 #endif
     }
+
+    public void OnLogout()
+    {
+        Game.Firebase.FirebaseAuthManager.Instance?.SignOut();
+    }
 }

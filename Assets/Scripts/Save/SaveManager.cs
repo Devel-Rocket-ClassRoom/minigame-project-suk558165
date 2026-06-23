@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Game.Firebase;
 
 public class SaveManager : MonoBehaviour
 {
@@ -35,14 +37,86 @@ public class SaveManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         Load();
+
+        if (FirebaseAuthManager.Instance != null)
+            FirebaseAuthManager.Instance.OnSignedIn += _ => SyncFromCloudAsync().Forget();
     }
 
     // ── 저장 ──
     public void Save()
     {
+        Data.updatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
         string json = JsonUtility.ToJson(Data, false);
         byte[] encrypted = Encrypt(json);
         File.WriteAllBytes(FilePath, encrypted);
+
+        UploadToCloudAsync(json).Forget();
+    }
+
+    // ── 클라우드 업로드 ──
+    async UniTaskVoid UploadToCloudAsync(string json)
+    {
+        var auth = FirebaseAuthManager.Instance;
+        var db = FirebaseDBManager.Instance;
+        if (auth == null || !auth.IsLoggedIn || db == null || !db.IsReady) return;
+
+        try
+        {
+            await db.SetJsonAsync($"users/{auth.UserId}/save", json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SaveManager] 클라우드 업로드 실패: {e.Message}");
+        }
+    }
+
+    // ── 로그인 시 클라우드에서 가져오기 (최신본 사용) ──
+    async UniTaskVoid SyncFromCloudAsync()
+    {
+        var auth = FirebaseAuthManager.Instance;
+        var db = FirebaseDBManager.Instance;
+        if (auth == null || !auth.IsLoggedIn || db == null) return;
+
+        await UniTask.WaitUntil(() => db.IsReady);
+
+        try
+        {
+            string cloudJson = await db.GetJsonAsync($"users/{auth.UserId}/save");
+            if (string.IsNullOrEmpty(cloudJson))
+            {
+                UploadToCloudAsync(JsonUtility.ToJson(Data, false)).Forget();
+                return;
+            }
+
+            var cloud = JsonUtility.FromJson<SaveData>(cloudJson);
+            if (cloud.updatedAt > Data.updatedAt)
+            {
+                PreserveDeviceSettings(cloud, Data);
+                Data = cloud;
+                string json = JsonUtility.ToJson(Data, false);
+                byte[] encrypted = Encrypt(json);
+                File.WriteAllBytes(FilePath, encrypted);
+                Debug.Log("[SaveManager] 클라우드 세이브로 동기화됨");
+            }
+            else if (Data.updatedAt > cloud.updatedAt)
+            {
+                UploadToCloudAsync(JsonUtility.ToJson(Data, false)).Forget();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SaveManager] 클라우드 동기화 실패: {e.Message}");
+        }
+    }
+
+    void PreserveDeviceSettings(SaveData target, SaveData local)
+    {
+        // 디스플레이는 기기마다 다르므로 로컬 값 유지
+        target.resolutionWidth = local.resolutionWidth;
+        target.resolutionHeight = local.resolutionHeight;
+        target.refreshRate = local.refreshRate;
+        target.fullscreenMode = local.fullscreenMode;
     }
 
     // ── 불러오기 ──
