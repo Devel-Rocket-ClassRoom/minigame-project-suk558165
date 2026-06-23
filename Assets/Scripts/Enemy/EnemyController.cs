@@ -76,6 +76,11 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Tooltip("원본 스프라이트가 왼쪽을 보고 있으면 체크")]
     public bool spriteFacesLeft = false;
 
+    [Tooltip("공격 애니메이션 프레임이 기본적으로 어느 쪽을 보는지. 일반 스프라이트와 다른 경우만 체크 해제하여 별도 설정")]
+    public bool attackSpriteFacesLeft = false;
+    [Tooltip("공격 애니메이션이 idle/walk와 다른 방향을 가지는지")]
+    public bool attackHasDifferentFacing = false;
+
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sr;
@@ -108,6 +113,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         return _cts.Token;
     }
 
+    Vector3 _hitboxBaseLocalPos;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -120,7 +127,23 @@ public class EnemyController : MonoBehaviour, IDamageable
         healthBar.Init(hpBarOffset);
 
         if (meleeHitbox != null)
+        {
             meleeHitbox.enabled = false;
+            // 프리팹에 설정된 hitbox 기본 위치(오른쪽 향한 상태) 기억
+            _hitboxBaseLocalPos = meleeHitbox.transform.localPosition;
+        }
+    }
+
+    /// <summary>플레이어 위치를 기준으로 hitbox를 좌우 미러링 (sprite 방향과 무관).</summary>
+    void UpdateHitboxFacing()
+    {
+        if (meleeHitbox == null) return;
+        // 플레이어가 오른쪽에 있으면 hitbox도 오른쪽
+        bool playerOnRight = player != null && player.position.x >= transform.position.x;
+        var lp = _hitboxBaseLocalPos;
+        meleeHitbox.transform.localPosition = new Vector3(
+            playerOnRight ? Mathf.Abs(lp.x) : -Mathf.Abs(lp.x),
+            lp.y, lp.z);
     }
 
     void OnEnable() => Instances.Add(this);
@@ -186,11 +209,14 @@ public class EnemyController : MonoBehaviour, IDamageable
             else
             {
                 Move(0f);
+                // 사정거리 안에서 멈춰있을 때도 매 프레임 플레이어 향해 회전
+                FaceForAttack();
             }
 
             if (attackTimer <= 0f && dist <= attackRange)
             {
                 attackTimer = attackCooldown;
+                FaceForAttack();
                 animator.SetTrigger(HashAttack);
                 AudioManager.Instance?.PlaySFX(attackSound);
             }
@@ -199,6 +225,14 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             Patrol();
         }
+    }
+
+    void FaceForAttack()
+    {
+        if (player == null) return;
+        bool playerOnLeft = player.position.x < transform.position.x;
+        bool facesLeftDefault = attackHasDifferentFacing ? attackSpriteFacesLeft : spriteFacesLeft;
+        sr.flipX = facesLeftDefault ? !playerOnLeft : playerOnLeft;
     }
 
     void UpdateRanged(float dist)
@@ -223,9 +257,8 @@ public class EnemyController : MonoBehaviour, IDamageable
                 Move(0f);
             }
 
-            // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
-            bool playerOnLeft = player.position.x < transform.position.x;
-            sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
+            // 멈춰있을 때 플레이어 방향으로 회전 (공격 프레임 기준)
+            FaceForAttack();
 
             if (attackTimer <= 0f && dist <= safeDistance)
             {
@@ -332,6 +365,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (meleeHitbox == null)
             return;
+        // 현재 sprite 방향에 맞춰 hitbox 좌우 위치 보정
+        UpdateHitboxFacing();
         var hitboxComp = meleeHitbox.GetComponent<MeleeHitbox>();
         if (hitboxComp != null)
             // 공격 지속 시간만큼만 활성화 → 이벤트 누락돼도 자동 비활성화

@@ -276,7 +276,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2.5, y: 2.5}
+    oldSize: {x: 2.56, y: 2.56}
     newSize: {x: 2.56, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -314,6 +314,8 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   projectileSpeed: 8
   safeDistance: 3
+  rangedCooldownMultiplier: 1.8
+  rangedYThreshold: 0.8
   projectileSpinSpeed: 0
   hpBarOffset: {x: 0, y: -0.6, z: 0}
   knockbackForce: 6
@@ -331,4 +333,7 @@ MonoBehaviour:
   platformLayer:
     serializedVersion: 2
     m_Bits: 512
+  spriteFacesLeft: 1
+  attackSpriteFacesLeft: 0
+  attackHasDifferentFacing: 1
   attackDamageDelay: 0.4

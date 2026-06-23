@@ -72,7 +72,37 @@ public class Inventory : MonoBehaviour
         Instance = this;
         if (weaponInventory == null)
             weaponInventory = GetComponent<WeaponInventory>();
+        // 새 플레이어 인스턴스가 SaveData의 현재 gold를 즉시 반영하도록 (NewGame 후 잔여 표시 방지)
+        LoadGold();
     }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    void Update()
+    {
+        // 디버그: F2 = 골드 10,000 지급 (도전과제 테스트용)
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            AddGold(10000);
+            AchievementManager.Instance?.Evaluate();
+            Debug.Log("[Debug] F2: +10,000 gold + Evaluate");
+        }
+
+        // F3 = 게임 클리어 강제 호출 (보스까지 가지 않고 테스트)
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            GameClearUI.Instance?.Show();
+            Debug.Log("[Debug] F3: Force GameClear");
+        }
+
+        // F4 = 게임 오버 강제 호출 (플레이어 즉시 사망)
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            var ph = PlayerRef.Health;
+            if (ph != null) ph.TakeDamage(99999f, Vector2.zero);
+            Debug.Log("[Debug] F4: Force GameOver");
+        }
+    }
+#endif
 
     void OnDestroy()
     {
@@ -259,15 +289,17 @@ public class Inventory : MonoBehaviour
         foreach (var a in accessories)
             d.equippedAccessories.Add(a != null ? a.id : "");
 
-        d.backpackWeapons.Clear();
-        d.backpackAccessories.Clear();
+        // 순서 보존: "w:id" / "a:id" 접두사로 타입+id 함께 저장
+        d.backpackItems.Clear();
         foreach (var item in backpack)
         {
-            if (item is WeaponData w)
-                d.backpackWeapons.Add(w.id);
-            else if (item is AccessoryData a)
-                d.backpackAccessories.Add(a.id);
+            if (item is WeaponData w) d.backpackItems.Add("w:" + w.id);
+            else if (item is AccessoryData a) d.backpackItems.Add("a:" + a.id);
         }
+        // 구버전 필드는 비워둠 (마이그레이션 후 더 이상 사용 X)
+        d.backpackWeapons.Clear();
+        d.backpackAccessories.Clear();
+
         SaveManager.Instance.Save();
     }
 
@@ -282,15 +314,38 @@ public class Inventory : MonoBehaviour
             accessories.Add(string.IsNullOrEmpty(id) ? null : db.FindAccessory(id));
 
         backpack.Clear();
-        foreach (var id in d.backpackWeapons)
+        if (d.backpackItems != null && d.backpackItems.Count > 0)
         {
-            var w = db.FindWeapon(id);
-            if (w != null) backpack.Add(w);
+            // 신규 형식 (순서 보존)
+            foreach (var entry in d.backpackItems)
+            {
+                if (string.IsNullOrEmpty(entry) || entry.Length < 3) continue;
+                string id = entry.Substring(2);
+                if (entry.StartsWith("w:"))
+                {
+                    var w = db.FindWeapon(id);
+                    if (w != null) backpack.Add(w);
+                }
+                else if (entry.StartsWith("a:"))
+                {
+                    var a = db.FindAccessory(id);
+                    if (a != null) backpack.Add(a);
+                }
+            }
         }
-        foreach (var id in d.backpackAccessories)
+        else
         {
-            var a = db.FindAccessory(id);
-            if (a != null) backpack.Add(a);
+            // 구버전 호환: backpackWeapons/Accessories 따로 로드
+            foreach (var id in d.backpackWeapons)
+            {
+                var w = db.FindWeapon(id);
+                if (w != null) backpack.Add(w);
+            }
+            foreach (var id in d.backpackAccessories)
+            {
+                var a = db.FindAccessory(id);
+                if (a != null) backpack.Add(a);
+            }
         }
         OnInventoryChanged?.Invoke();
     }

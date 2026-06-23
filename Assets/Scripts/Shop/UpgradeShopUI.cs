@@ -122,6 +122,17 @@ public class UpgradeShopUI : MonoBehaviour
 
         AudioManager.Instance?.PlaySFX(buySound);
 
+        // 최대 체력 강화 시 현재 체력도 새 최대치만큼 회복
+        if (type == MetaUpgradeType.MaxHp)
+        {
+            var ph = PlayerRef.Health;
+            if (ph != null)
+            {
+                // 인벤토리 이벤트로 EffectiveMaxHp 재계산이 일어나도록 트리거
+                ph.Heal(float.MaxValue); // EffectiveMaxHp로 clamp됨
+            }
+        }
+
         if (goldText != null)
             goldText.text = L10n.Format("ui.shop.gold", "골드: {0}", inventory.Gold);
 

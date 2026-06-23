@@ -120,6 +120,23 @@ public class ShopUI : MonoBehaviour
         }
     }
 
+    void RecordPurchase(ScriptableObject item)
+    {
+        if (SaveManager.Instance == null) return;
+        string id = null;
+        if (item is WeaponData w) id = w.id;
+        else if (item is AccessoryData a) id = a.id;
+        if (string.IsNullOrEmpty(id)) return;
+
+        var list = SaveManager.Instance.Data.purchasedItemIds;
+        if (!list.Contains(id))
+        {
+            list.Add(id);
+            SaveManager.Instance.Save();
+            AchievementManager.Instance?.Evaluate();
+        }
+    }
+
     public bool TryBuy(ScriptableObject item, int price)
     {
         if (inventory == null || inventory.Gold < price)
@@ -140,6 +157,7 @@ public class ShopUI : MonoBehaviour
         if (goldText != null)
             goldText.text = L10n.Format("ui.shop.gold", "골드: {0}", inventory.Gold);
 
+        RecordPurchase(item);
         OnItemSold?.Invoke(item);
         return true;
     }

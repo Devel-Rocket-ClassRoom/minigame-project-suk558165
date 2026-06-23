@@ -18,10 +18,11 @@ public class SaveData
     // 장착 악세서리 (id로 저장, 빈 슬롯은 "")
     public List<string> equippedAccessories = new List<string>();
 
-    // 가방 무기 (id로 저장)
-    public List<string> backpackWeapons = new List<string>();
+    // 가방 아이템 (순서 보존, "w:id" 또는 "a:id" 형식)
+    public List<string> backpackItems = new List<string>();
 
-    // 가방 악세서리 (id로 저장)
+    // (구버전 호환) 무기와 악세서리를 따로 저장하던 필드
+    public List<string> backpackWeapons = new List<string>();
     public List<string> backpackAccessories = new List<string>();
 
     // 마을 영구 강화 레벨 (인덱스 = MetaUpgradeType)
@@ -29,6 +30,14 @@ public class SaveData
 
     // 베스트 런 기록
     public BestRunData bestRun = new BestRunData();
+
+    public TotelData totelData = new TotelData();
+
+    // 달성한 도전과제 id 목록
+    public List<string> unlockedAchievements = new List<string>();
+
+    // 한 번이라도 구매한 아이템 id 목록 (도전과제용)
+    public List<string> purchasedItemIds = new List<string>();
 
     // 오디오 설정
     public float volumeMaster = 1f;
@@ -77,4 +86,30 @@ public class BestRunData
     public int bestGoldEarned;
     public float bestPlayTime;
     public float bestDamageDealt;
+}
+
+[Serializable]
+public class TotelData
+{
+    public int totalKills;
+
+    public int totalDeaths;
+
+    public int totalRuns;
+
+    public float totalPlaytime;
+
+    // 사람이 읽기 쉬운 형식 "HH:MM:SS" — DB/세이브에 함께 저장 (totalPlaytime 값으로부터 매번 갱신)
+    public string totalPlaytimeFormatted = "00:00:00";
+
+    public long totalGoldGet;
+
+    public int totalbossKliis;
+
+    /// <summary>totalPlaytime(초)을 HH:MM:SS 문자열로 변환해 totalPlaytimeFormatted에 동기화.</summary>
+    public void UpdatePlaytimeFormatted()
+    {
+        int sec = (int)totalPlaytime; // 음수 안 나오므로 truncate로 충분
+        totalPlaytimeFormatted = $"{sec / 3600:D2}:{(sec % 3600) / 60:D2}:{sec % 60:D2}";
+    }
 }

@@ -445,7 +445,7 @@ public partial class BossController : MonoBehaviour, IDamageable
             col.enabled = false;
         onDeath?.Invoke();
         onDeath = null;
-        RunStats.Instance?.AddKill();
+        RunStats.Instance?.AddBossKill();
         SpawnDrops();
         DeathRoutine(token).Forget();
     }

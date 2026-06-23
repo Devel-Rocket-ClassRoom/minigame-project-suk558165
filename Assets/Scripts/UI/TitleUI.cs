@@ -76,7 +76,8 @@ public class TitleUI : MonoBehaviour
         if (GameFlowController.Instance == null)
             return;
 
-        if (GameFlowController.Instance.HasSaveData() && newGameConfirmPanel != null)
+        // 확인 패널이 연결돼 있으면 세이브 유무와 무관하게 항상 표시
+        if (newGameConfirmPanel != null)
         {
             newGameConfirmPanel.SetActive(true);
             return;

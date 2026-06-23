@@ -71,6 +71,8 @@ public class GameClearUI : MonoBehaviour
         if (triggered)
             return;
         triggered = true;
+        if (RunStats.Instance != null && RunStats.Instance.DamageTaken <= 0f)
+            AchievementManager.Instance?.UnlockManually("no_hit_clear");
         RunStats.Instance?.StopTimer();
         Time.timeScale = 0f;
 
@@ -91,8 +93,8 @@ public class GameClearUI : MonoBehaviour
         BossHealthBarUI.Instance?.Hide();
         WeaponSlotUI.Instance?.SetActive(false);
         MinimapController.Instance?.Hide();
+        ScreenHitEffect.Instance?.Clear();
 
-        SetupBackground();
         PopulateStats();
 
         float elapsed = 0f;
@@ -120,63 +122,6 @@ public class GameClearUI : MonoBehaviour
                 "[ {0} ] 마을로 돌아가기",
                 returnKey
             );
-    }
-
-    void SetupBackground()
-    {
-        if (backgroundSprite == null)
-            return;
-
-        foreach (var img in GetComponentsInChildren<Image>(true))
-        {
-            if (img.gameObject != gameObject && img.gameObject.name != "BG" && img.gameObject.name != "Dim")
-            {
-                var c = img.color;
-                img.color = new Color(c.r, c.g, c.b, 0f);
-            }
-        }
-
-        if (transform.Find("Dim") == null)
-        {
-            var dimGo = new GameObject("Dim", typeof(RectTransform));
-            dimGo.transform.SetParent(transform, false);
-            dimGo.transform.SetAsFirstSibling();
-            var dimRt = dimGo.GetComponent<RectTransform>();
-            dimRt.anchorMin = new Vector2(-1f, -1f);
-            dimRt.anchorMax = new Vector2(2f, 2f);
-            dimRt.offsetMin = Vector2.zero;
-            dimRt.offsetMax = Vector2.zero;
-            var dimImg = dimGo.AddComponent<Image>();
-            dimImg.color = new Color(0f, 0f, 0f, 0.7f);
-            dimImg.raycastTarget = false;
-        }
-
-        var bgTransform = transform.Find("BG");
-        Image bgImage;
-
-        if (bgTransform != null)
-        {
-            bgImage = bgTransform.GetComponent<Image>();
-        }
-        else
-        {
-            var bgGo = new GameObject("BG", typeof(RectTransform));
-            bgGo.transform.SetParent(transform, false);
-            bgGo.transform.SetSiblingIndex(1);
-
-            var rt = bgGo.GetComponent<RectTransform>();
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            bgImage = bgGo.AddComponent<Image>();
-            bgImage.raycastTarget = false;
-        }
-
-        bgImage.sprite = backgroundSprite;
-        bgImage.preserveAspect = true;
-        bgImage.color = Color.white;
     }
 
     void Update()

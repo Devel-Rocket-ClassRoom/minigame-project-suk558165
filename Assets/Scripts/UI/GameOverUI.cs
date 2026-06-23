@@ -97,8 +97,8 @@ public class GameOverUI : MonoBehaviour
         BossHealthBarUI.Instance?.Hide();
         WeaponSlotUI.Instance?.SetActive(false);
         MinimapController.Instance?.Hide();
+        ScreenHitEffect.Instance?.Clear();
 
-        SetupBackground();
         PopulateStats();
 
         float elapsed = 0f;
@@ -126,66 +126,6 @@ public class GameOverUI : MonoBehaviour
             );
 
         canReturn = true;
-    }
-
-    void SetupBackground()
-    {
-        if (backgroundSprite == null)
-            return;
-
-        // 기존 자식 Image들의 배경색 제거 (아이콘 이미지는 유지)
-        foreach (var img in GetComponentsInChildren<Image>(true))
-        {
-            if (img.gameObject != gameObject && img.gameObject.name != "BG" && img.gameObject.name != "Dim")
-            {
-                var c = img.color;
-                img.color = new Color(c.r, c.g, c.b, 0f);
-            }
-        }
-
-        // 화면 전체 어두운 딤
-        if (transform.Find("Dim") == null)
-        {
-            var dimGo = new GameObject("Dim", typeof(RectTransform));
-            dimGo.transform.SetParent(transform, false);
-            dimGo.transform.SetAsFirstSibling();
-            var dimRt = dimGo.GetComponent<RectTransform>();
-            dimRt.anchorMin = new Vector2(-1f, -1f);
-            dimRt.anchorMax = new Vector2(2f, 2f);
-            dimRt.offsetMin = Vector2.zero;
-            dimRt.offsetMax = Vector2.zero;
-            var dimImg = dimGo.AddComponent<Image>();
-            dimImg.color = new Color(0f, 0f, 0f, 0.7f);
-            dimImg.raycastTarget = false;
-        }
-
-        // 책 페이지 배경
-        var bgTransform = transform.Find("BG");
-        Image bgImage;
-
-        if (bgTransform != null)
-        {
-            bgImage = bgTransform.GetComponent<Image>();
-        }
-        else
-        {
-            var bgGo = new GameObject("BG", typeof(RectTransform));
-            bgGo.transform.SetParent(transform, false);
-            bgGo.transform.SetSiblingIndex(1);
-
-            var rt = bgGo.GetComponent<RectTransform>();
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            bgImage = bgGo.AddComponent<Image>();
-            bgImage.raycastTarget = false;
-        }
-
-        bgImage.sprite = backgroundSprite;
-        bgImage.preserveAspect = true;
-        bgImage.color = Color.white;
     }
 
     void PopulateStats()

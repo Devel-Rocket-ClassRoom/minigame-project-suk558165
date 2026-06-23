@@ -13,6 +13,9 @@ public class NpcController : MonoBehaviour
     [Header("강화창 (설정 시 대화 대신 강화창을 연다)")]
     public UpgradeShopUI upgradeShopUI;
 
+    [Header("도전과제 목록 (설정 시 대화 대신 도전과제창을 연다)")]
+    public AchievementListUI achievementListUI;
+
     [Header("상호작용 범위")]
     public float interactRange = 2f;
 
@@ -71,6 +74,28 @@ public class NpcController : MonoBehaviour
             return;
         }
 
+        // 도전과제 NPC: 대화 대신 도전과제 목록을 토글한다.
+        if (achievementListUI != null)
+        {
+            if (hintObject != null)
+                hintObject.SetActive(inRange && !AchievementListUI.IsOpen);
+
+            if (!inRange) return;
+
+            var key = InputManager.Instance?.Interact ?? KeyCode.A;
+            if (Input.GetKeyDown(key))
+            {
+                if (AchievementListUI.IsOpen)
+                    achievementListUI.Close();
+                else
+                {
+                    EnsureAchievementListInstance();
+                    achievementListUI.Open();
+                }
+            }
+            return;
+        }
+
         if (hintObject != null)
             hintObject.SetActive(inRange && !DialogueUI.IsOpen);
 
@@ -92,6 +117,15 @@ public class NpcController : MonoBehaviour
 
         upgradeShopUI = Instantiate(upgradeShopUI);
         upgradeShopUI.gameObject.name = "UpgradePanel";
+    }
+
+    void EnsureAchievementListInstance()
+    {
+        if (achievementListUI == null || achievementListUI.gameObject.scene.IsValid())
+            return;
+
+        achievementListUI = Instantiate(achievementListUI);
+        achievementListUI.gameObject.name = "AchievementListPanel";
     }
 
     void StartTalk()

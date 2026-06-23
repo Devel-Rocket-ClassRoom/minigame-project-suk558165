@@ -257,10 +257,21 @@ public class GameFlowController : MonoBehaviour
 
     public bool HasSaveData()
     {
-        return SaveManager.Instance != null
-            && System.IO.File.Exists(
-                System.IO.Path.Combine(UnityEngine.Application.persistentDataPath, "save.dat")
-            );
+        if (SaveManager.Instance == null) return false;
+
+        // 로컬 파일 존재 OR 메모리상 진행도가 있으면 세이브 있음으로 판정
+        string path = System.IO.Path.Combine(UnityEngine.Application.persistentDataPath, "save.dat");
+        if (System.IO.File.Exists(path)) return true;
+
+        var d = SaveManager.Instance.Data;
+        if (d == null) return false;
+        // 새로 시작한 계정과 진행 중인 계정을 구분하는 지표들
+        return d.gold > 0
+            || d.totelData.totalRuns > 0
+            || d.tutorialCompleted
+            || d.lastLocation == "Dungeon"
+            || d.equippedWeapons.Count > 0
+            || d.backpackItems.Count > 0;
     }
 
     void DestroyTitle()

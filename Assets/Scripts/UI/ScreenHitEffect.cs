@@ -78,11 +78,22 @@ public class ScreenHitEffect : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
-            elapsed += Time.deltaTime;
+            // Time.timeScale=0(게임오버 등)에서도 페이드아웃 진행되도록 unscaled 사용
+            elapsed += Time.unscaledDeltaTime;
             float a = Mathf.Lerp(flashAlpha, 0f, elapsed / fadeDuration);
             overlay.color = new Color(1f, 0f, 0f, a);
             await UniTask.Yield(token);
         }
         overlay.color = new Color(1f, 0f, 0f, 0f);
+    }
+
+    /// <summary>오버레이 즉시 초기화. 게임오버/씬 전환 시 호출.</summary>
+    public void Clear()
+    {
+        _flashCts?.Cancel();
+        _flashCts?.Dispose();
+        _flashCts = null;
+        if (overlay != null)
+            overlay.color = new Color(1f, 0f, 0f, 0f);
     }
 }

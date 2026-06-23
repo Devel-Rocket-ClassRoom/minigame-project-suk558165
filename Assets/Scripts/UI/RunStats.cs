@@ -44,11 +44,23 @@ public class RunStats : MonoBehaviour
         DamageTaken = 0f;
         ItemsGained = 0;
         running = true;
+
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.Data.totelData.totalRuns++;
+            SaveManager.Instance.Save();
+        }
     }
 
     public void StopTimer()
     {
         running = false;
+        if (SaveManager.Instance != null)
+        {
+            var t = SaveManager.Instance.Data.totelData;
+            t.totalPlaytime += PlayTime;
+            t.UpdatePlaytimeFormatted();
+        }
         SaveBestRun();
     }
 
@@ -81,15 +93,41 @@ public class RunStats : MonoBehaviour
             changed = true;
         }
 
-        if (changed)
-            SaveManager.Instance.Save();
+        // 누적 통계는 StopTimer 시점에 무조건 저장
+        SaveManager.Instance.Save();
+
+        // 도전과제 평가
+        AchievementManager.Instance?.Evaluate();
     }
 
-    public void AddKill() => Kills++;
+    public void AddKill()
+    {
+        Kills++;
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.Data.totelData.totalKills++;
+    }
 
-    public void AddDeath() => Deaths++;
+    public void AddBossKill()
+    {
+        AddKill();
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.Data.totelData.totalbossKliis++;
+    }
 
-    public void AddGold(int amount) => GoldEarned += Mathf.Max(0, amount);
+    public void AddDeath()
+    {
+        Deaths++;
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.Data.totelData.totalDeaths++;
+    }
+
+    public void AddGold(int amount)
+    {
+        int a = Mathf.Max(0, amount);
+        GoldEarned += a;
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.Data.totelData.totalGoldGet += a;
+    }
 
     public void AddDamageDealt(float d) => DamageDealt += Mathf.Max(0f, d);
 

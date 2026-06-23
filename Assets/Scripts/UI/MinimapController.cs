@@ -66,7 +66,12 @@ public class MinimapController : MonoBehaviour
         minimapCamera.clearFlags = CameraClearFlags.SolidColor;
         minimapCamera.backgroundColor = new Color(0.1f, 0.1f, 0.15f, 1f);
         minimapCamera.depth = -10;
-        minimapCamera.cullingMask = ~(1 << 5);
+        // UI 레이어(5)는 제외하지만 MinimapMarker 레이어는 포함
+        int minimapMarkerLayer = LayerMask.NameToLayer("MinimapMarker");
+        int mask = ~(1 << 5);
+        if (minimapMarkerLayer >= 0)
+            mask |= (1 << minimapMarkerLayer);
+        minimapCamera.cullingMask = mask;
 
         renderTexture = new RenderTexture(textureWidth, textureHeight, 0);
         minimapCamera.targetTexture = renderTexture;

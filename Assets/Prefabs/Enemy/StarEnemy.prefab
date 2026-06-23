@@ -241,6 +241,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   spriteFacesLeft: 1
+  attackSpriteFacesLeft: 0
+  attackHasDifferentFacing: 1
   attackDamageDelay: 0.65
 --- !u!1 &8995280196249140786
 GameObject:
