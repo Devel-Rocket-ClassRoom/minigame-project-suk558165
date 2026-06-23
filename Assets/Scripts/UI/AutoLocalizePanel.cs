@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -26,7 +26,7 @@ public class AutoLocalizePanel : MonoBehaviour
     void OnEnable()
     {
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
-        StartCoroutine(InitAndRefresh());
+        InitAndRefresh().Forget();
     }
 
     void OnDisable()
@@ -34,18 +34,22 @@ public class AutoLocalizePanel : MonoBehaviour
         LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
     }
 
-    IEnumerator InitAndRefresh()
+    async UniTaskVoid InitAndRefresh()
     {
-        yield return LocalizationSettings.InitializationOperation;
+        await LocalizationSettings.InitializationOperation;
         if (!_initialized)
         {
             Bind();
             _initialized = true;
         }
-        Refresh();
+        // SelectedLocaleChanged 콜백 안에서 InitializationOperation이 이미 완료된 경우
+        // continuation이 동기 실행되어 ResourceManager.Update에 재진입하게 된다.
+        // 한 프레임 양보해서 콜백 밖으로 빠진 뒤 비동기 테이블 로드로 갱신.
+        await UniTask.Yield();
+        await RefreshAsync();
     }
 
-    void OnLocaleChanged(Locale _) => StartCoroutine(InitAndRefresh());
+    void OnLocaleChanged(Locale _) => InitAndRefresh().Forget();
 
     void Bind()
     {
@@ -65,9 +69,10 @@ public class AutoLocalizePanel : MonoBehaviour
         }
     }
 
-    void Refresh()
+    async UniTask RefreshAsync()
     {
-        var table = LocalizationSettings.StringDatabase?.GetTable(tableName);
+        var tableOp = LocalizationSettings.StringDatabase.GetTableAsync(tableName);
+        var table = await tableOp;
         if (table == null)
             return;
 

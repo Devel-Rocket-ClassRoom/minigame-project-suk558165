@@ -6,16 +6,22 @@ public class GoldDisplay : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI goldText;
 
-    private Inventory inventory;
-
-    void Update()
+    void OnEnable()
     {
-        if (inventory == null)
-            inventory = Inventory.Instance;
+        Inventory.OnGoldChanged += UpdateGold;
+        // 이미 인벤토리가 존재하면 현재 골드로 즉시 1회 갱신.
+        if (Inventory.Instance != null)
+            UpdateGold(Inventory.Instance.Gold);
+    }
 
-        if (inventory == null || goldText == null)
-            return;
+    void OnDisable()
+    {
+        Inventory.OnGoldChanged -= UpdateGold;
+    }
 
-        goldText.text = inventory.Gold.ToString();
+    void UpdateGold(int gold)
+    {
+        if (goldText != null)
+            goldText.text = gold.ToString();
     }
 }

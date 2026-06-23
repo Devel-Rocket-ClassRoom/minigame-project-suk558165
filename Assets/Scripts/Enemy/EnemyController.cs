@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -31,6 +32,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public GameObject projectilePrefab;
     public Transform firePoint;
     public float projectileSpeed = 8f;
+    private ObjectPool<Projectile> projPool;
     public float safeDistance = 3f;
 
     [Tooltip("원거리 적의 공격 쿨다운에 곱해지는 배수 — 회피 시간 확보용")]
@@ -91,10 +93,20 @@ public class EnemyController : MonoBehaviour, IDamageable
     private Vector2 patrolOrigin;
     private int patrolDir = 1;
 
+    private CancellationTokenSource _cts = new();
+
     private static readonly int HashSpeed = Animator.StringToHash("Speed");
     private static readonly int HashAttack = Animator.StringToHash("Attack");
     private static readonly int HashIsDead = Animator.StringToHash("IsDead");
     private static readonly int HashIsHit = Animator.StringToHash("IsHit");
+
+    CancellationToken RefreshToken()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts.Token;
+    }
 
     void Awake()
     {
@@ -114,6 +126,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     void OnEnable() => Instances.Add(this);
 
     void OnDisable() => Instances.Remove(this);
+
+    void OnDestroy()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 
     void Start()
     {
@@ -193,13 +211,15 @@ public class EnemyController : MonoBehaviour, IDamageable
         bool sameLine = Mathf.Abs(player.position.y - transform.position.y) <= rangedYThreshold;
         if (dist <= detectionRange && sameLine)
         {
-            if (dist < safeDistance)
+            if (dist > safeDistance)
             {
-                float dir = transform.position.x > player.position.x ? 1f : -1f;
+                // 사정거리 밖 — 플레이어에게 접근
+                float dir = player.position.x > transform.position.x ? 1f : -1f;
                 Move(IsEdgeAhead(dir) ? 0f : dir);
             }
             else
             {
+                // 사정거리 안 — 멈춰서 사격
                 Move(0f);
             }
 
@@ -207,12 +227,12 @@ public class EnemyController : MonoBehaviour, IDamageable
             bool playerOnLeft = player.position.x < transform.position.x;
             sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
 
-            if (attackTimer <= 0f)
+            if (attackTimer <= 0f && dist <= safeDistance)
             {
                 attackTimer = attackCooldown * Mathf.Max(1f, rangedCooldownMultiplier);
                 animator.SetTrigger(HashAttack);
                 AudioManager.Instance?.PlaySFX(attackSound);
-                StartCoroutine(ShootAfterDelay(attackDamageDelay));
+                ShootAfterDelay(attackDamageDelay, _cts.Token).Forget();
             }
         }
         else
@@ -237,10 +257,11 @@ public class EnemyController : MonoBehaviour, IDamageable
             dir = facingLeft ? Vector2.left : Vector2.right;
         }
 
-        var proj = Instantiate(projectilePrefab, origin, Quaternion.identity);
-        var projComp = proj.GetComponent<Projectile>();
-        if (projComp != null)
-            projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
+        if (projPool == null)
+            projPool = new ObjectPool<Projectile>(projectilePrefab.GetComponent<Projectile>());
+        var projComp = projPool.Get(origin, Quaternion.identity);
+        projComp.Pool = projPool;
+        projComp.Init(dir, projectileSpeed, damage, gameObject, spinSpeed: projectileSpinSpeed);
     }
 
     void Patrol()
@@ -330,9 +351,9 @@ public class EnemyController : MonoBehaviour, IDamageable
             meleeHitbox.enabled = false;
     }
 
-    IEnumerator ShootAfterDelay(float delay)
+    async UniTaskVoid ShootAfterDelay(float delay, CancellationToken token)
     {
-        yield return new WaitForSeconds(delay);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(delay), cancellationToken: token);
         if (!isDead)
             ShootProjectile();
     }
@@ -351,7 +372,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         hp -= amount;
         healthBar?.SetHealth(hp, maxHp);
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, amount);
-        StartCoroutine(HitFlash());
+        HitFlash(_cts.Token).Forget();
 
         if (hp <= 0f)
         {
@@ -367,17 +388,17 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.SetTrigger(HashIsHit);
 
         if (player != null)
-            StartCoroutine(Knockback((transform.position - player.position).normalized));
+            Knockback((transform.position - player.position).normalized, _cts.Token).Forget();
     }
 
-    IEnumerator HitFlash()
+    async UniTask HitFlash(CancellationToken token)
     {
         sr.color = Color.red;
-        yield return new WaitForSeconds(0.15f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f), cancellationToken: token);
         sr.color = Color.white;
     }
 
-    IEnumerator Knockback(Vector2 dir)
+    async UniTaskVoid Knockback(Vector2 dir, CancellationToken token)
     {
         float elapsed = 0f;
         rb.bodyType = RigidbodyType2D.Dynamic;
@@ -385,7 +406,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             rb.linearVelocity = new Vector2(dir.x * knockbackForce, rb.linearVelocity.y);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
@@ -397,7 +418,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         isDead = true;
         AudioManager.Instance?.PlaySFX(deathSound);
         healthBar?.SetHealth(0, maxHp);
-        StopAllCoroutines();
+        var token = RefreshToken();
         sr.color = Color.white;
         var hitbox = meleeHitbox != null ? meleeHitbox.GetComponent<MeleeHitbox>() : null;
         if (hitbox != null)
@@ -415,14 +436,14 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.ResetTrigger(HashIsHit);
         animator.ResetTrigger(HashAttack);
         animator.SetBool(HashIsDead, true);
-        StartCoroutine(DeathRoutine());
+        DeathRoutine(token).Forget();
     }
 
     void SpawnDrops()
     {
         EnemyUtils.SpawnGoldDrops(goldDropPrefab, transform.position, groundLayer, 1, goldDropMin, goldDropMax, 50f, 130f);
 
-        if (potionDropPrefab != null && Random.value < potionDropChance)
+        if (potionDropPrefab != null && Random.value < potionDropChance + MetaUpgrades.PotionDropBonus)
         {
             float floorY = EnemyUtils.FindFloorY(transform.position, groundLayer);
             Vector3 pos = transform.position + Vector3.up * 0.3f;
@@ -438,13 +459,13 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
     }
 
-    IEnumerator DeathRoutine()
+    async UniTaskVoid DeathRoutine(CancellationToken token)
     {
-        yield return null;
-        yield return null;
+        await UniTask.Yield(token);
+        await UniTask.Yield(token);
 
         while (animator.IsInTransition(0))
-            yield return null;
+            await UniTask.Yield(token);
 
         float elapsed = 0f;
         while (elapsed < 5f)
@@ -453,7 +474,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             if (info.IsName("Death") && info.normalizedTime >= 1f)
                 break;
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield(token);
         }
 
         Destroy(gameObject);

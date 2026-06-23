@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -159,12 +159,12 @@ public class CameraFollow : MonoBehaviour
     }
 
     /// <summary>OrthographicSize를 from에서 to까지 duration 동안 보간.</summary>
-    public IEnumerator LerpOrthographicSize(float from, float to, float duration)
+    public async UniTask LerpOrthographicSize(float from, float to, float duration)
     {
         if (_cam == null)
         {
             OrthographicSize = to;
-            yield break;
+            return;
         }
 
         float elapsed = 0f;
@@ -173,7 +173,7 @@ public class CameraFollow : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
             OrthographicSize = Mathf.Lerp(from, to, t);
-            yield return null;
+            await UniTask.Yield();
         }
         OrthographicSize = to;
     }

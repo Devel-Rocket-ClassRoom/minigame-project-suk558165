@@ -6,7 +6,10 @@ public class Projectile : MonoBehaviour
     public float lifetime = 5f;
     [Tooltip("원본 스프라이트가 향하는 각도 (오른쪽=0, 왼쪽=180)")]
     public float spriteAngleOffset;
+    
+    public ObjectPool<Projectile> Pool;
 
+    private bool released;
     private float damage;
     private float knockbackForce;
     private GameObject shooter;
@@ -14,6 +17,8 @@ public class Projectile : MonoBehaviour
     private bool ready;
     private int pierceRemaining;
     private float spinSpeed;
+    private Transform homingTarget;
+    private float homingTurnSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
     private Rigidbody2D rb;
 
@@ -41,22 +46,49 @@ public class Projectile : MonoBehaviour
     )
     {
         this.damage = damage;
+        released = false;
+        ready = false;
+        hitIds.Clear();
+        CancelInvoke();
         this.knockbackForce = knockbackForce;
         this.shooter = shooter;
         this.lifesteal = lifesteal;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
+        this.homingTarget = null;
+        this.homingTurnSpeed = 0f;
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
         Invoke(nameof(Activate), 0.05f);
-        Destroy(gameObject, lifetime);
+        Invoke(nameof(ReleaseSelf), lifetime);
+    }
+
+    public void SetHoming(Transform target, float turnSpeed)
+    {
+        homingTarget = target;
+        homingTurnSpeed = turnSpeed;
     }
 
     void Update()
     {
         if (spinSpeed != 0f)
             transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime);
+
+        if (homingTarget != null && rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            Vector2 toTarget = ((Vector2)homingTarget.position - rb.position).normalized;
+            Vector2 cur = rb.linearVelocity.normalized;
+            Vector2 newDir = Vector2.Lerp(cur, toTarget, homingTurnSpeed * Time.deltaTime).normalized;
+            rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+
+            // 호밍으로 진행 방향이 바뀌므로 스프라이트도 따라 회전 (spinSpeed 사용 시 제외).
+            if (spinSpeed == 0f)
+            {
+                float angle = Mathf.Atan2(newDir.y, newDir.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
+            }
+        }
     }
 
     void Activate() => ready = true;
@@ -111,9 +143,22 @@ public class Projectile : MonoBehaviour
             }
 
             if (pierceRemaining <= 0)
-                Destroy(gameObject);
+                ReleaseSelf();
             else
                 pierceRemaining--;
         }
+    }
+
+    void ReleaseSelf()
+    {
+        if (released)
+            return;
+
+        released = true;
+        CancelInvoke();
+        if (Pool != null)
+            Pool.Release(this);
+        else
+            Destroy(gameObject);
     }
 }

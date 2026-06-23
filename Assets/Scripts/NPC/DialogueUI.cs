@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,7 +47,7 @@ public class DialogueUI : MonoBehaviour
 
     private DialogueLine[] lines;
     private int currentIndex;
-    private Coroutine typingCoroutine;
+    private CancellationTokenSource _typingCts;
     private bool isTyping;
     private System.Action onFinished;
 
@@ -84,7 +85,9 @@ public class DialogueUI : MonoBehaviour
     /// <summary>대화를 강제로 닫습니다.</summary>
     public void Close()
     {
-        StopAllCoroutines();
+        _typingCts?.Cancel();
+        _typingCts?.Dispose();
+        _typingCts = null;
         isTyping = false;
         IsOpen = false;
         SetPanelVisible(false);
@@ -135,12 +138,13 @@ public class DialogueUI : MonoBehaviour
         }
 
         // 타이핑 효과
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-        typingCoroutine = StartCoroutine(TypeText(line.text));
+        _typingCts?.Cancel();
+        _typingCts?.Dispose();
+        _typingCts = new CancellationTokenSource();
+        TypeText(line.text, _typingCts.Token).Forget();
     }
 
-    IEnumerator TypeText(string fullText)
+    async UniTaskVoid TypeText(string fullText, CancellationToken token)
     {
         isTyping = true;
         if (continueHint != null)
@@ -152,7 +156,7 @@ public class DialogueUI : MonoBehaviour
         {
             if (dialogueText != null)
                 dialogueText.text += c;
-            yield return new WaitForSeconds(charDelay);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(charDelay), cancellationToken: token);
         }
 
         isTyping = false;
@@ -162,7 +166,9 @@ public class DialogueUI : MonoBehaviour
 
     void SkipTyping()
     {
-        StopCoroutine(typingCoroutine);
+        _typingCts?.Cancel();
+        _typingCts?.Dispose();
+        _typingCts = null;
         isTyping = false;
         if (dialogueText != null)
             dialogueText.text = lines[currentIndex].text;

@@ -10,6 +10,9 @@ public class NpcController : MonoBehaviour
     [Header("대화 데이터")]
     public DialogueData dialogueData;
 
+    [Header("강화창 (설정 시 대화 대신 강화창을 연다)")]
+    public UpgradeShopUI upgradeShopUI;
+
     [Header("상호작용 범위")]
     public float interactRange = 2f;
 
@@ -45,6 +48,29 @@ public class NpcController : MonoBehaviour
         float dist = Vector2.Distance(transform.position, player.position);
         bool inRange = dist <= interactRange;
 
+        // 강화 NPC: 대화 대신 강화창을 토글한다.
+        if (upgradeShopUI != null)
+        {
+            if (hintObject != null)
+                hintObject.SetActive(inRange && !UpgradeShopUI.IsOpen);
+
+            if (!inRange)
+                return;
+
+            var key = InputManager.Instance?.Interact ?? KeyCode.A;
+            if (Input.GetKeyDown(key))
+            {
+                if (UpgradeShopUI.IsOpen)
+                    upgradeShopUI.Close();
+                else
+                {
+                    EnsureUpgradeShopInstance();
+                    upgradeShopUI.Open();
+                }
+            }
+            return;
+        }
+
         if (hintObject != null)
             hintObject.SetActive(inRange && !DialogueUI.IsOpen);
 
@@ -54,6 +80,18 @@ public class NpcController : MonoBehaviour
         var interactKey = InputManager.Instance?.Interact ?? KeyCode.A;
         if (Input.GetKeyDown(interactKey))
             StartTalk();
+    }
+
+    // upgradeShopUI 필드가 씬 인스턴스가 아닌 프리팹 에셋을 가리키는 경우 첫 사용 시 인스턴스화한다.
+    // UpgradePanel 프리팹은 자체 Canvas/CanvasScaler/GraphicRaycaster를 갖는 루트 캔버스 구조이므로
+    // 다른 캔버스의 자식으로 넣지 말고 씬 루트에 직접 인스턴스화한다.
+    void EnsureUpgradeShopInstance()
+    {
+        if (upgradeShopUI == null || upgradeShopUI.gameObject.scene.IsValid())
+            return;
+
+        upgradeShopUI = Instantiate(upgradeShopUI);
+        upgradeShopUI.gameObject.name = "UpgradePanel";
     }
 
     void StartTalk()

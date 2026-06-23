@@ -42,13 +42,15 @@ public class LocalizedLabel : MonoBehaviour
         if (_label == null || string.IsNullOrEmpty(entryKey))
             return;
 
-        var table = LocalizationSettings.StringDatabase.GetTable(tableName);
-        if (table == null)
-            return;
-
-        var entry = table.GetEntry(entryKey);
-        if (entry != null)
-            _label.text = entry.GetLocalizedString();
+        // SelectedLocaleChanged 콜백은 ResourceManager.Update 안에서 호출되므로
+        // 동기 GetTable() (내부 WaitForCompletion) 호출 시 재진입 예외가 발생한다.
+        // GetLocalizedStringAsync + Completed 콜백으로 비동기 처리.
+        var op = LocalizationSettings.StringDatabase.GetLocalizedStringAsync(tableName, entryKey);
+        op.Completed += handle =>
+        {
+            if (_label != null && handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                _label.text = handle.Result;
+        };
     }
 
     /// <summary>코드에서 키를 바꾸고 즉시 갱신.</summary>

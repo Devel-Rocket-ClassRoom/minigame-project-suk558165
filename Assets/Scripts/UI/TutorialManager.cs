@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
@@ -29,24 +29,32 @@ public class TutorialManager : MonoBehaviour
 
     public System.Action onTutorialComplete;
 
-    public void Begin()
+    private PlayerCombat playerCombat;
+    private PlayerMovement playerMovement;
+
+    public void Begin(GameObject player = null)
     {
         if (stepUI == null)
             stepUI = TutorialStepUI.Instance;
-        StartCoroutine(RunSteps());
+        if (player != null)
+        {
+            playerCombat = player.GetComponent<PlayerCombat>();
+            playerMovement = player.GetComponent<PlayerMovement>();
+        }
+        RunSteps().Forget();
     }
 
-    IEnumerator RunSteps()
+    async UniTaskVoid RunSteps()
     {
         foreach (var step in steps)
         {
             if (stepUI != null)
                 stepUI.Show($"{step.message}  0 / 5");
 
-            yield return WaitForInput(step.requiredInput, step.message);
+            await WaitForInput(step.requiredInput, step.message);
 
             if (stepUI != null)
-                yield return stepUI.Hide();
+                await stepUI.Hide();
         }
 
         if (SaveManager.Instance != null)
@@ -58,25 +66,55 @@ public class TutorialManager : MonoBehaviour
         if (stepUI != null)
         {
             stepUI.Show("튜토리얼이 완료되었습니다\n3초 뒤에 이동합니다");
-            yield return new WaitForSeconds(3f);
-            yield return stepUI.Hide();
+            await UniTask.Delay(System.TimeSpan.FromSeconds(3f));
+            await stepUI.Hide();
         }
 
         onTutorialComplete?.Invoke();
     }
 
-    IEnumerator WaitForInput(TutorialInput input, string baseMessage)
+    async UniTask WaitForInput(TutorialInput input, string baseMessage)
     {
         int count = 0;
+        bool prevActive = false;
         while (count < 5)
         {
-            yield return null;
-            if (CheckInput(input))
+            await UniTask.Yield();
+
+            bool counted;
+            if (UsesAnimationGate(input))
+            {
+                bool active = IsActionInProgress(input);
+                counted = prevActive && !active;
+                prevActive = active;
+            }
+            else
+            {
+                counted = CheckInput(input);
+            }
+
+            if (counted)
             {
                 count++;
                 if (stepUI != null)
                     stepUI.UpdateText($"{baseMessage}  {count} / 5");
             }
+        }
+    }
+
+    bool UsesAnimationGate(TutorialInput input) =>
+        input == TutorialInput.Attack || input == TutorialInput.Dash;
+
+    bool IsActionInProgress(TutorialInput input)
+    {
+        switch (input)
+        {
+            case TutorialInput.Attack:
+                return playerCombat != null && playerCombat.IsAttacking;
+            case TutorialInput.Dash:
+                return playerMovement != null && playerMovement.IsDashing;
+            default:
+                return false;
         }
     }
 
@@ -87,7 +125,8 @@ public class TutorialManager : MonoBehaviour
             case TutorialInput.MoveLeftRight:
                 return Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
             case TutorialInput.Jump:
-                return Input.GetButtonDown("Jump");
+                var jumpKey = InputManager.Instance?.Jump ?? KeyCode.Space;
+                return Input.GetKeyDown(jumpKey);
             case TutorialInput.Dash:
                 var dashKey = InputManager.Instance?.Dash ?? KeyCode.Z;
                 return Input.GetKeyDown(dashKey);

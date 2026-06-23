@@ -55,10 +55,17 @@ public class Inventory : MonoBehaviour
 
     public event Action OnInventoryChanged;
 
+    /// <summary>골드가 변할 때 발행: (현재 골드). UI가 구독.</summary>
+    public static event Action<int> OnGoldChanged;
+
     public static Inventory Instance { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void ResetStatics() => Instance = null;
+    static void ResetStatics()
+    {
+        Instance = null;
+        OnGoldChanged = null;
+    }
 
     void Awake()
     {
@@ -213,6 +220,7 @@ public class Inventory : MonoBehaviour
         gold += amount;
         RunStats.Instance?.AddGold(amount);
         OnInventoryChanged?.Invoke();
+        OnGoldChanged?.Invoke(gold);
         SaveGold();
     }
 
@@ -222,6 +230,7 @@ public class Inventory : MonoBehaviour
             return false;
         gold -= amount;
         OnInventoryChanged?.Invoke();
+        OnGoldChanged?.Invoke(gold);
         SaveGold();
         return true;
     }
@@ -238,6 +247,7 @@ public class Inventory : MonoBehaviour
     {
         if (SaveManager.Instance != null)
             gold = SaveManager.Instance.Data.gold;
+        OnGoldChanged?.Invoke(gold);
     }
 
     public void SaveInventory()
@@ -329,6 +339,7 @@ public class Inventory : MonoBehaviour
             bonus.projectileSpeedMult += acc.projectileSpeedMult;
             bonus.potionHealMult += acc.potionHealMult;
         }
+        MetaUpgrades.Contribute(ref bonus);
         return bonus;
     }
 }

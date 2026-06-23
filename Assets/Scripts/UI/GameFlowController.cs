@@ -1,4 +1,4 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -37,6 +37,9 @@ public class GameFlowController : MonoBehaviour
     [SerializeField]
     private ItemDatabase itemDatabase;
 
+    [SerializeField]
+    private MetaUpgradeConfig metaUpgradeConfig;
+
     [Header("레퍼런스")]
     [SerializeField]
     private RoomManager roomManager;
@@ -73,6 +76,10 @@ public class GameFlowController : MonoBehaviour
         if (itemDatabase != null)
             itemDatabase.Init();
 
+        // MetaUpgradeConfig 초기화
+        if (metaUpgradeConfig != null)
+            metaUpgradeConfig.Init();
+
         // RunStats 가 씬에 없으면 자동 생성
         if (RunStats.Instance == null)
             new GameObject("RunStats").AddComponent<RunStats>();
@@ -84,6 +91,12 @@ public class GameFlowController : MonoBehaviour
         // WeaponSlotUI 가 씬에 없으면 자동 생성
         if (WeaponSlotUI.Instance == null)
             new GameObject("WeaponSlotUI").AddComponent<WeaponSlotUI>();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     void Start()
@@ -323,7 +336,7 @@ public class GameFlowController : MonoBehaviour
                 tutorialInstance = null;
                 GoToVillage();
             };
-            tutorial.Begin();
+            tutorial.Begin(playerInstance);
         }
     }
 
@@ -372,13 +385,13 @@ public class GameFlowController : MonoBehaviour
 
     public void ReturnToVillage()
     {
-        StartCoroutine(ReturnToVillageRoutine());
+        ReturnToVillageRoutine().Forget();
     }
 
-    IEnumerator ReturnToVillageRoutine()
+    async UniTaskVoid ReturnToVillageRoutine()
     {
         if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeOut();
+            await ScreenFader.Instance.FadeOut();
 
         roomManager.ResetDungeon();
         GameClearUI.Instance?.ResetUI();
@@ -400,7 +413,7 @@ public class GameFlowController : MonoBehaviour
         GoToVillage();
 
         if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeIn();
+            await ScreenFader.Instance.FadeIn();
     }
 
     public void EnterDungeon()
@@ -416,6 +429,7 @@ public class GameFlowController : MonoBehaviour
             roomManager.SetPlayer(playerInstance.transform);
 
         RunStats.Instance?.StartRun();
+        MetaUpgrades.BeginRun();
         roomManager.StartGame();
     }
 }

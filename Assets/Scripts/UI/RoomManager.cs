@@ -1,5 +1,6 @@
-using System.Collections;
+using System.Threading;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public enum RoomType
@@ -51,6 +52,7 @@ public class RoomManager : MonoBehaviour
     private List<int> normalRoomOrder;
     private int normalRoomCursor;
     private Portal currentPortal;
+    private CancellationTokenSource _masterCts;
 
     private CameraFollow cameraFollow;
 
@@ -77,7 +79,9 @@ public class RoomManager : MonoBehaviour
 
     public void ResetDungeon()
     {
-        StopAllCoroutines();
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = null;
         if (currentRoom != null)
         {
             currentRoom.GetComponentInChildren<SpawnManager>()?.CleanupAll();
@@ -93,7 +97,10 @@ public class RoomManager : MonoBehaviour
     public void StartGame()
     {
         ShuffleNormalRooms();
-        StartCoroutine(LoadRoomWithFade(1, true));
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = new CancellationTokenSource();
+        LoadRoomWithFade(1, true, _masterCts.Token).Forget();
     }
 
     public void ResumeGame(int roomNumber)
@@ -114,7 +121,10 @@ public class RoomManager : MonoBehaviour
         {
             ShuffleNormalRooms();
         }
-        StartCoroutine(LoadRoomWithFade(roomNumber, true));
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = new CancellationTokenSource();
+        LoadRoomWithFade(roomNumber, true, _masterCts.Token).Forget();
     }
 
     void ShuffleNormalRooms()
@@ -271,7 +281,10 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(LoadRoomWithFade(next, false));
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = new CancellationTokenSource();
+        LoadRoomWithFade(next, false, _masterCts.Token).Forget();
     }
 
     void OnGameClear()
@@ -312,11 +325,11 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    IEnumerator LoadRoomWithFade(int roomNumber, bool isFirst)
+    async UniTaskVoid LoadRoomWithFade(int roomNumber, bool isFirst, CancellationToken token)
     {
         // 1. 화면을 어둡게 (이전 방이 더이상 보이지 않게)
         if (!isFirst && ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeOut();
+            await ScreenFader.Instance.FadeOut();
 
         // 2. 새 방 로드 (플레이어 위치도 새 스폰포인트로 이동)
         LoadRoom(roomNumber);
@@ -328,11 +341,11 @@ public class RoomManager : MonoBehaviour
         SnapCameraTo(spawnPos);
 
         // 5. CameraFollow가 새 위치를 반영할 시간 확보
-        yield return null;
+        await UniTask.Yield(token);
 
         // 6. 페이드 인 → 카메라가 새 위치에 자리 잡힌 상태에서 맵이 드러남
         if (ScreenFader.Instance != null)
-            yield return ScreenFader.Instance.FadeIn();
+            await ScreenFader.Instance.FadeIn();
     }
 
     Vector3 GetPlayerWorldPosition()

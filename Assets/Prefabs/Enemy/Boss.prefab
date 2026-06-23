@@ -286,7 +286,6 @@ MonoBehaviour:
   goldDropMax: 40
   knockbackForce: 3
   knockbackDuration: 0.1
-  spriteFacesLeft: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 576
@@ -297,6 +296,10 @@ MonoBehaviour:
   dashSound: {fileID: 8300000, guid: 3f34edecaa132514fb8b4b06bf21fc6c, type: 3}
   bossDisplayName: King
   bossHealthBarUIPrefab: {fileID: 0}
+  spikePrefab: {fileID: 2831065272797078489, guid: 09fbc0dfb00a26e48936aa18e1e2fe27, type: 3}
+  warningPrefab: {fileID: 6945726611966360431, guid: 0e5b478e60def2d4e8569fa9f9fc34a0, type: 3}
+  magicProjectilePrefab: {fileID: 85884875458821378, guid: cbc3daca415d1894ab7e8d719d107d4f, type: 3}
+  magicProjectileSpeed: 11
 --- !u!95 &4455667788990022334
 Animator:
   serializedVersion: 7

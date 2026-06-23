@@ -81,7 +81,7 @@ public class DamagePopup : MonoBehaviour
         label.font = GetFont();
         label.alignment = TextAlignmentOptions.Center;
         label.overflowMode = TextOverflowModes.Overflow;
-        label.enableWordWrapping = false;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
         label.raycastTarget = false;
 
         int display = Mathf.RoundToInt(value);

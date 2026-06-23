@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections.Generic;
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Melee")]
@@ -45,6 +45,18 @@ public class PlayerCombat : MonoBehaviour
     private StatBonus pendingRangedBonus;
     private WeaponType pendingWeaponType;
     private bool hasPendingRanged;
+
+    readonly Dictionary<GameObject, ObjectPool<Projectile>> projPools = new();
+
+    ObjectPool<Projectile> GetPool(GameObject prefab)
+    {
+        if (!projPools.TryGetValue(prefab, out var pool))
+        {
+            pool = new ObjectPool<Projectile>(prefab.GetComponent<Projectile>());
+            projPools[prefab] = pool;
+        }
+        return pool;
+    }
 
     void Awake()
     {
@@ -220,10 +232,10 @@ public class PlayerCombat : MonoBehaviour
             if (facingLeft == firePointOnRight)
                 origin.x = transform.position.x - xDiff;
         }
-        var proj = Instantiate(prefab, origin, Quaternion.identity);
-        var projComp = proj.GetComponent<Projectile>();
-        if (projComp != null)
-            projComp.Init(dir, speed, damage, gameObject, pierce: pierce, lifesteal: lifesteal);
+        var pool = GetPool(prefab);
+        var projComp = pool.Get(origin, Quaternion.identity);
+        projComp.Pool = pool;
+        projComp.Init(dir, speed, damage, gameObject, pierce: pierce, lifesteal: lifesteal);
     }
 
     static Vector2 RotateVector(Vector2 v, float degrees)

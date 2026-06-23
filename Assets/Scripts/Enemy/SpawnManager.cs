@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -73,6 +74,22 @@ public class SpawnManager : MonoBehaviour
     private bool allWavesCleared;
     private readonly List<GameObject> spawnedEnemies = new List<GameObject>();
 
+    private CancellationTokenSource _cts = new();
+
+    CancellationToken RefreshToken()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        return _cts.Token;
+    }
+
+    void OnDestroy()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
     void Start()
     {
         currentWaveIndex = 0;
@@ -109,18 +126,18 @@ public class SpawnManager : MonoBehaviour
         {
             Wave firstWave = waves[0];
             // 카메라가 보스 위치에 도착하면 보스를 스폰 — 연출 후 입력 잠금 해제.
-            bossIntro.Play(onSpawn: () => StartCoroutine(SpawnWave(firstWave)), onComplete: null);
+            bossIntro.Play(onSpawn: () => SpawnWave(firstWave, _cts.Token).Forget(), onComplete: null);
         }
         else
         {
-            StartCoroutine(SpawnWave(waves[0]));
+            SpawnWave(waves[0], _cts.Token).Forget();
         }
     }
 
-    IEnumerator SpawnWave(Wave wave)
+    async UniTask SpawnWave(Wave wave, CancellationToken token)
     {
         if (wave.delayBeforeSpawn > 0f)
-            yield return new WaitForSeconds(wave.delayBeforeSpawn);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(wave.delayBeforeSpawn), cancellationToken: token);
 
         // 이 웨이브가 스폰할 총 적 수를 미리 더해서, 스폰이 다 끝나기 전엔 클리어 판정이 안 나도록.
         int totalPending = 0;
@@ -139,44 +156,44 @@ public class SpawnManager : MonoBehaviour
         pendingSpawnCount += totalPending;
 
         foreach (var group in wave.groups)
-            StartCoroutine(SpawnGroupItems(group, wave.instantSpawn));
+            SpawnGroupItems(group, wave.instantSpawn, token).Forget();
     }
 
-    IEnumerator SpawnGroupItems(SpawnGroup group, bool instant = false)
+    async UniTaskVoid SpawnGroupItems(SpawnGroup group, bool instant, CancellationToken token)
     {
         if (group.prefab == null)
-            yield break;
+            return;
         if (group.spawnPointIndex < 0 || group.spawnPointIndex >= spawnPoints.Length)
-            yield break;
+            return;
 
         Transform point = spawnPoints[group.spawnPointIndex];
         if (point == null)
-            yield break;
+            return;
+
+        // 같은 그룹의 적은 모두 같은 프레임에 동시 스폰 (SpawnGroup.interval, Wave.instantSpawn 무시).
+        // FX는 그룹당 한 번만 재생하고 spawnEffectDelay만큼 한 번 대기.
+        if (spawnEffectPrefab != null)
+        {
+            var fxPos = point.position + new Vector3(0f, spawnEffectYOffset, 0f);
+            var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
+            Destroy(fx, 0.8f);
+            if (spawnEffectDelay > 0f)
+                await UniTask.Delay(System.TimeSpan.FromSeconds(spawnEffectDelay), cancellationToken: token);
+        }
 
         for (int i = 0; i < group.count; i++)
         {
             if (allWavesCleared)
             {
                 pendingSpawnCount = Mathf.Max(0, pendingSpawnCount - (group.count - i));
-                yield break;
+                return;
             }
-            yield return SpawnEnemyWithEffect(group.prefab, point.position);
-            if (!instant && i < group.count - 1 && group.interval > 0f)
-                yield return new WaitForSeconds(group.interval);
+            SpawnEnemyInstance(group.prefab, point.position);
         }
     }
 
-    IEnumerator SpawnEnemyWithEffect(GameObject prefab, Vector3 position)
+    void SpawnEnemyInstance(GameObject prefab, Vector3 position)
     {
-        if (spawnEffectPrefab != null)
-        {
-            var fxPos = position + new Vector3(0f, spawnEffectYOffset, 0f);
-            var fx = Instantiate(spawnEffectPrefab, fxPos, Quaternion.identity);
-            Destroy(fx, 0.8f);
-            if (spawnEffectDelay > 0f)
-                yield return new WaitForSeconds(spawnEffectDelay);
-        }
-
         var go = Instantiate(prefab, position, Quaternion.identity);
         go.transform.SetParent(transform.root, worldPositionStays: true);
         spawnedEnemies.Add(go);
@@ -187,21 +204,21 @@ public class SpawnManager : MonoBehaviour
         if (enemy != null)
         {
             enemy.onDeath += OnEnemyDied;
-            yield break;
+            return;
         }
 
         var boss = go.GetComponent<BossController>();
         if (boss != null)
         {
             boss.onDeath += OnEnemyDied;
-            yield break;
+            return;
         }
 
         var miniBoss = go.GetComponent<MiniBossController>();
         if (miniBoss != null)
         {
             miniBoss.onDeath += OnEnemyDied;
-            yield break;
+            return;
         }
 
         // 알 수 없는 컴포넌트 — onDeath 연결 불가, aliveCount 즉시 보정
@@ -210,7 +227,7 @@ public class SpawnManager : MonoBehaviour
 
     public void CleanupAll()
     {
-        StopAllCoroutines();
+        RefreshToken();
         foreach (var go in spawnedEnemies)
             if (go != null)
                 Destroy(go);
@@ -254,7 +271,7 @@ public class SpawnManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(SpawnWave(nextWave));
+            SpawnWave(nextWave, _cts.Token).Forget();
         }
     }
 
@@ -277,6 +294,6 @@ public class SpawnManager : MonoBehaviour
         if (clearedWave.triggerZone != null)
             clearedWave.triggerZone.gameObject.SetActive(false);
 
-        StartCoroutine(SpawnWave(waves[currentWaveIndex]));
+        SpawnWave(waves[currentWaveIndex], _cts.Token).Forget();
     }
 }

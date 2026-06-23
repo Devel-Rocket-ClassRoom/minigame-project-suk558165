@@ -1,26 +1,26 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public static class EnemyUtils
 {
-    public static IEnumerator HitFlash(SpriteRenderer sr, Color originalColor, System.Func<bool> isDead)
+    public static async UniTask HitFlash(SpriteRenderer sr, Color originalColor, System.Func<bool> isDead)
     {
         sr.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.1f));
         if (!isDead())
             sr.color = originalColor;
     }
 
-    public static IEnumerator DeathBlink(SpriteRenderer sr)
+    public static async UniTask DeathBlink(SpriteRenderer sr)
     {
         for (int i = 0; i < 8; i++)
         {
             sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.15f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f));
         }
     }
 
-    public static IEnumerator TellFlash(SpriteRenderer sr, Color color, Color originalColor, float duration)
+    public static async UniTask TellFlash(SpriteRenderer sr, Color color, Color originalColor, float duration)
     {
         float elapsed = 0f;
         while (elapsed < duration)
@@ -28,12 +28,12 @@ public static class EnemyUtils
             float t = Mathf.PingPong(elapsed * 10f, 1f);
             sr.color = Color.Lerp(originalColor, color, t);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield();
         }
         sr.color = originalColor;
     }
 
-    public static IEnumerator TellShake(Transform transform, float duration)
+    public static async UniTask TellShake(Transform transform, float duration)
     {
         Vector3 origin = transform.position;
         float elapsed = 0f;
@@ -42,16 +42,22 @@ public static class EnemyUtils
             float offsetX = Random.Range(-0.05f, 0.05f);
             transform.position = origin + new Vector3(offsetX, 0f, 0f);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield();
         }
         transform.position = origin;
     }
 
-    public static void FlipToPlayer(SpriteRenderer sr, Transform player, Transform self)
+    // defaultFacesRight: 스프라이트 원본이 오른쪽을 보면 true (대부분의 적). 왼쪽을 보면 false.
+    // deadband: 플레이어와 적의 x좌표 차가 이 값 미만이면 방향을 유지 — 겹쳤을 때 깜빡거림 방지.
+    public static void FlipToPlayer(SpriteRenderer sr, Transform player, Transform self, bool defaultFacesRight = true, float deadband = 0.1f)
     {
         if (player == null)
             return;
-        sr.flipX = player.position.x < self.position.x;
+        float dx = player.position.x - self.position.x;
+        if (Mathf.Abs(dx) < deadband)
+            return;
+        bool playerOnLeft = dx < 0f;
+        sr.flipX = defaultFacesRight ? playerOnLeft : !playerOnLeft;
     }
 
     public static bool IsGrounded(Collider2D col, Transform transform, LayerMask groundLayer)

@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class DashGhostEffect : MonoBehaviour
@@ -14,7 +15,7 @@ public class DashGhostEffect : MonoBehaviour
 
     private SpriteRenderer sr;
     private Transform visuals;
-    private Coroutine spawnCoroutine;
+    private CancellationTokenSource _spawnCts;
 
     void Awake()
     {
@@ -24,26 +25,25 @@ public class DashGhostEffect : MonoBehaviour
 
     public void StartGhost()
     {
-        if (spawnCoroutine != null)
-            StopCoroutine(spawnCoroutine);
-        spawnCoroutine = StartCoroutine(SpawnGhosts());
+        _spawnCts?.Cancel();
+        _spawnCts?.Dispose();
+        _spawnCts = new CancellationTokenSource();
+        SpawnGhosts(_spawnCts.Token).Forget();
     }
 
     public void StopGhost()
     {
-        if (spawnCoroutine != null)
-        {
-            StopCoroutine(spawnCoroutine);
-            spawnCoroutine = null;
-        }
+        _spawnCts?.Cancel();
+        _spawnCts?.Dispose();
+        _spawnCts = null;
     }
 
-    IEnumerator SpawnGhosts()
+    async UniTaskVoid SpawnGhosts(CancellationToken token)
     {
-        while (true)
+        while (!token.IsCancellationRequested)
         {
             SpawnOne();
-            yield return new WaitForSeconds(ghostInterval);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(ghostInterval), cancellationToken: token);
         }
     }
 
@@ -66,10 +66,10 @@ public class DashGhostEffect : MonoBehaviour
         else
             go.transform.localScale = transform.localScale;
 
-        StartCoroutine(FadeAndDestroy(ghostSr));
+        FadeAndDestroy(ghostSr).Forget();
     }
 
-    IEnumerator FadeAndDestroy(SpriteRenderer ghostSr)
+    async UniTaskVoid FadeAndDestroy(SpriteRenderer ghostSr)
     {
         float elapsed = 0f;
         Color startColor = ghostSr.color;
@@ -79,7 +79,7 @@ public class DashGhostEffect : MonoBehaviour
             elapsed += Time.deltaTime;
             float alpha = Mathf.Lerp(startColor.a, 0f, elapsed / ghostLifetime);
             ghostSr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-            yield return null;
+            await UniTask.Yield();
         }
 
         Destroy(ghostSr.gameObject);

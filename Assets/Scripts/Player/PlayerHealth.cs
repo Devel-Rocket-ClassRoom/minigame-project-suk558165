@@ -1,13 +1,24 @@
+using System;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
+    /// <summary>체력(또는 최대체력)이 변할 때 발행: (현재 HP, 유효 최대 HP). UI가 구독.</summary>
+    public static event Action<float, float> OnHealthChanged;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => OnHealthChanged = null;
+
     public float maxHp = 100f;
 
     [Header("Audio")]
     public AudioClip deathSound;
 
+    [Header("부활 무적 시간(초)")]
+    public float reviveInvulnDuration = 1f;
+
     private float hp;
+    private float invulnTimer;
     private Inventory inventory;
     private PlayerMovement movement;
 
@@ -22,11 +33,26 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         movement = GetComponent<PlayerMovement>();
         hp = maxHp;
         PlayerRef.Register(this);
+
+        // 장신구 장착 등으로 EffectiveMaxHp가 바뀌면 체력바 최대치도 갱신되도록 인벤토리 변경을 체력 이벤트로 재발행한다.
+        if (inventory != null)
+            inventory.OnInventoryChanged += NotifyHealth;
+        NotifyHealth();
     }
 
     void OnDestroy()
     {
+        if (inventory != null)
+            inventory.OnInventoryChanged -= NotifyHealth;
         PlayerRef.Clear(this);
+    }
+
+    void NotifyHealth() => OnHealthChanged?.Invoke(hp, EffectiveMaxHp);
+
+    void Update()
+    {
+        if (invulnTimer > 0f)
+            invulnTimer -= Time.deltaTime;
     }
 
     public void TakeDamage(float amount, GameObject attacker = null)
@@ -34,8 +60,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (IsDead)
             return;
 
-        // 대쉬 중 무적
-        if (movement != null && movement.IsDashing)
+        // 대쉬 중 / 부활 무적
+        if ((movement != null && movement.IsDashing) || invulnTimer > 0f)
             return;
 
         var bonus = inventory?.GetTotalStatBonus() ?? default;
@@ -55,11 +81,24 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, finalDamage, isPlayerDamage: true);
         ScreenHitEffect.Instance?.Flash();
+
+        // 1회성 부활: 죽을 데미지를 받았으나 부활 강화가 남아있으면 체력을 복구한다.
+        if (hp <= 0f && MetaUpgrades.CanRevive)
+        {
+            MetaUpgrades.ConsumeRevive();
+            hp = EffectiveMaxHp;
+            invulnTimer = reviveInvulnDuration;
+            NotifyHealth();
+            return;
+        }
+
         if (IsDead)
         {
             RunStats.Instance?.AddDeath();
             AudioManager.Instance?.PlaySFX(deathSound);
         }
+
+        NotifyHealth();
     }
 
     public void Heal(float amount)
@@ -67,11 +106,13 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (IsDead)
             return;
         hp = Mathf.Min(hp + amount, EffectiveMaxHp);
+        NotifyHealth();
     }
 
     /// <summary>마을 귀환 시 HP를 최대치로 복구합니다.</summary>
     public void Revive()
     {
         hp = EffectiveMaxHp;
+        NotifyHealth();
     }
 }

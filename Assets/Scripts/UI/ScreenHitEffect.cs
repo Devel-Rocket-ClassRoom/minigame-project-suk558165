@@ -1,10 +1,14 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ScreenHitEffect : MonoBehaviour
 {
     public static ScreenHitEffect Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instance = null;
 
     [SerializeField]
     float flashAlpha = 0.4f;
@@ -22,7 +26,7 @@ public class ScreenHitEffect : MonoBehaviour
     }
 
     private Image overlay;
-    private Coroutine flashCoroutine;
+    private CancellationTokenSource _flashCts;
 
     void Awake()
     {
@@ -62,12 +66,13 @@ public class ScreenHitEffect : MonoBehaviour
 
     public void Flash()
     {
-        if (flashCoroutine != null)
-            StopCoroutine(flashCoroutine);
-        flashCoroutine = StartCoroutine(FlashRoutine());
+        _flashCts?.Cancel();
+        _flashCts?.Dispose();
+        _flashCts = new CancellationTokenSource();
+        FlashRoutine(_flashCts.Token).Forget();
     }
 
-    IEnumerator FlashRoutine()
+    async UniTaskVoid FlashRoutine(CancellationToken token)
     {
         overlay.color = new Color(1f, 0f, 0f, flashAlpha);
         float elapsed = 0f;
@@ -76,7 +81,7 @@ public class ScreenHitEffect : MonoBehaviour
             elapsed += Time.deltaTime;
             float a = Mathf.Lerp(flashAlpha, 0f, elapsed / fadeDuration);
             overlay.color = new Color(1f, 0f, 0f, a);
-            yield return null;
+            await UniTask.Yield(token);
         }
         overlay.color = new Color(1f, 0f, 0f, 0f);
     }

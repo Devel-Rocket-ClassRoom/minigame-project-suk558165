@@ -24,6 +24,9 @@ public class SaveData
     // 가방 악세서리 (id로 저장)
     public List<string> backpackAccessories = new List<string>();
 
+    // 마을 영구 강화 레벨 (인덱스 = MetaUpgradeType)
+    public List<int> permaUpgradeLevels = new List<int>();
+
     // 베스트 런 기록
     public BestRunData bestRun = new BestRunData();
 
@@ -59,10 +62,12 @@ public class SaveData
 [Serializable]
 public class KeyBindingSaveData
 {
+    public string jumpKey = "Space";
     public string dashKey = "Z";
     public string attackKey = "X";
     public string inventoryKey = "Tab";
     public string interactKey = "A";
+    public string weaponSwitchKey = "C";
 }
 
 [Serializable]

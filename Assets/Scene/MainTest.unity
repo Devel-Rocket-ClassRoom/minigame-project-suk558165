@@ -185,6 +185,7 @@ MonoBehaviour:
   firebaseSystemPrefab: {fileID: 6861943874853234632, guid: 08300f9e2fd296248b8b9f4eff1855d5, type: 3}
   loginCanvasPrefab: {fileID: 3634775228663779224, guid: a04df4dba05a35546a5c1f1d06186738, type: 3}
   itemDatabase: {fileID: 11400000, guid: b3729aac221931249a72f1b27908e7ad, type: 2}
+  metaUpgradeConfig: {fileID: 11400000, guid: 7c9e1f2a4b6d8e3f5a0c1d2e3f4a5b6c, type: 2}
   roomManager: {fileID: 2085237427}
 --- !u!1 &582639439
 GameObject:
