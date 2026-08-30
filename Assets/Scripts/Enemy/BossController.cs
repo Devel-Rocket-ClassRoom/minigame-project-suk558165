@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -8,6 +8,10 @@ using UnityEngine;
 public partial class BossController : MonoBehaviour, IDamageable
 {
     public static readonly List<BossController> Instances = new List<BossController>();
+
+    // 도메인 리로드를 끈 상태에서도 이전 플레이의 잔여 항목이 남지 않도록 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instances.Clear();
 
     [Header("Stats")]
     [SerializeField]
@@ -73,6 +77,7 @@ public partial class BossController : MonoBehaviour, IDamageable
 
     [SerializeField]
     private Collider2D meleeHitbox;
+    private float hitboxOffsetX;
 
     [Header("패턴 공통")]
     [SerializeField]
@@ -209,7 +214,10 @@ public partial class BossController : MonoBehaviour, IDamageable
         healthBarUI.SetHealth(hp, maxHp);
 
         if (meleeHitbox != null)
+        {
             meleeHitbox.enabled = false;
+            hitboxOffsetX = Mathf.Abs(meleeHitbox.offset.x);
+        }
     }
 
     void OnEnable() => Instances.Add(this);
@@ -273,6 +281,14 @@ public partial class BossController : MonoBehaviour, IDamageable
             return;
         bool flip = dx > 0f;
         sr.flipX = attackFlip ? !flip : flip;
+
+        // flipX는 콜라이더에 영향이 없으므로 히트박스 오프셋을 직접 미러링
+        if (meleeHitbox != null)
+        {
+            Vector2 o = meleeHitbox.offset;
+            o.x = dx > 0f ? hitboxOffsetX : -hitboxOffsetX;
+            meleeHitbox.offset = o;
+        }
     }
 
     void ChasePlayer()

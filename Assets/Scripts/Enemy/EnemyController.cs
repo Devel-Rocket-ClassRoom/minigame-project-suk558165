@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -9,6 +9,10 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour, IDamageable
 {
     public static readonly List<EnemyController> Instances = new List<EnemyController>();
+
+    // 도메인 리로드를 끈 상태에서도 이전 플레이의 잔여 항목이 남지 않도록 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instances.Clear();
 
     [Header("Stats")]
     public float maxHp = 50f;
@@ -82,6 +86,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private Collider2D col;
 
     private float hp;
+    private float hitboxOffsetX;
     private bool isDead;
     public bool IsDead => isDead;
     private float attackTimer;
@@ -120,7 +125,26 @@ public class EnemyController : MonoBehaviour, IDamageable
         healthBar.Init(hpBarOffset);
 
         if (meleeHitbox != null)
+        {
             meleeHitbox.enabled = false;
+            hitboxOffsetX = Mathf.Abs(meleeHitbox.offset.x);
+        }
+    }
+
+    /// <summary>
+    /// 스프라이트 반전과 히트박스 위치를 함께 처리한다.
+    /// SpriteRenderer.flipX는 콜라이더에 영향이 없으므로 히트박스 오프셋을 직접 미러링해야 한다.
+    /// </summary>
+    void SetFacing(bool faceRight)
+    {
+        sr.flipX = faceRight ? spriteFacesLeft : !spriteFacesLeft;
+
+        if (meleeHitbox != null)
+        {
+            Vector2 o = meleeHitbox.offset;
+            o.x = faceRight ? hitboxOffsetX : -hitboxOffsetX;
+            meleeHitbox.offset = o;
+        }
     }
 
     void OnEnable() => Instances.Add(this);
@@ -225,7 +249,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
             // 멈춰있을 때도 플레이어 방향으로 스프라이트 전환
             bool playerOnLeft = player.position.x < transform.position.x;
-            sr.flipX = spriteFacesLeft ? !playerOnLeft : playerOnLeft;
+            SetFacing(!playerOnLeft);
 
             if (attackTimer <= 0f && dist <= safeDistance)
             {
@@ -323,9 +347,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         animator.SetFloat(HashSpeed, Mathf.Abs(dir));
 
         if (dir > 0f)
-            sr.flipX = spriteFacesLeft;
+            SetFacing(true);
         else if (dir < 0f)
-            sr.flipX = !spriteFacesLeft;
+            SetFacing(false);
     }
 
     public void EnableHitbox()

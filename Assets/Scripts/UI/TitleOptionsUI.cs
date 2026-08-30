@@ -1,3 +1,4 @@
+﻿using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -56,6 +57,7 @@ public class TitleOptionsUI : MonoBehaviour
         }
 
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+        RefreshLocalizedAfterInit().Forget();
 
         RefreshVolume();
     }
@@ -94,14 +96,18 @@ public class TitleOptionsUI : MonoBehaviour
         }
     }
 
-    static string GetLocalized(string key, string fallback)
+    /// <summary>
+    /// Localization 초기화 완료 후 로케일 문자열이 필요한 UI를 다시 채운다.
+    /// OnEnable 시점에는 초기화가 끝나지 않아 폴백 문자열로 먼저 표시된다.
+    /// </summary>
+    async UniTaskVoid RefreshLocalizedAfterInit()
     {
-        var table = LocalizationSettings.StringDatabase?.GetTable("Items");
-        if (table == null)
-            return fallback;
-        var entry = table.GetEntry(key);
-        return entry != null ? entry.GetLocalizedString() : fallback;
+        await LocalizationSettings.InitializationOperation;
+        if (fullscreenDropdown == null)
+            return;
+        SetupFullscreenDropdown();
     }
+
 
     void Update()
     {
@@ -260,12 +266,12 @@ public class TitleOptionsUI : MonoBehaviour
         // 인스펙터 더미 항목 무시하고 항상 덮어쓴다. 로케일별로 라벨 자동 적용
         fullscreenDropdown.options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>
         {
-            new TMP_Dropdown.OptionData(GetLocalized("ui.options.fullscreen_windowed", "창 모드")),
+            new TMP_Dropdown.OptionData(L10n.Get("ui.options.fullscreen_windowed", "창 모드")),
             new TMP_Dropdown.OptionData(
-                GetLocalized("ui.options.fullscreen_borderless", "테두리 없는 창")
+                L10n.Get("ui.options.fullscreen_borderless", "테두리 없는 창")
             ),
             new TMP_Dropdown.OptionData(
-                GetLocalized("ui.options.fullscreen_exclusive", "전체화면")
+                L10n.Get("ui.options.fullscreen_exclusive", "전체화면")
             ),
         };
 

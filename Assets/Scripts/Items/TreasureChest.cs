@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TreasureChest : MonoBehaviour
@@ -96,7 +96,7 @@ public class TreasureChest : MonoBehaviour
     async UniTaskVoid AnimatorOpenRoutine()
     {
         animator.SetTrigger("Open");
-        await UniTask.Delay(System.TimeSpan.FromSeconds(animatorOpenDuration));
+        await UniTask.Delay(System.TimeSpan.FromSeconds(animatorOpenDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
         Destroy(gameObject);
     }
 

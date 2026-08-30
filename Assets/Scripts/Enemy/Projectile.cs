@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Projectile : MonoBehaviour
@@ -116,7 +116,11 @@ public class Projectile : MonoBehaviour
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
-            if (!hitIds.Add(other.GetInstanceID()))
+            // 콜라이더가 아니라 피격 대상 기준으로 중복을 막는다.
+            // 콜라이더 ID로 하면 콜라이더가 여러 개인 적을 중복 타격한다.
+            var targetObj = (damageable as Component)?.gameObject;
+            int targetId = targetObj != null ? targetObj.GetInstanceID() : other.GetInstanceID();
+            if (!hitIds.Add(targetId))
                 return;
 
             damageable.TakeDamage(damage, shooter);

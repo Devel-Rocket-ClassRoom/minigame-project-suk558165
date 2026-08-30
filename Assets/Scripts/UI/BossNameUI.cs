@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,7 +30,7 @@ public class BossNameUI : MonoBehaviour
 
         float holdTime = displayDuration - fadeDuration * 2f;
         if (holdTime > 0f)
-            await UniTask.Delay(System.TimeSpan.FromSeconds(holdTime));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(holdTime), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         await Fade(1f, 0f);
 

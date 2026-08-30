@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Shop : MonoBehaviour
@@ -20,6 +20,11 @@ public class Shop : MonoBehaviour
 
     [SerializeField]
     private Canvas parentCanvas;
+
+    private static Canvas cachedUICanvas;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => cachedUICanvas = null;
 
     [SerializeField]
     private GameObject interactPrompt;
@@ -86,16 +91,21 @@ public class Shop : MonoBehaviour
 
         if (!shopUI.gameObject.scene.IsValid())
         {
-            // Screen Space UICanvas를 찾아서 부모로 사용
-            Canvas uiCanvas = null;
-            foreach (var c in Canvas.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
+            // Screen Space UICanvas를 찾아서 부모로 사용.
+            // 세션당 1회만 탐색하고 캐싱한다(상점을 열 때마다 씬을 훑지 않도록).
+            if (cachedUICanvas == null)
             {
-                if (c.renderMode == RenderMode.ScreenSpaceOverlay && c.GetComponent<UnityEngine.UI.CanvasScaler>() != null)
+                foreach (var c in Canvas.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
                 {
-                    uiCanvas = c;
-                    break;
+                    if (c.renderMode == RenderMode.ScreenSpaceOverlay
+                        && c.GetComponent<UnityEngine.UI.CanvasScaler>() != null)
+                    {
+                        cachedUICanvas = c;
+                        break;
+                    }
                 }
             }
+            Canvas uiCanvas = cachedUICanvas;
 
             Transform parent = uiCanvas != null ? uiCanvas.transform : (parentCanvas != null ? parentCanvas.transform : null);
             shopUI = Instantiate(shopUI, parent);

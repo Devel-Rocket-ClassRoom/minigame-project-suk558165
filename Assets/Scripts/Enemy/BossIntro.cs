@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class BossIntro : MonoBehaviour
@@ -74,17 +74,17 @@ public class BossIntro : MonoBehaviour
         }
         else
         {
-            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
         }
 
         // 카메라가 보스 위치에 도착 — 보스 스폰
         if (spawnDelay > 0f)
-            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnDelay));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
         onSpawn?.Invoke();
 
         // 보스 등장 직후 잠깐 보여준 뒤 이름 표시
         if (spawnToNameDelay > 0f)
-            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnToNameDelay));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(spawnToNameDelay), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (bossNameUIPrefab != null)
         {
@@ -93,7 +93,7 @@ public class BossIntro : MonoBehaviour
             if (nameUI != null)
                 nameUI.Show(bossName, bossTitle, nameDisplayDuration);
         }
-        await UniTask.Delay(System.TimeSpan.FromSeconds(nameDisplayDuration));
+        await UniTask.Delay(System.TimeSpan.FromSeconds(nameDisplayDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (cam != null)
         {
@@ -102,7 +102,7 @@ public class BossIntro : MonoBehaviour
         }
         else
         {
-            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(zoomDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
         }
 
         if (playerController != null)

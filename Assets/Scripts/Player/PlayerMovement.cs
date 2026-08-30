@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -12,6 +12,9 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public Vector2 groundCheckSize = new Vector2(0.65f, 0.3f);
     public float dropDownDuration = 0.15f;
+
+    [Tooltip("아래 점프 시 초기 하강 속도")]
+    public float dropDownSpeed = 8f;
 
     [Header("Gravity")]
     public float gravityScale = 4f;
@@ -287,46 +290,68 @@ public class PlayerMovement : MonoBehaviour
             Physics2D.OverlapCircle(checkPos, 0.15f, platformLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.left * halfW, 0.12f, platformLayer)
             || Physics2D.OverlapCircle(checkPos + Vector2.right * halfW, 0.12f, platformLayer);
+
+        // 통과 중에는 접지로 보지 않는다. OverlapCircle은 IgnoreCollision을 무시하기 때문에
+        // 그대로 두면 점프 횟수가 계속 회복되고 애니메이터가 착지 상태로 남는다.
+        if (isDropping)
+        {
+            IsGrounded = false;
+            IsOnPlatform = false;
+        }
     }
 
     async UniTaskVoid DropDown()
     {
-        if (isDropping)
+        if (isDropping || mainCollider == null)
             return;
 
-        float feetY = mainCollider != null ? mainCollider.bounds.min.y : groundCheck.position.y;
-        var hits = Physics2D.OverlapCircleAll(groundCheck.position, 0.5f, platformLayer);
+        // 발밑 플랫폼을 콜라이더 폭 전체로 탐색.
+        // 작은 원으로 찾으면 플랫폼 가장자리에 섰을 때 놓쳐서 아래 점프가 씹힌다.
+        Bounds b = mainCollider.bounds;
+        var hits = Physics2D.OverlapBoxAll(
+            new Vector2(b.center.x, b.min.y - 0.05f),
+            new Vector2(b.size.x * 0.9f, 0.2f),
+            0f,
+            platformLayer
+        );
+
         var toIgnore = new System.Collections.Generic.List<Collider2D>();
-        float surfaceMax = float.NegativeInfinity;
+        float lowestBottom = float.PositiveInfinity;
         foreach (var h in hits)
         {
             if (h == null)
                 continue;
-            float surfaceY = h.ClosestPoint(groundCheck.position).y;
-            if (surfaceY <= feetY + 0.3f)
-            {
-                toIgnore.Add(h);
-                if (surfaceY > surfaceMax)
-                    surfaceMax = surfaceY;
-            }
+            toIgnore.Add(h);
+            lowestBottom = Mathf.Min(lowestBottom, h.bounds.min.y);
         }
         if (toIgnore.Count == 0)
             return;
 
         isDropping = true;
+
+        // 대쉬 중에는 FixedUpdateMovement가 y속도를 0으로 고정해 내려가지 못한다.
+        // 그대로 두면 플랫폼 안에 낀 채 충돌이 복구되어 튕겨 나온다.
+        if (IsDashing)
+        {
+            IsDashing = false;
+            LastDashEndTime = Time.time;
+            rb.gravityScale = gravityScale;
+            dashGhost?.StopGhost();
+        }
+
         foreach (var p in toIgnore)
             Physics2D.IgnoreCollision(mainCollider, p, true);
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -10f);
 
-        // 발이 플랫폼 표면 아래로 충분히 내려갈 때까지만 충돌 무시
-        float clearY = surfaceMax - (mainCollider != null ? mainCollider.bounds.size.y : 1f) - 0.15f;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -dropDownSpeed);
+
+        // 몸 전체가 플랫폼 아래로 빠져나가면 즉시 충돌 복구.
+        // 타임아웃은 안전장치일 뿐이며, 여기 걸리면 플랫폼 안에서 복구되어 튕길 수 있다.
         float elapsed = 0f;
-        while (elapsed < 0.5f)
+        while (elapsed < 0.6f)
         {
             await UniTask.Yield();
             elapsed += Time.deltaTime;
-            float currentFeetY = mainCollider != null ? mainCollider.bounds.min.y : transform.position.y;
-            if (currentFeetY < clearY)
+            if (mainCollider.bounds.max.y < lowestBottom)
                 break;
         }
 

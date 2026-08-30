@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -8,6 +8,10 @@ using UnityEngine;
 public class MiniBossController : MonoBehaviour, IDamageable
 {
     public static readonly List<MiniBossController> Instances = new List<MiniBossController>();
+
+    // 도메인 리로드를 끈 상태에서도 이전 플레이의 잔여 항목이 남지 않도록 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instances.Clear();
 
     [Header("Stats")]
     [SerializeField]

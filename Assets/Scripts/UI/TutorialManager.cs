@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
@@ -66,7 +66,7 @@ public class TutorialManager : MonoBehaviour
         if (stepUI != null)
         {
             stepUI.Show("튜토리얼이 완료되었습니다\n3초 뒤에 이동합니다");
-            await UniTask.Delay(System.TimeSpan.FromSeconds(3f));
+            await UniTask.Delay(System.TimeSpan.FromSeconds(3f), cancellationToken: this.GetCancellationTokenOnDestroy());
             await stepUI.Hide();
         }
 

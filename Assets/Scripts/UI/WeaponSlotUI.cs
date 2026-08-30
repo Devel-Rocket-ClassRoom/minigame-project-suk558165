@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class WeaponSlotUI : MonoBehaviour
@@ -129,10 +129,9 @@ public class WeaponSlotUI : MonoBehaviour
         if (weaponInventory == null || weaponInventory.gameObject == null)
         {
             weaponInventory = null;
-            var player = GameObject.FindWithTag("Player");
-            if (player == null)
+            if (!PlayerRef.Exists)
                 return;
-            weaponInventory = player.GetComponentInChildren<WeaponInventory>();
+            weaponInventory = PlayerRef.GameObject.GetComponentInChildren<WeaponInventory>();
             if (weaponInventory == null)
                 return;
             weaponInventory.OnWeaponChanged += OnWeaponChanged;

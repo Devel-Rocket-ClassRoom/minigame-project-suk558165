@@ -1,9 +1,13 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldPotion : MonoBehaviour
 {
     public static readonly List<WorldPotion> Instances = new List<WorldPotion>();
+
+    // 도메인 리로드를 끈 상태에서도 이전 플레이의 잔여 항목이 남지 않도록 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => Instances.Clear();
 
     public float healAmount = 20f;
     public float pickupRadius = 1.2f;
