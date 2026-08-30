@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -26,7 +26,7 @@ public class AutoLocalizePanel : MonoBehaviour
     void OnEnable()
     {
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
-        StartCoroutine(InitAndRefresh());
+        InitAndRefresh().Forget();
     }
 
     void OnDisable()
@@ -34,9 +34,9 @@ public class AutoLocalizePanel : MonoBehaviour
         LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
     }
 
-    IEnumerator InitAndRefresh()
+    async UniTaskVoid InitAndRefresh()
     {
-        yield return LocalizationSettings.InitializationOperation;
+        await LocalizationSettings.InitializationOperation;
         if (!_initialized)
         {
             Bind();
@@ -45,7 +45,7 @@ public class AutoLocalizePanel : MonoBehaviour
         Refresh();
     }
 
-    void OnLocaleChanged(Locale _) => StartCoroutine(InitAndRefresh());
+    void OnLocaleChanged(Locale _) => InitAndRefresh().Forget();
 
     void Bind()
     {

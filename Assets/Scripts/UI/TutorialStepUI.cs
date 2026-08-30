@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class TutorialStepUI : MonoBehaviour
 
     [SerializeField]
     private float fadeDuration = 0.3f;
+
+    private CancellationTokenSource _fadeCts;
 
     public static TutorialStepUI Instance { get; private set; }
 
@@ -29,6 +32,10 @@ public class TutorialStepUI : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
+
+        _fadeCts?.Cancel();
+        _fadeCts?.Dispose();
+        _fadeCts = null;
     }
 
     public void Show(string message)
@@ -36,8 +43,10 @@ public class TutorialStepUI : MonoBehaviour
         if (messageText != null)
             messageText.text = message;
 
-        StopAllCoroutines();
-        StartCoroutine(Fade(0f, 1f));
+        _fadeCts?.Cancel();
+        _fadeCts?.Dispose();
+        _fadeCts = new CancellationTokenSource();
+        Fade(0f, 1f, _fadeCts.Token).Forget();
     }
 
     public void UpdateText(string message)
@@ -46,22 +55,19 @@ public class TutorialStepUI : MonoBehaviour
             messageText.text = message;
     }
 
-    public Coroutine Hide()
-    {
-        return StartCoroutine(Fade(1f, 0f));
-    }
+    public UniTask Hide() => Fade(1f, 0f);
 
-    IEnumerator Fade(float from, float to)
+    async UniTask Fade(float from, float to, CancellationToken cancellationToken = default)
     {
         if (canvasGroup == null)
-            yield break;
+            return;
 
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(from, to, elapsed / fadeDuration);
-            yield return null;
+            await UniTask.Yield(cancellationToken);
         }
         canvasGroup.alpha = to;
     }

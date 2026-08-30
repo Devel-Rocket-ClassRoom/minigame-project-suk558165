@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Projectile : MonoBehaviour
@@ -17,6 +17,8 @@ public class Projectile : MonoBehaviour
     private bool ready;
     private int pierceRemaining;
     private float spinSpeed;
+    private Transform homingTarget;
+    private float homingTurnSpeed;
     private System.Collections.Generic.HashSet<int> hitIds = new();
     private Rigidbody2D rb;
 
@@ -53,6 +55,8 @@ public class Projectile : MonoBehaviour
         this.lifesteal = lifesteal;
         this.pierceRemaining = pierce;
         this.spinSpeed = spinSpeed;
+        this.homingTarget = null;
+        this.homingTurnSpeed = 0f;
         rb.linearVelocity = direction.normalized * speed;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - spriteAngleOffset);
@@ -60,10 +64,24 @@ public class Projectile : MonoBehaviour
         Invoke(nameof(ReleaseSelf), lifetime);
     }
 
+    public void SetHoming(Transform target, float turnSpeed)
+    {
+        homingTarget = target;
+        homingTurnSpeed = turnSpeed;
+    }
+
     void Update()
     {
         if (spinSpeed != 0f)
             transform.Rotate(0f, 0f, spinSpeed * Time.deltaTime);
+
+        if (homingTarget != null && rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            Vector2 toTarget = ((Vector2)homingTarget.position - rb.position).normalized;
+            Vector2 cur = rb.linearVelocity.normalized;
+            Vector2 newDir = Vector2.Lerp(cur, toTarget, homingTurnSpeed * Time.deltaTime).normalized;
+            rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+        }
     }
 
     void Activate() => ready = true;
@@ -98,7 +116,11 @@ public class Projectile : MonoBehaviour
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
-            if (!hitIds.Add(other.GetInstanceID()))
+            // 콜라이더가 아니라 피격 대상 기준으로 중복을 막는다.
+            // 콜라이더 ID로 하면 콜라이더가 여러 개인 적을 중복 타격한다.
+            var targetObj = (damageable as Component)?.gameObject;
+            int targetId = targetObj != null ? targetObj.GetInstanceID() : other.GetInstanceID();
+            if (!hitIds.Add(targetId))
                 return;
 
             damageable.TakeDamage(damage, shooter);

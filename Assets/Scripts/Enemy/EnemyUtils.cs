@@ -1,50 +1,63 @@
-using System.Collections;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public static class EnemyUtils
 {
-    public static IEnumerator HitFlash(SpriteRenderer sr, Color originalColor, System.Func<bool> isDead)
+    public static async UniTask HitFlash(SpriteRenderer sr, Color originalColor, System.Func<bool> isDead)
     {
+        if (sr == null)
+            return;
         sr.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        if (!isDead())
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.1f));
+        // await 도중 적이 파괴될 수 있다
+        if (sr != null && !isDead())
             sr.color = originalColor;
     }
 
-    public static IEnumerator DeathBlink(SpriteRenderer sr)
+    public static async UniTask DeathBlink(SpriteRenderer sr)
     {
         for (int i = 0; i < 8; i++)
         {
+            if (sr == null)
+                return;
             sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.15f);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f));
         }
     }
 
-    public static IEnumerator TellFlash(SpriteRenderer sr, Color color, Color originalColor, float duration)
+    public static async UniTask TellFlash(SpriteRenderer sr, Color color, Color originalColor, float duration)
     {
         float elapsed = 0f;
         while (elapsed < duration)
         {
+            if (sr == null)
+                return;
             float t = Mathf.PingPong(elapsed * 10f, 1f);
             sr.color = Color.Lerp(originalColor, color, t);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield();
         }
-        sr.color = originalColor;
+        if (sr != null)
+            sr.color = originalColor;
     }
 
-    public static IEnumerator TellShake(Transform transform, float duration)
+    public static async UniTask TellShake(Transform transform, float duration)
     {
+        if (transform == null)
+            return;
         Vector3 origin = transform.position;
         float elapsed = 0f;
         while (elapsed < duration)
         {
+            if (transform == null)
+                return;
             float offsetX = Random.Range(-0.05f, 0.05f);
             transform.position = origin + new Vector3(offsetX, 0f, 0f);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield();
         }
-        transform.position = origin;
+        if (transform != null)
+            transform.position = origin;
     }
 
     public static void FlipToPlayer(SpriteRenderer sr, Transform player, Transform self)

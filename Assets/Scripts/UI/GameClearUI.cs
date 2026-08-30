@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -30,6 +31,7 @@ public class GameClearUI : MonoBehaviour
 
     private bool triggered;
     private bool canReturn;
+    private CancellationTokenSource _masterCts;
 
     public static GameClearUI Instance { get; private set; }
 
@@ -78,10 +80,13 @@ public class GameClearUI : MonoBehaviour
                 t.gameObject.SetActive(true);
         }
 
-        StartCoroutine(ShowRoutine());
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = new CancellationTokenSource();
+        ShowRoutine(_masterCts.Token).Forget();
     }
 
-    IEnumerator ShowRoutine()
+    async UniTaskVoid ShowRoutine(CancellationToken token)
     {
         BossHealthBarUI.Instance?.Hide();
         WeaponSlotUI.Instance?.SetActive(false);
@@ -93,10 +98,11 @@ public class GameClearUI : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
+            token.ThrowIfCancellationRequested();
             elapsed += Time.unscaledDeltaTime;
             if (canvasGroup != null)
                 canvasGroup.alpha = Mathf.Clamp01(elapsed / fadeInDuration);
-            yield return null;
+            await UniTask.Yield(token);
         }
 
         if (canvasGroup != null)
@@ -234,7 +240,9 @@ public class GameClearUI : MonoBehaviour
         Time.timeScale = 1f;
         triggered = false;
         canReturn = false;
-        StopAllCoroutines();
+        _masterCts?.Cancel();
+        _masterCts?.Dispose();
+        _masterCts = null;
         Hide();
     }
 }

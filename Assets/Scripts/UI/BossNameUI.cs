@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,35 +16,35 @@ public class BossNameUI : MonoBehaviour
         if (titleText != null)
             titleText.text = bossTitle;
 
-        StartCoroutine(ShowSequence(displayDuration));
+        ShowSequence(displayDuration).Forget();
     }
 
-    IEnumerator ShowSequence(float displayDuration)
+    async UniTaskVoid ShowSequence(float displayDuration)
     {
         if (canvasGroup == null)
-            yield break;
+            return;
 
         canvasGroup.alpha = 0f;
 
-        yield return Fade(0f, 1f);
+        await Fade(0f, 1f);
 
         float holdTime = displayDuration - fadeDuration * 2f;
         if (holdTime > 0f)
-            yield return new WaitForSeconds(holdTime);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(holdTime), cancellationToken: this.GetCancellationTokenOnDestroy());
 
-        yield return Fade(1f, 0f);
+        await Fade(1f, 0f);
 
         Destroy(gameObject);
     }
 
-    IEnumerator Fade(float from, float to)
+    async UniTask Fade(float from, float to)
     {
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(from, to, elapsed / fadeDuration);
-            yield return null;
+            await UniTask.Yield();
         }
         canvasGroup.alpha = to;
     }

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TreasureChest : MonoBehaviour
@@ -87,36 +87,36 @@ public class TreasureChest : MonoBehaviour
         SpawnGoldCoins();
 
         if (animator != null)
-            StartCoroutine(AnimatorOpenRoutine());
+            AnimatorOpenRoutine().Forget();
         else
-            StartCoroutine(BuiltinOpenRoutine());
+            BuiltinOpenRoutine().Forget();
     }
 
     // Animator 보유 시: Open 트리거 → 클립 재생 대기 → 파괴
-    IEnumerator AnimatorOpenRoutine()
+    async UniTaskVoid AnimatorOpenRoutine()
     {
         animator.SetTrigger("Open");
-        yield return new WaitForSeconds(animatorOpenDuration);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(animatorOpenDuration), cancellationToken: this.GetCancellationTokenOnDestroy());
         Destroy(gameObject);
     }
 
     // Animator 없을 때: 바운스 → 셰이크 → 축소 소멸
-    IEnumerator BuiltinOpenRoutine()
+    async UniTaskVoid BuiltinOpenRoutine()
     {
         // 1. 위로 튀어오르기
-        yield return MoveLocal(originPos, originPos + Vector3.up * 0.35f, 0.12f);
-        yield return MoveLocal(transform.position, originPos, 0.08f);
+        await MoveLocal(originPos, originPos + Vector3.up * 0.35f, 0.12f);
+        await MoveLocal(transform.position, originPos, 0.08f);
 
         // 2. 찌그러짐 (squash & stretch)
-        yield return ScaleTo(
+        await ScaleTo(
             new Vector3(originScale.x * 1.35f, originScale.y * 0.65f, originScale.z),
             0.07f
         );
-        yield return ScaleTo(
+        await ScaleTo(
             new Vector3(originScale.x * 0.75f, originScale.y * 1.35f, originScale.z),
             0.07f
         );
-        yield return ScaleTo(originScale, 0.06f);
+        await ScaleTo(originScale, 0.06f);
 
         // 3. 셰이크
         float shakeTime = 0.25f;
@@ -128,24 +128,24 @@ public class TreasureChest : MonoBehaviour
             float offset = Mathf.Lerp(intensity, 0f, progress);
             transform.position = originPos + (Vector3)(Random.insideUnitCircle * offset);
             elapsed += Time.deltaTime;
-            yield return null;
+            await UniTask.Yield();
         }
         transform.position = originPos;
 
         // 4. 축소되며 소멸
-        yield return ScaleTo(Vector3.zero, 0.2f);
+        await ScaleTo(Vector3.zero, 0.2f);
 
         Destroy(gameObject);
     }
 
-    IEnumerator MoveLocal(Vector3 from, Vector3 to, float duration)
+    async UniTask MoveLocal(Vector3 from, Vector3 to, float duration)
     {
         float elapsed = 0f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             transform.position = Vector3.Lerp(from, to, elapsed / duration);
-            yield return null;
+            await UniTask.Yield();
         }
         transform.position = to;
     }
@@ -180,7 +180,7 @@ public class TreasureChest : MonoBehaviour
         }
     }
 
-    IEnumerator ScaleTo(Vector3 target, float duration)
+    async UniTask ScaleTo(Vector3 target, float duration)
     {
         Vector3 start = transform.localScale;
         float elapsed = 0f;
@@ -188,7 +188,7 @@ public class TreasureChest : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             transform.localScale = Vector3.Lerp(start, target, elapsed / duration);
-            yield return null;
+            await UniTask.Yield();
         }
         transform.localScale = target;
     }

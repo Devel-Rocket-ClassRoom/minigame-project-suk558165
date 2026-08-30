@@ -1,5 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,7 +42,7 @@ public class UpgradeShopUI : MonoBehaviour
     }
 
     private Inventory inventory;
-    private Coroutine noticeCoroutine;
+    private CancellationTokenSource _noticeCts;
 
     void Awake()
     {
@@ -134,14 +135,15 @@ public class UpgradeShopUI : MonoBehaviour
             return;
         noticeText.text = msg;
         noticeText.gameObject.SetActive(true);
-        if (noticeCoroutine != null)
-            StopCoroutine(noticeCoroutine);
-        noticeCoroutine = StartCoroutine(HideNoticeAfter(2f));
+        _noticeCts?.Cancel();
+        _noticeCts?.Dispose();
+        _noticeCts = new CancellationTokenSource();
+        HideNoticeAfter(2f, _noticeCts.Token).Forget();
     }
 
-    IEnumerator HideNoticeAfter(float seconds)
+    async UniTaskVoid HideNoticeAfter(float seconds, CancellationToken token)
     {
-        yield return new WaitForSecondsRealtime(seconds);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(seconds), ignoreTimeScale: true, cancellationToken: token);
         if (noticeText != null)
             noticeText.gameObject.SetActive(false);
     }
