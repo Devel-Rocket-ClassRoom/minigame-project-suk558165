@@ -35,7 +35,13 @@ public class LanguageManager : MonoBehaviour
 
     async UniTaskVoid Start()
     {
-        await LocalizationSettings.InitializationOperation;
+        // 중복 인스턴스는 Awake 에서 Destroy 되지만 Start 는 그대로 실행된다.
+        // 토큰 없이 기다리면 파괴된 뒤에 ApplyLocale 이 돌아 예외가 난다.
+        var token = this.GetCancellationTokenOnDestroy();
+        await UniTask.WaitUntil(
+            () => LocalizationSettings.InitializationOperation.IsDone,
+            cancellationToken: token
+        );
 
         string saved = SaveManager.Instance != null
             ? SaveManager.Instance.Data.languageCode

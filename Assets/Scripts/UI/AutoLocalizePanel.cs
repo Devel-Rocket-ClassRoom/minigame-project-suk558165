@@ -36,7 +36,15 @@ public class AutoLocalizePanel : MonoBehaviour
 
     async UniTaskVoid InitAndRefresh()
     {
-        await LocalizationSettings.InitializationOperation;
+        // 초기화를 기다리는 동안 패널이 파괴될 수 있다(일시정지 옵션 패널처럼
+        // 생성 직후 닫히는 경우). 토큰 없이 두면 파괴된 오브젝트에서
+        // Bind()/Refresh() 가 실행돼 MissingReferenceException 이 난다.
+        var token = this.GetCancellationTokenOnDestroy();
+        await UniTask.WaitUntil(
+            () => LocalizationSettings.InitializationOperation.IsDone,
+            cancellationToken: token
+        );
+
         if (!_initialized)
         {
             Bind();
