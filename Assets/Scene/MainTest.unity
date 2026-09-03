@@ -601,19 +601,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 0}
-  smoothTime: 0.2
-  horizontalOffset: -2
-  verticalOffset: 1.8
-  lookAheadDistance: 2
-  lookAheadSpeed: 3
+  horizontalSmoothTime: 0.18
+  verticalSmoothTime: 0.32
+  deadzoneWidth: 2.4
+  deadzoneHeight: 3.2
+  followGroundedYOnly: 1
+  horizontalOffset: 0
+  verticalOffset: 1.2
+  lookAheadDistance: 2.2
+  lookAheadSpeed: 2.5
   orthographicSize: 6
   cameraZ: -10
   useBounds: 0
   autoDetectBoundsFromTilemap: 1
+  boundsPadding: 0
   minX: -100
   maxX: 100
   minY: -100
   maxY: 100
+  shakeMagnitude: 0.25
+  shakeDuration: 0.18
 --- !u!1 &2085237426
 GameObject:
   m_ObjectHideFlags: 0

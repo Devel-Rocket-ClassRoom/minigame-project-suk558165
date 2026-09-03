@@ -81,6 +81,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         DamagePopup.Spawn(transform.position + Vector3.up * 0.5f, finalDamage, isPlayerDamage: true);
         ScreenHitEffect.Instance?.Flash();
+        CameraFollow.Instance?.Shake();
 
         // 1회성 부활: 죽을 데미지를 받았으나 부활 강화가 남아있으면 체력을 복구한다.
         if (hp <= 0f && MetaUpgrades.CanRevive)
