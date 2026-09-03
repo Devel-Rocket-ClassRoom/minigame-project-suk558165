@@ -205,8 +205,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0d8cfc06d909d924798741a37f4b1e2d, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -3170574969009359605, guid: c20b38a0ee9de9e49a52c73df6b5eaa0, type: 3}
+  m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
@@ -214,7 +214,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.25
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &4778895324094875390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1538,8 +1538,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0d8cfc06d909d924798741a37f4b1e2d, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -8743756344971347990, guid: c20b38a0ee9de9e49a52c73df6b5eaa0, type: 3}
+  m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1547,7 +1547,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.25
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &8990205793717015970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2432,8 +2432,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0d8cfc06d909d924798741a37f4b1e2d, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -976802306255237695, guid: c20b38a0ee9de9e49a52c73df6b5eaa0, type: 3}
+  m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2441,7 +2441,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.25
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &4418528554277839254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2581,8 +2581,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0d8cfc06d909d924798741a37f4b1e2d, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -2097460500168193084, guid: c20b38a0ee9de9e49a52c73df6b5eaa0, type: 3}
+  m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2590,7 +2590,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.25
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &5518222705814916755
 MonoBehaviour:
   m_ObjectHideFlags: 0
