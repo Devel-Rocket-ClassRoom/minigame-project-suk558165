@@ -361,7 +361,14 @@ public class RoomManager : MonoBehaviour
     {
         if (cameraFollow == null)
             cameraFollow = CameraFollow.Instance;
-        cameraFollow?.ForcePosition(worldPos);
-        cameraFollow?.SnapToTarget();
+        if (cameraFollow == null)
+            return;
+
+        // 플레이어가 있으면 대상 기준으로 정렬한다(오프셋·룩어헤드·경계까지 반영).
+        // 없을 때만 좌표로 강제 이동. 둘 다 새 방 경계로 클램프된다.
+        if (player != null)
+            cameraFollow.SnapToTarget();
+        else
+            cameraFollow.ForcePosition(worldPos);
     }
 }

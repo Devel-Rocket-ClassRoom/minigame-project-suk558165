@@ -25,6 +25,9 @@ public class WeaponData : ScriptableObject
     public float damage = 20f;
     public float attackCooldown = 0.5f;
 
+    [Tooltip("근접 사거리(몸통 앞으로 뻗는 거리). 0이면 PlayerWeapon의 기본값 사용")]
+    public float hitRange = 0f;
+
     [Header("Audio")]
     public AudioClip attackSound;
 

@@ -7,6 +7,9 @@ public class InputManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics() => Instance = null;
 
+    public KeyCode MoveLeft { get; private set; } = KeyCode.LeftArrow;
+    public KeyCode MoveRight { get; private set; } = KeyCode.RightArrow;
+    public KeyCode MoveDown { get; private set; } = KeyCode.DownArrow;
     public KeyCode Jump { get; private set; } = KeyCode.Space;
     public KeyCode Dash { get; private set; } = KeyCode.Z;
     public KeyCode Attack { get; private set; } = KeyCode.X;
@@ -36,6 +39,9 @@ public class InputManager : MonoBehaviour
             return;
 
         var kb = SaveManager.Instance.Data.keyBindings;
+        MoveLeft = ParseKey(kb.moveLeftKey, KeyCode.LeftArrow);
+        MoveRight = ParseKey(kb.moveRightKey, KeyCode.RightArrow);
+        MoveDown = ParseKey(kb.moveDownKey, KeyCode.DownArrow);
         Jump = ParseKey(kb.jumpKey, KeyCode.Space);
         Dash = ParseKey(kb.dashKey, KeyCode.Z);
         Attack = ParseKey(kb.attackKey, KeyCode.X);
@@ -52,6 +58,18 @@ public class InputManager : MonoBehaviour
         var kb = SaveManager.Instance.Data.keyBindings;
         switch (action)
         {
+            case "MoveLeft":
+                MoveLeft = key;
+                kb.moveLeftKey = key.ToString();
+                break;
+            case "MoveRight":
+                MoveRight = key;
+                kb.moveRightKey = key.ToString();
+                break;
+            case "MoveDown":
+                MoveDown = key;
+                kb.moveDownKey = key.ToString();
+                break;
             case "Jump":
                 Jump = key;
                 kb.jumpKey = key.ToString();

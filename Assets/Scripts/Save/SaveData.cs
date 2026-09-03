@@ -50,6 +50,9 @@ public class SaveData
 [Serializable]
 public class KeyBindingSaveData
 {
+    public string moveLeftKey = "LeftArrow";
+    public string moveRightKey = "RightArrow";
+    public string moveDownKey = "DownArrow";
     public string jumpKey = "Space";
     public string dashKey = "Z";
     public string attackKey = "X";

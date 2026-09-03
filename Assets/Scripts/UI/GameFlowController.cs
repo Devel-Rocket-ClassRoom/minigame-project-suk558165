@@ -45,11 +45,17 @@ public class GameFlowController : MonoBehaviour
     private GameObject tutorialInstance;
     private GameObject uiCanvasInstance;
 
+    /// <summary>UICanvas 프리팹의 Screen Space 캔버스. 상점 등 런타임 UI의 부모로 쓴다.</summary>
+    public Canvas UICanvas { get; private set; }
+
     void Awake()
     {
         Instance = this;
         if (uiCanvasPrefab != null)
+        {
             uiCanvasInstance = Instantiate(uiCanvasPrefab);
+            UICanvas = uiCanvasInstance.GetComponentInChildren<Canvas>(true);
+        }
 
         // SaveManager 가 씬에 없으면 자동 생성
         if (SaveManager.Instance == null)
@@ -104,8 +110,8 @@ public class GameFlowController : MonoBehaviour
         if (InventoryUI.IsOpen)
             return;
 
-        // GameOver / GameClear 가 이미 화면을 점유 중이면 무시
-        if (Time.timeScale == 0f && !PauseMenu.IsPaused)
+        // GameOver / GameClear / 상점 등이 이미 화면을 점유 중이면 무시
+        if (TimeScaleLock.IsFrozen && !PauseMenu.IsPaused)
             return;
 
         if (PauseMenu.IsPaused)
@@ -145,12 +151,18 @@ public class GameFlowController : MonoBehaviour
     public void GoToTitle()
     {
         AudioManager.Instance?.PlayDefaultBGM();
+        TimeScaleLock.ReleaseAll();
         roomManager.ResetDungeon();
 
         if (villageInstance != null)
         {
             Destroy(villageInstance);
             villageInstance = null;
+        }
+        if (tutorialInstance != null)
+        {
+            Destroy(tutorialInstance);
+            tutorialInstance = null;
         }
         if (playerInstance != null)
         {
@@ -331,6 +343,10 @@ public class GameFlowController : MonoBehaviour
             SaveManager.Instance.Data.lastLocation = "Village";
             SaveManager.Instance.Save();
         }
+
+        // 이미 마을이 떠 있으면 중복 생성하지 않도록 먼저 정리
+        if (villageInstance != null)
+            Destroy(villageInstance);
 
         villageInstance = Instantiate(villagePrefab);
         SetupSceneCamera(villageInstance);

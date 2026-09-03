@@ -266,7 +266,7 @@ GameObject:
   - component: {fileID: 1404150574}
   - component: {fileID: 1404150575}
   m_Layer: 0
-  m_Name: AudioManeger
+  m_Name: AudioManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -601,19 +601,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 0}
-  smoothTime: 0.2
-  horizontalOffset: -2
-  verticalOffset: 1.8
-  lookAheadDistance: 2
-  lookAheadSpeed: 3
+  horizontalSmoothTime: 0.18
+  verticalSmoothTime: 0.32
+  deadzoneWidth: 2.4
+  deadzoneHeight: 3.2
+  followGroundedYOnly: 1
+  horizontalOffset: 0
+  verticalOffset: 1.2
+  lookAheadDistance: 2.2
+  lookAheadSpeed: 2.5
   orthographicSize: 6
   cameraZ: -10
   useBounds: 0
   autoDetectBoundsFromTilemap: 1
+  boundsPadding: 0
   minX: -100
   maxX: 100
   minY: -100
   maxY: 100
+  shakeMagnitude: 0.25
+  shakeDuration: 0.18
 --- !u!1 &2085237426
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,6 +661,16 @@ MonoBehaviour:
   - {fileID: 4862789034877095688, guid: 545385a74b771164a86188a1e2c3ee37, type: 3}
   - {fileID: 7780680429786160934, guid: 4c0cbaa4da30f7a40a0111504beeb8c5, type: 3}
   - {fileID: 8973464995475913087, guid: 280fc0722fa8d3c4f83c8319327649f9, type: 3}
+  - {fileID: 5346191361574880811, guid: e40e26298f5d4c746a754a3a899ef68b, type: 3}
+  - {fileID: 5346191361574880811, guid: ae8e423e2dc34634faffe05e413ef260, type: 3}
+  - {fileID: 5346191361574880811, guid: be01ccee27370fa479da6a2ed897fb9d, type: 3}
+  - {fileID: 5346191361574880811, guid: f49a76001f88e6143bb73ebfbb51c075, type: 3}
+  - {fileID: 5346191361574880811, guid: 7c4b25e40a362cf4798ab9072b4f64f1, type: 3}
+  - {fileID: 5346191361574880811, guid: 5e98ee7b55c703c4782c4e5fddf9b9ac, type: 3}
+  - {fileID: 5346191361574880811, guid: 2847a570b42db6a44968ad2ed04847f3, type: 3}
+  - {fileID: 5346191361574880811, guid: 845f55f9c4c44dd4fb05525a0b11522f, type: 3}
+  - {fileID: 5346191361574880811, guid: caa36c1acdf537644abdf13908cc6e9e, type: 3}
+  - {fileID: 5346191361574880811, guid: 69cc48d9ffbc1a649921287054b493c4, type: 3}
   shopRoomPrefab: {fileID: 7677070055771143526, guid: 03c2759f31d5c404087bd1920bfaf74b, type: 3}
   miniBossRoomPrefab: {fileID: 2033410180147792784, guid: 09aa310d8bbcdc048a8c5180fdbeba2d, type: 3}
   bossRoomPrefab: {fileID: 203403302495070545, guid: 25fe004c5c21f0c409c614a5e5ad0ee3, type: 3}

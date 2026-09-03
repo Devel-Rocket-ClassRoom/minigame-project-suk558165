@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class TreasureChest : MonoBehaviour
@@ -103,20 +104,26 @@ public class TreasureChest : MonoBehaviour
     // Animator 없을 때: 바운스 → 셰이크 → 축소 소멸
     async UniTaskVoid BuiltinOpenRoutine()
     {
+        // 연출 도중 방이 전환되면 상자가 파괴된다. 토큰 없이 돌리면
+        // 파괴된 transform 에 접근해 MissingReferenceException 이 난다.
+        var token = this.GetCancellationTokenOnDestroy();
+
         // 1. 위로 튀어오르기
-        await MoveLocal(originPos, originPos + Vector3.up * 0.35f, 0.12f);
-        await MoveLocal(transform.position, originPos, 0.08f);
+        await MoveLocal(originPos, originPos + Vector3.up * 0.35f, 0.12f, token);
+        await MoveLocal(transform.position, originPos, 0.08f, token);
 
         // 2. 찌그러짐 (squash & stretch)
         await ScaleTo(
             new Vector3(originScale.x * 1.35f, originScale.y * 0.65f, originScale.z),
-            0.07f
+            0.07f,
+            token
         );
         await ScaleTo(
             new Vector3(originScale.x * 0.75f, originScale.y * 1.35f, originScale.z),
-            0.07f
+            0.07f,
+            token
         );
-        await ScaleTo(originScale, 0.06f);
+        await ScaleTo(originScale, 0.06f, token);
 
         // 3. 셰이크
         float shakeTime = 0.25f;
@@ -128,24 +135,24 @@ public class TreasureChest : MonoBehaviour
             float offset = Mathf.Lerp(intensity, 0f, progress);
             transform.position = originPos + (Vector3)(Random.insideUnitCircle * offset);
             elapsed += Time.deltaTime;
-            await UniTask.Yield();
+            await UniTask.Yield(token);
         }
         transform.position = originPos;
 
         // 4. 축소되며 소멸
-        await ScaleTo(Vector3.zero, 0.2f);
+        await ScaleTo(Vector3.zero, 0.2f, token);
 
         Destroy(gameObject);
     }
 
-    async UniTask MoveLocal(Vector3 from, Vector3 to, float duration)
+    async UniTask MoveLocal(Vector3 from, Vector3 to, float duration, CancellationToken token)
     {
         float elapsed = 0f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             transform.position = Vector3.Lerp(from, to, elapsed / duration);
-            await UniTask.Yield();
+            await UniTask.Yield(token);
         }
         transform.position = to;
     }
@@ -180,7 +187,7 @@ public class TreasureChest : MonoBehaviour
         }
     }
 
-    async UniTask ScaleTo(Vector3 target, float duration)
+    async UniTask ScaleTo(Vector3 target, float duration, CancellationToken token)
     {
         Vector3 start = transform.localScale;
         float elapsed = 0f;
@@ -188,7 +195,7 @@ public class TreasureChest : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             transform.localScale = Vector3.Lerp(start, target, elapsed / duration);
-            await UniTask.Yield();
+            await UniTask.Yield(token);
         }
         transform.localScale = target;
     }

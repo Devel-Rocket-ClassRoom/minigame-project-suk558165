@@ -29,7 +29,11 @@ public class WeaponInventory : MonoBehaviour
 
     void Update()
     {
-        if (weapons.Count < 2 || InventoryUI.IsOpen)
+        if (weapons.Count < 2)
+            return;
+
+        // PlayerCombat 과 동일한 가드. 이게 없으면 대화·상점·일시정지 중에도 무기가 바뀐다.
+        if (InventoryUI.IsOpen || ShopUI.IsOpen || PauseMenu.IsPaused || DialogueUI.IsOpen)
             return;
 
         var switchKey = InputManager.Instance?.WeaponSwitch ?? KeyCode.C;

@@ -49,7 +49,7 @@ public class PauseMenu : MonoBehaviour
     public void Open()
     {
         IsPaused = true;
-        Time.timeScale = 0f;
+        TimeScaleLock.Acquire(this);
         ShowPanel(pausePanel);
         optionsPanelInstance?.gameObject.SetActive(false);
     }
@@ -57,7 +57,7 @@ public class PauseMenu : MonoBehaviour
     public void Close()
     {
         IsPaused = false;
-        Time.timeScale = 1f;
+        TimeScaleLock.Release(this);
         HidePanel(pausePanel);
         optionsPanelInstance?.gameObject.SetActive(false);
     }
@@ -115,6 +115,7 @@ public class PauseMenu : MonoBehaviour
     public void ForceClose()
     {
         IsPaused = false;
+        TimeScaleLock.Release(this);
         HidePanel(pausePanel);
         optionsPanelInstance?.gameObject.SetActive(false);
     }

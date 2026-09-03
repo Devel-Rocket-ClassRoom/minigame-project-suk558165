@@ -143,7 +143,7 @@ public class InventoryUI : MonoBehaviour
 
         IsOpen = true;
         frame.SetActive(true);
-        Time.timeScale = 0f;
+        TimeScaleLock.Acquire(this);
         Refresh();
     }
 
@@ -154,7 +154,7 @@ public class InventoryUI : MonoBehaviour
 
         IsOpen = false;
         frame.SetActive(false);
-        Time.timeScale = 1f;
+        TimeScaleLock.Release(this);
         ItemTooltip.Instance?.Hide();
     }
 

@@ -12,6 +12,10 @@ public class PlayerCombat : MonoBehaviour
     public Transform firePoint;
     public float projectileSpeed = 12f;
 
+    [Header("Input")]
+    [Tooltip("쿨다운 중에 누른 공격을 이 시간만큼 기억했다가 쿨다운이 풀리면 바로 낸다")]
+    public float attackBufferTime = 0.16f;
+
     [Header("Attack Clips")]
     [SerializeField]
     private AnimationClip meleeAttackClip;
@@ -45,6 +49,7 @@ public class PlayerCombat : MonoBehaviour
     private StatBonus pendingRangedBonus;
     private WeaponType pendingWeaponType;
     private bool hasPendingRanged;
+    private float attackBufferTimer;
 
     readonly Dictionary<GameObject, ObjectPool<Projectile>> projPools = new();
 
@@ -107,10 +112,20 @@ public class PlayerCombat : MonoBehaviour
 
         var currentWeapon = weaponInventory != null ? weaponInventory.Current : null;
         var attackKey = InputManager.Instance?.Attack ?? KeyCode.X;
-        if (!Input.GetKeyDown(attackKey) || currentWeapon == null)
+
+        // 입력 버퍼: 쿨다운 중에 누른 공격을 잠깐 기억한다.
+        // 이게 없으면 연타 시 타이밍이 조금만 일러도 입력이 통째로 사라진다.
+        if (Input.GetKeyDown(attackKey))
+            attackBufferTimer = attackBufferTime;
+        else
+            attackBufferTimer -= Time.deltaTime;
+
+        if (attackBufferTimer <= 0f || currentWeapon == null)
             return;
         if (attackTimer > 0f)
             return;
+
+        attackBufferTimer = 0f;
 
         // 근접 무기는 공중 1회 제한, 원거리/마법은 제한 없이 쏠 수 있음
         bool isMelee = currentWeapon.weaponType == WeaponType.Melee;

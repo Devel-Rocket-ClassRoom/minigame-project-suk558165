@@ -102,7 +102,13 @@ public class TitleOptionsUI : MonoBehaviour
     /// </summary>
     async UniTaskVoid RefreshLocalizedAfterInit()
     {
-        await LocalizationSettings.InitializationOperation;
+        // 대기 도중 패널이 파괴되면 중단한다 (파괴된 오브젝트 접근 방지)
+        var token = this.GetCancellationTokenOnDestroy();
+        await UniTask.WaitUntil(
+            () => LocalizationSettings.InitializationOperation.IsDone,
+            cancellationToken: token
+        );
+
         if (fullscreenDropdown == null)
             return;
         SetupFullscreenDropdown();

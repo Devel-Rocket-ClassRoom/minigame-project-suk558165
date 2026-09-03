@@ -72,7 +72,7 @@ public class GameClearUI : MonoBehaviour
             return;
         triggered = true;
         RunStats.Instance?.StopTimer();
-        Time.timeScale = 0f;
+        TimeScaleLock.Acquire(this);
 
         for (var t = transform; t != null; t = t.parent)
         {
@@ -222,7 +222,8 @@ public class GameClearUI : MonoBehaviour
 
     public void ReturnToVillage()
     {
-        Time.timeScale = 1f;
+        // 마을 귀환은 상태 전체 재설정 — 남아있는 잠금까지 전부 해제한다.
+        TimeScaleLock.ReleaseAll();
         GameFlowController.Instance?.ReturnToVillage();
     }
 
@@ -237,7 +238,7 @@ public class GameClearUI : MonoBehaviour
 
     public void ResetUI()
     {
-        Time.timeScale = 1f;
+        TimeScaleLock.Release(this);
         triggered = false;
         canReturn = false;
         _masterCts?.Cancel();

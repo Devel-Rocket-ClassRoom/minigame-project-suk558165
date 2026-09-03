@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 9500000}
   - component: {fileID: 6100000}
   - component: {fileID: 7740948866993071214}
-  - component: {fileID: 7588921145118788374}
   - component: {fileID: 6507411717424860390}
   - component: {fileID: 217879244351405584}
   - component: {fileID: 3765672486079037674}
@@ -215,22 +214,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b623391606bf38b469f8cbdcd5f29163, type: 2}
   - {fileID: 11400000, guid: 247d9f0a91328af49924a001f05b9e9b, type: 2}
   currentIndex: 0
---- !u!114 &7588921145118788374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43728f4994615924795e52a65f701d02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthDisplay
-  fillImage: {fileID: 0}
-  hpText: {fileID: 0}
-  lowHpThreshold: 30
-  lowHpColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &6507411717424860390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,7 +309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc641c037ba40a4da644c315f61401e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  weaponInventory: {fileID: 0}
+  weaponInventory: {fileID: 7740948866993071214}
 --- !u!114 &1014718216165679732
 MonoBehaviour:
   m_ObjectHideFlags: 0

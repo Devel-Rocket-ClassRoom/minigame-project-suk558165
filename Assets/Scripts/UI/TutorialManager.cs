@@ -123,7 +123,9 @@ public class TutorialManager : MonoBehaviour
         switch (input)
         {
             case TutorialInput.MoveLeftRight:
-                return Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
+                var im = InputManager.Instance;
+                return Input.GetKeyDown(im?.MoveLeft ?? KeyCode.LeftArrow)
+                    || Input.GetKeyDown(im?.MoveRight ?? KeyCode.RightArrow);
             case TutorialInput.Jump:
                 var jumpKey = InputManager.Instance?.Jump ?? KeyCode.Space;
                 return Input.GetKeyDown(jumpKey);

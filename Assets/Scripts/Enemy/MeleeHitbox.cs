@@ -3,6 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class MeleeHitbox : MonoBehaviour
 {
+    [Tooltip(
+        "EnemyController 를 가진 적은 이 값을 무시하고 EnemyController.damage 를 사용한다. "
+        + "보스처럼 컨트롤러가 다른 경우에만 이 값이 쓰인다."
+    )]
     public float damage = 10f;
     public float knockbackForce = 10f;
 
@@ -17,6 +21,11 @@ public class MeleeHitbox : MonoBehaviour
         col.isTrigger = true;
         col.enabled = false;
         owner = GetComponentInParent<EnemyController>();
+
+        // 데미지 단일 출처: 근접 적의 피해량이 두 군데에 따로 적혀 어긋나는 것을 막는다.
+        // (인스펙터에서 EnemyController.damage 를 고쳐도 근접 피해가 안 바뀌던 문제)
+        if (owner != null)
+            damage = owner.damage;
     }
 
     void LateUpdate()
