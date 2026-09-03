@@ -32,6 +32,10 @@ public class GameOverUI : MonoBehaviour
     public TextMeshProUGUI returnHintText;
     public KeyCode returnKey = KeyCode.X;
 
+    [Header("사망 연출")]
+    [Tooltip("죽는 애니메이션이 재생될 시간. 이 시간이 지난 뒤 게임을 멈추고 결과창을 띄운다.")]
+    public float deathAnimDuration = 1.2f;
+
     private bool triggered;
     private bool canReturn;
     private CancellationTokenSource _masterCts;
@@ -79,7 +83,6 @@ public class GameOverUI : MonoBehaviour
                 triggered = true;
                 RunStats.Instance?.StopTimer();
                 AudioManager.Instance?.PlaySFX(gameOverSound);
-                Time.timeScale = 0f;
                 _masterCts?.Cancel();
                 _masterCts?.Dispose();
                 _masterCts = new CancellationTokenSource();
@@ -94,6 +97,17 @@ public class GameOverUI : MonoBehaviour
 
     async UniTaskVoid ShowRoutine(CancellationToken token)
     {
+        // 죽는 애니메이션이 다 나온 뒤에 게임을 멈춘다.
+        // 사망 프레임에 바로 timeScale=0 을 걸면 Animator(UpdateMode=Normal)가
+        // 그대로 얼어붙어 사망 모션이 한 프레임만 보이고 정지한다.
+        if (deathAnimDuration > 0f)
+            await UniTask.Delay(
+                System.TimeSpan.FromSeconds(deathAnimDuration),
+                cancellationToken: token
+            );
+
+        TimeScaleLock.Acquire(this);
+
         BossHealthBarUI.Instance?.Hide();
         WeaponSlotUI.Instance?.SetActive(false);
         MinimapController.Instance?.Hide();
@@ -225,7 +239,8 @@ public class GameOverUI : MonoBehaviour
 
     public void ReturnToVillage()
     {
-        Time.timeScale = 1f;
+        // 마을 귀환은 상태 전체 재설정 — 남아있는 잠금까지 전부 해제한다.
+        TimeScaleLock.ReleaseAll();
         GameFlowController.Instance?.ReturnToVillage();
     }
 
@@ -240,7 +255,7 @@ public class GameOverUI : MonoBehaviour
 
     public void ResetUI()
     {
-        Time.timeScale = 1f;
+        TimeScaleLock.Release(this);
         triggered = false;
         canReturn = false;
         _masterCts?.Cancel();

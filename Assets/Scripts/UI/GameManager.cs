@@ -15,22 +15,12 @@ public class GameManager : MonoBehaviour
             var rm = RoomManager.Instance;
             if (rm != null && rm.CurrentRoomNumber > 0)
             {
-                int count = 0;
                 foreach (var e in EnemyController.Instances.ToArray())
-                {
                     e.TakeDamage(99999f);
-                    count++;
-                }
                 foreach (var m in MiniBossController.Instances.ToArray())
-                {
                     m.TakeDamage(99999f);
-                    count++;
-                }
                 foreach (var b in BossController.Instances.ToArray())
-                {
                     b.TakeDamage(99999f);
-                    count++;
-                }
             }
         }
 #endif

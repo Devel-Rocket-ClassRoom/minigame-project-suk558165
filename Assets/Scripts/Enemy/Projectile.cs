@@ -6,7 +6,10 @@ public class Projectile : MonoBehaviour
     public float lifetime = 5f;
     [Tooltip("원본 스프라이트가 향하는 각도 (오른쪽=0, 왼쪽=180)")]
     public float spriteAngleOffset;
-    
+
+    [Tooltip("이 레이어에 닿으면 소멸한다. 비워두면 Ground 를 사용 (일방향 발판은 통과)")]
+    public LayerMask blockingLayer;
+
     public ObjectPool<Projectile> Pool;
 
     private bool released;
@@ -28,6 +31,9 @@ public class Projectile : MonoBehaviour
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        if (blockingLayer == 0)
+            blockingLayer = LayerMask.GetMask("Ground");
 
         // 모든 콜라이더를 트리거로 설정 (이전 RequireComponent로 남은 콜라이더 대응)
         foreach (var col in GetComponents<Collider2D>())
@@ -96,6 +102,13 @@ public class Projectile : MonoBehaviour
 
         if (shooter != null && other.transform.IsChildOf(shooter.transform))
             return;
+
+        // 벽·바닥에 막힘. 이게 없으면 화살이 지형을 그대로 통과한다.
+        if ((blockingLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            ReleaseSelf();
+            return;
+        }
 
         int enemyLayer = LayerMask.NameToLayer("Enemy");
         int shooterLayer = shooter != null ? shooter.layer : -1;

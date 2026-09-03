@@ -140,6 +140,9 @@ public class ControlPanelUI : MonoBehaviour
     static KeyCode GetKey(InputManager im, string action) =>
         action switch
         {
+            "MoveLeft" => im.MoveLeft,
+            "MoveRight" => im.MoveRight,
+            "MoveDown" => im.MoveDown,
             "Jump" => im.Jump,
             "Dash" => im.Dash,
             "Attack" => im.Attack,

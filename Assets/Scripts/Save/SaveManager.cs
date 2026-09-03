@@ -24,6 +24,10 @@ public class SaveManager : MonoBehaviour
     private static readonly byte[] LegacyIV = Encoding.UTF8.GetBytes("MG_InitVec_16B!");
 
     private string FilePath => Path.Combine(Application.persistentDataPath, "save.dat");
+    private string TempPath => FilePath + ".tmp";
+    private string BackupPath => FilePath + ".bak";
+
+    private bool isDirty;
 
     void Awake()
     {
@@ -37,44 +41,113 @@ public class SaveManager : MonoBehaviour
         Load();
     }
 
+    void OnApplicationQuit() => Flush();
+
+    void OnApplicationPause(bool paused)
+    {
+        if (paused)
+            Flush();
+    }
+
+    /// <summary>
+    /// 저장 예약. 골드 획득처럼 자주 일어나는 변경은 이걸 쓴다.
+    /// 실제 디스크 쓰기는 Flush() 시점(방 전환·씬 이탈·종료)에 1회만 일어난다.
+    /// </summary>
+    public void MarkDirty() => isDirty = true;
+
+    /// <summary>예약된 변경이 있을 때만 실제로 기록한다.</summary>
+    public void Flush()
+    {
+        if (isDirty)
+            Save();
+    }
+
     // ── 저장 ──
+    // 원자적 쓰기: 임시 파일에 먼저 쓰고 교체한다.
+    // 곧바로 덮어쓰면 쓰는 도중 강제 종료 시 세이브가 통째로 깨지고,
+    // 암호화되어 있어 수동 복구도 불가능하다.
     public void Save()
     {
-        string json = JsonUtility.ToJson(Data, false);
-        byte[] encrypted = Encrypt(json);
-        File.WriteAllBytes(FilePath, encrypted);
+        try
+        {
+            string json = JsonUtility.ToJson(Data, false);
+            byte[] encrypted = Encrypt(json);
+
+            File.WriteAllBytes(TempPath, encrypted);
+
+            if (File.Exists(FilePath))
+                File.Replace(TempPath, FilePath, BackupPath);
+            else
+                File.Move(TempPath, FilePath);
+
+            isDirty = false;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[SaveManager] 저장 실패: {e.Message}");
+        }
     }
 
     // ── 불러오기 ──
     public void Load()
     {
-        if (!File.Exists(FilePath))
-        {
-            Data = new SaveData();
-            ApplyPlayerPrefsVolume();
+        // 정상 파일 → 직전 백업 순으로 시도.
+        // 쓰기 도중 종료돼 본 파일이 깨졌더라도 한 판 전 상태로는 복구된다.
+        if (TryLoadFrom(FilePath) || TryLoadFrom(BackupPath))
             return;
-        }
-
-        byte[] encrypted = File.ReadAllBytes(FilePath);
-
-        // 현재 IV로 복호화 시도
-        if (TryDecrypt(encrypted, IV, out string json))
-        {
-            Data = JsonUtility.FromJson<SaveData>(json);
-            Migrate();
-            return;
-        }
-
-        // 구버전(15바이트 IV) 세이브 호환 복호화
-        if (TryDecrypt(encrypted, LegacyIV, out json))
-        {
-            Data = JsonUtility.FromJson<SaveData>(json);
-            Save(); // 새 IV로 덮어쓰기
-            Migrate();
-            return;
-        }
 
         Data = new SaveData();
+        ApplyPlayerPrefsVolume();
+    }
+
+    bool TryLoadFrom(string path)
+    {
+        if (!File.Exists(path))
+            return false;
+
+        byte[] encrypted;
+        try
+        {
+            encrypted = File.ReadAllBytes(path);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[SaveManager] 읽기 실패 ({path}): {e.Message}");
+            return false;
+        }
+
+        // 현재 IV → 구버전(15바이트 IV) 순으로 복호화 시도
+        if (TryDecrypt(encrypted, IV, out string json) && TryParse(json))
+        {
+            Migrate();
+            return true;
+        }
+
+        if (TryDecrypt(encrypted, LegacyIV, out json) && TryParse(json))
+        {
+            Save(); // 새 IV로 덮어쓰기
+            Migrate();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>복호화는 됐지만 내용이 세이브 형식이 아닐 수 있으므로 파싱 결과를 검증한다.</summary>
+    bool TryParse(string json)
+    {
+        try
+        {
+            var parsed = JsonUtility.FromJson<SaveData>(json);
+            if (parsed == null)
+                return false;
+            Data = parsed;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // ── 세이브 초기화 ──

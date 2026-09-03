@@ -119,8 +119,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        float left = Input.GetKey(KeyCode.LeftArrow) ? -1f : 0f;
-        float right = Input.GetKey(KeyCode.RightArrow) ? 1f : 0f;
+        var im = InputManager.Instance;
+        float left = Input.GetKey(im?.MoveLeft ?? KeyCode.LeftArrow) ? -1f : 0f;
+        float right = Input.GetKey(im?.MoveRight ?? KeyCode.RightArrow) ? 1f : 0f;
         MoveInput = left + right;
 
         if (IsGrounded && !wasGrounded)
@@ -140,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
         if (!Input.GetKeyDown(jumpKey))
             return;
 
-        bool pressingDown = Input.GetKey(KeyCode.DownArrow);
+        bool pressingDown = Input.GetKey(InputManager.Instance?.MoveDown ?? KeyCode.DownArrow);
 
         if (pressingDown && IsOnPlatform)
         {
@@ -346,11 +347,15 @@ public class PlayerMovement : MonoBehaviour
 
         // 몸 전체가 플랫폼 아래로 빠져나가면 즉시 충돌 복구.
         // 타임아웃은 안전장치일 뿐이며, 여기 걸리면 플랫폼 안에서 복구되어 튕길 수 있다.
+        // 통과 도중 방이 전환되면 플레이어가 파괴될 수 있으므로 토큰으로 중단시킨다.
+        var token = this.GetCancellationTokenOnDestroy();
         float elapsed = 0f;
         while (elapsed < 0.6f)
         {
-            await UniTask.Yield();
+            await UniTask.Yield(token);
             elapsed += Time.deltaTime;
+            if (mainCollider == null)
+                return;
             if (mainCollider.bounds.max.y < lowestBottom)
                 break;
         }

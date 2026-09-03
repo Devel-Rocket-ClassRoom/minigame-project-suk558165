@@ -11,6 +11,10 @@ public class EnemyHealthBar : MonoBehaviour
 
     private static Sprite _whiteSprite;
 
+    // 도메인 리로드를 끈 상태에서 이전 플레이의 파괴된 텍스처가 남지 않도록 초기화
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics() => _whiteSprite = null;
+
     public void Init(Vector3 worldOffset, float scale = 1f)
     {
         BuildBar(worldOffset, scale);
@@ -59,21 +63,25 @@ public class EnemyHealthBar : MonoBehaviour
 
     void Update()
     {
-        if (fillTransform == null)
+        if (fillTransform == null || Mathf.Approximately(displayRatio, targetRatio))
             return;
         displayRatio = Mathf.MoveTowards(displayRatio, targetRatio, Time.deltaTime * drainSpeed);
-        fillTransform.localScale = new Vector3(displayRatio, 1f, 1f);
-        fillTransform.localPosition = new Vector3((displayRatio - 1f) * 0.5f, 0f, 0f);
+        ApplyFill();
     }
 
     public void SetHealth(float current, float max)
     {
         if (fillTransform == null)
             return;
+        // targetRatio 만 갱신한다. 여기서 displayRatio 까지 대입하면
+        // Update 의 drainSpeed 보간이 무의미해져 체력이 즉시 깎여 보인다.
         targetRatio = max > 0f ? Mathf.Clamp01(current / max) : 0f;
-        displayRatio = targetRatio;
+        bgTransform.gameObject.SetActive(current < max && current > 0f);
+    }
+
+    void ApplyFill()
+    {
         fillTransform.localScale = new Vector3(displayRatio, 1f, 1f);
         fillTransform.localPosition = new Vector3((displayRatio - 1f) * 0.5f, 0f, 0f);
-        bgTransform.gameObject.SetActive(current < max && current > 0f);
     }
 }

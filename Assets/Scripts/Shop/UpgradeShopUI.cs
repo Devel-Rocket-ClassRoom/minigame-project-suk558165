@@ -89,7 +89,7 @@ public class UpgradeShopUI : MonoBehaviour
 
         frame.SetActive(true);
         openCount++;
-        Time.timeScale = 0f;
+        TimeScaleLock.Acquire(this);
     }
 
     public void Close()
@@ -99,8 +99,7 @@ public class UpgradeShopUI : MonoBehaviour
         frame.SetActive(false);
         openCount = Mathf.Max(0, openCount - 1);
         closedFrame = Time.frameCount;
-        if (openCount == 0)
-            Time.timeScale = 1f;
+        TimeScaleLock.Release(this);
     }
 
     public void TryUpgrade(MetaUpgradeType type)

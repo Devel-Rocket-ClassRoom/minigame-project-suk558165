@@ -205,7 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   maxHp: 45
   moveSpeed: 1.8
-  damage: 10
+  damage: 8
   detectionRange: 7
   attackRange: 1.53
   attackCooldown: 1.2

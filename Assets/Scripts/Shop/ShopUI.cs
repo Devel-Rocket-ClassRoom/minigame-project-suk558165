@@ -103,7 +103,7 @@ public class ShopUI : MonoBehaviour
 
         frame.SetActive(true);
         openCount++;
-        Time.timeScale = 0f;
+        TimeScaleLock.Acquire(this);
     }
 
     public void Close()
@@ -114,8 +114,7 @@ public class ShopUI : MonoBehaviour
             openCount = Mathf.Max(0, openCount - 1);
             closedFrame = Time.frameCount;
             ItemTooltip.Instance?.Hide();
-            if (openCount == 0)
-                Time.timeScale = 1f;
+            TimeScaleLock.Release(this);
             OnClosed?.Invoke();
         }
     }

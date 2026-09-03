@@ -193,6 +193,18 @@ public class Inventory : MonoBehaviour
 
     public bool AddAccessory(AccessoryData data)
     {
+        // EquipAccessory 는 슬롯을 null 로 채워두므로 Count 만 보면
+        // 빈 슬롯이 있는데도 가득 찬 것으로 판정된다. 빈 칸부터 채운다.
+        for (int i = 0; i < accessories.Count; i++)
+        {
+            if (accessories[i] == null)
+            {
+                accessories[i] = data;
+                OnInventoryChanged?.Invoke();
+                return true;
+            }
+        }
+
         if (accessories.Count >= MaxAccessories)
             return false;
         accessories.Add(data);
@@ -233,7 +245,9 @@ public class Inventory : MonoBehaviour
         if (SaveManager.Instance == null)
             return;
         SaveManager.Instance.Data.gold = gold;
-        SaveManager.Instance.Save();
+        // 코인 1개마다 전체 세이브를 암호화해 디스크에 쓰면 전투 중 히칭이 생긴다.
+        // 예약만 걸고 실제 기록은 방 전환·종료 시점에 한 번만 한다.
+        SaveManager.Instance.MarkDirty();
     }
 
     public void LoadGold()
