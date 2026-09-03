@@ -667,6 +667,10 @@ MonoBehaviour:
   - {fileID: 5346191361574880811, guid: f49a76001f88e6143bb73ebfbb51c075, type: 3}
   - {fileID: 5346191361574880811, guid: 7c4b25e40a362cf4798ab9072b4f64f1, type: 3}
   - {fileID: 5346191361574880811, guid: 5e98ee7b55c703c4782c4e5fddf9b9ac, type: 3}
+  - {fileID: 5346191361574880811, guid: 2847a570b42db6a44968ad2ed04847f3, type: 3}
+  - {fileID: 5346191361574880811, guid: 845f55f9c4c44dd4fb05525a0b11522f, type: 3}
+  - {fileID: 5346191361574880811, guid: caa36c1acdf537644abdf13908cc6e9e, type: 3}
+  - {fileID: 5346191361574880811, guid: 69cc48d9ffbc1a649921287054b493c4, type: 3}
   shopRoomPrefab: {fileID: 7677070055771143526, guid: 03c2759f31d5c404087bd1920bfaf74b, type: 3}
   miniBossRoomPrefab: {fileID: 2033410180147792784, guid: 09aa310d8bbcdc048a8c5180fdbeba2d, type: 3}
   bossRoomPrefab: {fileID: 203403302495070545, guid: 25fe004c5c21f0c409c614a5e5ad0ee3, type: 3}
