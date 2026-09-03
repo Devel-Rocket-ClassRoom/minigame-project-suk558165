@@ -134,12 +134,23 @@ Assets/
 
 ### ⚠️ 아트 에셋은 이 저장소에 포함되어 있지 않습니다
 
-`Assets/Imported/` 는 `.gitignore` 로 제외되어 있습니다(에셋스토어 라이선스 재배포 방지).
-`Assets/Prefabs/Enemy/` 와 `Assets/Animations/` 가 이 폴더의 스프라이트를 참조하므로,
-**새로 클론한 상태에서는 스프라이트가 깨진 채로 실행됩니다.**
+`Assets/Imported/` 는 `.gitignore` 로 제외되어 **별도 저장소**에서 관리합니다.
 
-복원하려면 아래 폴더를 `Assets/Imported/` 아래에 **같은 폴더명 그대로** 다시 임포트해야 합니다.
-(괄호 안은 추적 중인 프리팹·애니메이션이 실제로 참조하는 파일 수)
+> **에셋 저장소**: https://github.com/Devel-Rocket-ClassRoom/minigame-project-assets-suk558165
+> (저장소 최상위의 `Imported/` 가 이 프로젝트의 `Assets/Imported/` 에 대응합니다)
+
+`Assets/Prefabs/Enemy/` 와 `Assets/Animations/` 가 이 폴더의 스프라이트를 참조하므로,
+**에셋 저장소를 받지 않으면 스프라이트가 깨진 채로 실행됩니다.**
+
+```bash
+git clone https://github.com/Devel-Rocket-ClassRoom/minigame-project-assets-suk558165.git /tmp/assets
+cp -r /tmp/assets/Imported Assets/
+```
+
+에셋을 수정했다면 **메인 저장소가 아니라 에셋 저장소에 커밋·푸시**해야 합니다.
+텍스처 임포트 설정(`.meta`)도 거기 들어있습니다.
+
+포함된 폴더 (괄호 안은 프리팹·애니메이션이 실제로 참조하는 파일 수):
 
 | 폴더 | 용도 |
 |---|---|
@@ -159,11 +170,11 @@ Assets/
 `2D Platformer Enemy Pack`, `2D SD Monster Pack`, `Apk` 는 임포트만 되어 있고
 현재 참조하는 자산이 하나도 없습니다(초기 프로토타입 잔재).
 
-#### 재임포트 후 반드시 맞춰야 하는 텍스처 설정
+#### 텍스처 임포트 설정
 
-`Assets/Imported/` 가 저장소에서 제외되므로 **`.meta` 의 임포트 설정도 함께 사라집니다.**
-기본값으로 다시 임포트하면 픽셀아트가 흐릿해지고 UI 테두리가 뭉개집니다.
-다음을 다시 적용해야 합니다.
+에셋 저장소에서 받으면 `.meta` 의 아래 설정이 함께 따라옵니다.
+에셋스토어에서 **새로 임포트할 때만** 직접 맞춰주세요 —
+기본값이면 픽셀아트가 흐릿해지고 UI 테두리가 뭉개집니다.
 
 | 설정 | 값 | 이유 |
 |---|---|---|
